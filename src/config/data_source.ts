@@ -4,9 +4,9 @@ export const AppDataSource = new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
-    username: process.env.DATA_BASE_NAME,
+    username: process.env.DATA_BASE_USER_NAME,
     password: process.env.DATA_BASE_PASSWORD,
-    database: "test_us_database",
+    database: process.env.DATA_BASE_NAME,
     synchronize: false, // dev용, 배포시 false
     logging: true,
     entities: ["./src/infrastructure/entities/*.ts"],

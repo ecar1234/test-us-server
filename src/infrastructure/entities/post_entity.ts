@@ -2,12 +2,16 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, One
 import { UserEntity } from "./user_entity";
 import { ApplicationEntity } from "./application_entity";
 
-type PostStatusType = 'active' | 'end' | 'expired';
+export enum PostStatusType {
+    ACTIVE = 'active',
+    END = 'end',
+    EXPIRED = 'expired',
+}
 
 @Entity('Post')
 export class PostEntity {
     @PrimaryGeneratedColumn('uuid')
-    post_id: string
+    postId: string
 
     @ManyToOne(() => UserEntity, user => user.posts, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'author_user_id' })
@@ -29,10 +33,10 @@ export class PostEntity {
     period: number
 
     @CreateDateColumn()
-    create_at: Date
+    createAt: Date
 
     @UpdateDateColumn()
-    update_at: Date
+    updateAt: Date
 
     @OneToMany(() => ApplicationEntity, application => application.post)
     applications: ApplicationEntity[]

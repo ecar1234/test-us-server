@@ -4,15 +4,19 @@ import { ApplicationEntity } from "./application_entity";
 import { MessagesEntity } from "./messagesEntity";
 import { ReviewEntity } from "./review_entity";
 
+export enum UserType {
+    INDVIDUALS = 'INDVIDUALS',
+    COMPANIES = 'COMPANIES',
+}
 
 @Entity('User')
 @Unique(['email'])
 export class UserEntity {
     @PrimaryColumn("uuid")
-    user_id: string
+    userId: string
 
     @Column('varchar')
-    user_naem: string
+    userName: string
 
     @Column('varchar', { length: 50})
     email: string
@@ -20,11 +24,14 @@ export class UserEntity {
     @Column('varchar', {length: 20})
     password_hash: string
 
+    @Column({ type: 'enum', enum: UserType, default: UserType.INDVIDUALS })
+    type: UserType
+
     @CreateDateColumn()
-    create_at: Date
+    createAt: Date
 
     @UpdateDateColumn()
-    update_at: Date
+    updateAt: Date
 
     @OneToMany(() => PostEntity, post => post.author)
     posts: PostEntity[]

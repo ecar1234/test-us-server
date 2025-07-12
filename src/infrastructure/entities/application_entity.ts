@@ -9,12 +9,20 @@ export enum ApplicationStatus {
     ACCEPTED = 'accepted',
     REJECTED = 'rejected',
 }
+export enum ApplicationsPlatform {
+    WEB = 'web',
+    IOS = 'ios',
+    ANDROID = 'android',
+}
 
 @Entity('Application')
 @Unique(['post', 'applicant'])
 export class ApplicationEntity {
     @PrimaryGeneratedColumn('uuid')
-    app_id: string
+    appId: string
+
+    @Column({type: 'enum', enum: ApplicationsPlatform, default: ApplicationsPlatform.WEB})
+    platform: ApplicationsPlatform
 
     @Column({
         type: 'enum',

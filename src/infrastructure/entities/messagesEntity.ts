@@ -4,16 +4,16 @@ import { UserEntity } from "./user_entity";
 @Entity('Messages')
 export class MessagesEntity {
     @PrimaryGeneratedColumn('uuid')
-    message_id: string
+    messageId: string
 
     @Column('text')
     contents: string
 
     @CreateDateColumn()
-    create_at: Date
+    createAt: Date
 
     @Column({type: 'timestamp', nullable: true })
-    read_at: Date | null
+    readAt: Date | null
 
     @ManyToOne(() => UserEntity, user => user.sentMessages, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'sender_user_id' })

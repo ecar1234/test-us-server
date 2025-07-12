@@ -13,7 +13,7 @@ export enum ReviewType {
 @Unique(['application', 'reviewer', 'reviewed'])
 export class ReviewEntity {
     @PrimaryGeneratedColumn('uuid')
-    review_id: string
+    reviewId: string
 
     @Column({ type: 'int' })
     rating: number; // 1-5점 등
