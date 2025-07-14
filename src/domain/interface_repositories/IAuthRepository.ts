@@ -1,9 +1,9 @@
+import { User } from "../entities/user";
+
 interface IAuthRepository {
-    signup(user_name: string, email: string, password: string): Promise<any>;
+    signup(user_name: string, email: string, password: string): Promise<User>;
 
-    signin(email: string, password: string): Promise<any>;
-
-    withdraw(email: string) : Promise<any>;
+    withdraw(email: string) : Promise<boolean>;
 }
 
 export default IAuthRepository;

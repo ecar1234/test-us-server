@@ -16,10 +16,10 @@ export class MessagesEntity {
     readAt: Date | null
 
     @ManyToOne(() => UserEntity, user => user.sentMessages, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'sender_user_id' })
+    @JoinColumn({ name: 'senderUserId' })
     sender: UserEntity
 
-    @ManyToOne(() => UserEntity, user => user.reciveMessages, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'receiver_user_id' })
+    @ManyToOne(() => UserEntity, user => user.receiveMessages, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'receiverUserId' })
     receiver: UserEntity
 }

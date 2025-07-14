@@ -10,19 +10,19 @@ export enum UserType {
 }
 
 @Entity('User')
-@Unique(['email'])
+@Unique(['email', 'nickname'])
 export class UserEntity {
     @PrimaryColumn("uuid")
     userId: string
-
-    @Column('varchar')
-    userName: string
 
     @Column('varchar', { length: 50})
     email: string
     
     @Column('varchar', {length: 20})
     password_hash: string
+
+    @Column('varchar', { length: 20 })
+    nickname: string
 
     @Column({ type: 'enum', enum: UserType, default: UserType.INDVIDUALS })
     type: UserType
@@ -43,7 +43,7 @@ export class UserEntity {
     sentMessages: MessagesEntity[]
 
     @OneToMany(() => MessagesEntity, message => message.receiver)
-    reciveMessages: MessagesEntity[]
+    receiveMessages: MessagesEntity[]
 
     @OneToMany(() => ReviewEntity, review => review.reviewer)
     givenReviews: ReviewEntity[]

@@ -1,4 +1,9 @@
+import { User } from "../entities/user";
+
 export interface IUserRepository {
-    updateUserInfo(userId: string, userName: string, email: string, userType: string): Promise<any>;
-    
+    updateUserInfo(changedUserInfo : User): Promise<User>;
+    findUserById(userId: string): Promise<User | null>;
+    findUserByEmail(email: string): Promise<User | null>;
+    findUserByNickname(nicname: string): Promise<User | null>;
+    findAllUsers(): Promise<User[]>;
 }

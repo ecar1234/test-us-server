@@ -38,11 +38,11 @@ export class ApplicationEntity {
     updatedAt: Date;
 
     @ManyToOne(() => PostEntity, post => post.applications, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'post_id' })
+    @JoinColumn({ name: 'postId' })
     post: PostEntity
 
     @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'app_user_id' })
+    @JoinColumn({ name: 'appUserId' })
     applicant: UserEntity
 
     @OneToMany(() => ReviewEntity, review => review.application)

@@ -1,18 +1,43 @@
 import IAuthRepository from "../../domain/interface_repositories/IAuthRepository";
+import { AppDataSource } from "../../config/data_source";
+import { User } from "../../domain/entities/user";
+import { UserEntity } from "../entities/user_entity";
+import bcrypt from "bcrypt";
+
 
 export class AuthRepository implements IAuthRepository {
-    async signup(user_name: string, email: string, password: string): Promise<any> {
-        // 회원가입 로직 구현
-        return { message: "회원가입 성공" };
+    async signup(email: string, password: string): Promise<User> {
+        const newUser = new UserEntity();
+        newUser.email = email;
+        newUser.password_hash = password;
+
+        const userRepository = AppDataSource.getRepository(UserEntity);
+        try {
+            const savedUser = await userRepository.save(newUser);
+            return new User(
+                savedUser.userId,
+                savedUser.email,
+                savedUser.password_hash,
+                savedUser.nickname,
+                savedUser.type,
+                savedUser.createAt,
+                savedUser.updateAt
+            );
+        } catch (error) {
+            console.error("Error saving user:", error);
+            throw new Error("User registration failed");
+        }
     }
 
-    async signin(email: string, password: string): Promise<any> {
-        // 로그인 로직 구현
-        return { message: "로그인 성공" };
-    }
+    async withdraw(email: string): Promise<boolean> {
+        const userRepository = AppDataSource.getRepository(UserEntity);
+        const result = await userRepository.delete({ email });
 
-    async withdraw(email: string): Promise<any> {
-        // 회원 탈퇴 로직 구현
-        return { message: "회원 탈퇴 성공" };
+        if (result.affected && result.affected > 0) {
+            return true; // User successfully deleted
+        } else {
+            return false; // User not found or deletion failed
+        }
+       
     }
 }
