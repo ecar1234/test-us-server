@@ -3,16 +3,18 @@ import { Router } from 'express';
 import { UserController } from "../controllers/user_controller";
 import { UserRepository } from "../../infrastructure/repositories/user_repo";
 
-const router = Router();
+const route = Router();
 const userUseCase: UserUseCase = new UserUseCase(new UserRepository());
 const userController: UserController = new UserController(userUseCase);
 
-router.post('/update', userController.update.bind(userController));
-router.post('/getUserInfoById', userController.getUserById.bind(userController));
-router.get('/all', userController.getAllUsers.bind(userController));
-router.post('/changePassword', userController.changePassword.bind(userController));
-router.post('/getUserInfoByEmail', userController.getUserByEmail.bind(userController));
-router.get('/getUserInfoByNickName', userController.getUserByNickname.bind(userController));
-// Add any additional routes as needed  
+route.post('/update', userController.update.bind(userController));
+route.post('/getUserById', userController.getUserById.bind(userController));
+route.post('/getUserByEmail', userController.getUserByEmail.bind(userController));
+route.post('/getUserByNickname', userController.getUserByNickname.bind(userController));
+route.post('/changePassword', userController.changePassword.bind(userController));
+route.get('/getAllUsers', userController.getAllUsers.bind(userController));
+route.get('/isNicknameAvailable', userController.isNicknameAvailable.bind(userController));
+route.get('/isEmailAvailable', userController.isEmailAvailable.bind(userController));
+route.post('/isPasswordValid', userController.isPasswordValid.bind(userController));
 
-export default router;
+export default route;

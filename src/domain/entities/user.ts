@@ -1,11 +1,11 @@
 export class User {
     constructor(
-        public userId: string,
+        public userId: string | null,
         public nickName: string,
         public password: string,
         public email: string,
         public userType: string,
-        public createAt: Date,
-        public updateAt: Date
+        public createAt: Date | null = null,
+        public updateAt: Date | null = null
     ) {}
 }

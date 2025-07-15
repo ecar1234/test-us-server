@@ -4,94 +4,29 @@ import { IUserRepository } from "../../domain/interface_repositories/IUserReposi
 import { UserEntity, UserType } from "../entities/user_entity";
 
 export class UserRepository implements IUserRepository {
-    async findUserById(userId: string): Promise<User | null> {
-        const user = await AppDataSource.getRepository(UserEntity).findOne({
-            where: { userId: userId }
-        });
-        if (!user) {
-            return null;
-        }
-        // Convert UserEntity to User domain entity
-        return new User(
-            user.userId,
-            user.email,
-            user.password_hash,
-            user.nickname,
-            user.type,
-            user.createAt,
-            user.updateAt,
-        );
+    registerUser(user: User, passwordHash: string): Promise<User> {
+        throw new Error("Method not implemented.");
     }
-    public async findUserByEmail(email: string): Promise<User | null> {
-        const user = await AppDataSource.getRepository(UserEntity).findOne({
-            where: { email: email }
-        });
-        if (!user) {
-            return null;
-        }
-        // Convert UserEntity to User domain entity
-        return new User(
-            user.userId,
-            user.email,
-            user.password_hash,
-            user.nickname,
-            user.type,
-            user.createAt,
-            user.updateAt,
-        );  
+    deleteUser(userId: string): Promise<boolean> {
+        throw new Error("Method not implemented.");
     }
-    async findAllUsers(): Promise<User[]> {
-        return AppDataSource.getRepository(UserEntity).find().then(users => {
-            return users.map(user => new User(
-                user.userId,
-                user.email,
-                user.password_hash,
-                user.nickname,
-                user.type,
-                user.createAt,
-                user.updateAt,
-            ));
-        });
+    updateUserInfo(user: User): Promise<User> {
+        throw new Error("Method not implemented.");
     }
-    async findUserByNickname(nicname: string): Promise<User | null> {
-        const user = await AppDataSource.getRepository(UserEntity).findOne({
-            where: { nickname: nicname }
-        });
-        if (!user) {
-            return null;
-        }
-        // Convert UserEntity to User domain entity
-        return new User(
-            user.userId,
-            user.email,
-            user.password_hash,
-            user.nickname,
-            user.type,
-            user.createAt,
-            user.updateAt,
-        );
+    findUserById(userId: string): Promise<User | null> {
+        throw new Error("Method not implemented.");
     }
-    async updateUserInfo(changedUserInfo : User): Promise<User>{
-        const userRepository = AppDataSource.getRepository(UserEntity);
-        const user = await userRepository.findOneBy({ userId: changedUserInfo.userId });
-        if (!user) {
-            throw new Error("User not found");
-        }
-        
-        user.email = changedUserInfo.email;
-        user.nickname = changedUserInfo.nickName;
-        user.type = changedUserInfo.userType == 'INDVIDUALS' ? UserType.INDVIDUALS : UserType.COMPANIES;;
-        
-        await userRepository.save(user);
-
-        return new User(
-            user.userId,
-            user.email,
-            user.password_hash,
-            user.nickname,
-            user.type,
-            user.createAt,
-            user.updateAt,
-        );
+    findUserByEmail(email: string): Promise<User | null> {
+        throw new Error("Method not implemented.");
     }
+    findUserByNickname(nickname: string): Promise<User | null> {
+        throw new Error("Method not implemented.");
+    }
+    changePassword(userId: string, newPassword: string): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+    findAllUsers(): Promise<User[]> {
+        throw new Error("Method not implemented.");
+    }
+   
 }
