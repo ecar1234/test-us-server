@@ -1,7 +1,7 @@
 import { User } from "../entities/user";
 
 export interface IUserRepository {
-    registerUser(user: User, passwordHash: string): Promise<User>;
+    registerUser(user: User): Promise<User>;
     deleteUser(userId: string): Promise<boolean>;
     updateUserInfo(user: User): Promise<User>;
     findUserById(userId: string): Promise<User | null>;

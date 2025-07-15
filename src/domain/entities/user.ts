@@ -5,7 +5,7 @@ export class User {
         public password: string,
         public email: string,
         public userType: string,
-        public createAt: Date | null = null,
-        public updateAt: Date | null = null
+        public createdAt: Date | null = null,
+        public updatedAt: Date | null = null
     ) {}
 }

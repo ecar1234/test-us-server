@@ -1,28 +1,13 @@
 export class Post {
     constructor(
-        public id: number,
+        public id: string | null,
+        public authorId: string | null = null,
         public title: string,
+        public subtitle: string,
         public content: string,
-        public authorId: number,
-        public createdAt: Date = new Date(),
-        public updatedAt: Date = new Date()
+        public status: string = 'active',
+        public period: number = 7,
+        public createdAt: Date | null = new Date(),
+        public updatedAt: Date | null = null
     ) {}
-
-    // 게시글 정보를 반환하는 메서드
-    getPostInfo() {
-        return {
-            id: this.id,
-            title: this.title,
-            content: this.content,
-            authorId: this.authorId,
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt
-        };
-    }
-
-    // 게시글 내용을 수정하는 메서드
-    updateContent(newContent: string) {
-        this.content = newContent;
-        this.updatedAt = new Date();
-    }
 }

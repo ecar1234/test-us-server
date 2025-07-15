@@ -10,7 +10,7 @@ export class MessagesEntity {
     contents: string
 
     @CreateDateColumn()
-    createAt: Date
+    createdAt: Date
 
     @Column({type: 'timestamp', nullable: true })
     readAt: Date | null

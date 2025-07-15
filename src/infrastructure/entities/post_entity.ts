@@ -14,7 +14,7 @@ export class PostEntity {
     postId: string
 
     @ManyToOne(() => UserEntity, user => user.posts, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'author_user_id' })
+    @JoinColumn({ name: 'authorId' })
     author: UserEntity
 
     @Column('varchar', { length: 30 })
@@ -33,10 +33,10 @@ export class PostEntity {
     period: number
 
     @CreateDateColumn()
-    createAt: Date
+    createdAt: Date
 
     @UpdateDateColumn()
-    updateAt: Date
+    updatedAt: Date
 
     @OneToMany(() => ApplicationEntity, application => application.post)
     applications: ApplicationEntity[]

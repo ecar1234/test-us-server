@@ -8,7 +8,7 @@ export class UserUseCase {
     async registerUser(email: string, nickname: string, password: string, userType: string): Promise<User> {
         const passwordHash = await bcrypt.hash(password, 10);
         const user = new User(null, email, nickname, passwordHash, userType);
-        return this.userRepo.registerUser(user, passwordHash);
+        return this.userRepo.registerUser(user);
     }
     async deleteUser(email: string): Promise<[boolean, string]> {
         const user = await this.userRepo.findUserByEmail(email);

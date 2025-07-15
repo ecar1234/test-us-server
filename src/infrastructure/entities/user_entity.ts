@@ -28,10 +28,10 @@ export class UserEntity {
     type: UserType
 
     @CreateDateColumn()
-    createAt: Date
+    createdAt: Date
 
     @UpdateDateColumn()
-    updateAt: Date
+    updatedAt: Date
 
     @OneToMany(() => PostEntity, post => post.author)
     posts: PostEntity[]
