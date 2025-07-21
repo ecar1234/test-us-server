@@ -41,6 +41,7 @@ export class ApplicationEntity {
     @JoinColumn({ name: 'postId' })
     post: PostEntity
 
+    // 신청 유저의 승인 상테
     @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'appUserId' })
     applicant: UserEntity

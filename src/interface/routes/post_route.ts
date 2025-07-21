@@ -14,3 +14,5 @@ route.post('/delete', postController.deletePost.bind(postController));
 route.post('/getPostById', postController.getPostById.bind(postController));
 route.post('/getPostByTitle', postController.getPostByTitle.bind(postController));
 route.get('/getAllPosts', postController.getAllPosts.bind(postController));
+
+export default route;

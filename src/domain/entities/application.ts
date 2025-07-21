@@ -1,9 +1,11 @@
 export class Application {
     constructor(
-        id: string | null,
-        platform: string,
-        status: string,
-        appliedAt: Date | null = new Date(),
-        updatedAt: Date | null = null
+        public readonly id: string | null,
+        public platform: string,
+        public status: string,
+        public readonly appliedAt: Date | null = new Date(),
+        public updatedAt: Date | null = null,
+        public readonly postId: string,
+        public readonly applicantId: string
     ) { }
 }
