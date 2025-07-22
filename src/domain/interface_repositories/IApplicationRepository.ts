@@ -1,22 +1,22 @@
-import { Application } from "../entities/application";
-import { Post } from "../entities/post";
+import { ApplicationModel } from "../entities/ApplicationModel";
+import { PostModel } from "../entities/PostModel";
 
 export interface IApplicationRepository {
-    findByPostId(postId: string): Promise<Application[]>;
-    findByUserId(userId: string): Promise<Application[]>;
-    findByUserNickname(nickname: string): Promise<Application[]>;
-    findPostListByUserId(userId: string): Promise<Post[]>;
-    create(application: Application): Promise<Application>;
-    update(application: Application): Promise<Application>;
+    findByPostId(postId: string): Promise<ApplicationModel[]>;
+    findByUserId(userId: string): Promise<ApplicationModel[]>;
+    findByUserNickname(nickname: string): Promise<ApplicationModel[]>;
+    findPostListByUserId(userId: string): Promise<PostModel[]>;
+    create(application: ApplicationModel): Promise<ApplicationModel>;
+    update(application: ApplicationModel): Promise<ApplicationModel>;
     delete(id: string): Promise<boolean>;
-    acceptUser(userId: string, postId: string): Promise<Application>;
-    rejectUser(userId: string, postId: string): Promise<Application>;
+    acceptUser(userId: string, postId: string): Promise<ApplicationModel>;
+    rejectUser(userId: string, postId: string): Promise<ApplicationModel>;
     countByPostId(postId: string): Promise<number>;
-    findByPostIdAndUserIdAndStatus(postId: string, userId: string, status: string): Promise<Application | null>;
+    findByPostIdAndUserIdAndStatus(postId: string, userId: string, status: string): Promise<ApplicationModel | null>;
     
     findByPostIdWithPagination(
         postId: string,
         page: number,
         limit: number
-    ): Promise<{ applications: Application[]; total: number }>;
+    ): Promise<{ applications: ApplicationModel[]; total: number }>;
 }

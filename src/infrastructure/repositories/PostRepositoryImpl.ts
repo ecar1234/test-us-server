@@ -1,13 +1,13 @@
-import { AppDataSource } from "../../config/data_source";
-import { Post } from "../../domain/entities/post";
+import { AppDataSource } from "../../config/DataSource";
+import { PostModel } from "../../domain/entities/PostModel";
 import { IPostRepository } from "../../domain/interface_repositories/IPostRepository";
-import { PostEntity, PostStatusType } from "../entities/post_entity";
+import { PostEntity, PostStatusType } from "../entities/PostEntity";
 
 
-export class PostRepository implements IPostRepository {
+export class PostRepositoryImpl implements IPostRepository {
     private postRepository = AppDataSource.getRepository(PostEntity);
-    private toDomainPost(postEntity: PostEntity): Post {
-        return new Post(
+    private toDomainPost(postEntity: PostEntity): PostModel {
+        return new PostModel(
             postEntity.postId,
             postEntity.author ? postEntity.author.userId : null,
             postEntity.title,
@@ -19,7 +19,7 @@ export class PostRepository implements IPostRepository {
             postEntity.updatedAt
         );
     }
-    private toEntityPost(post: Post): PostEntity {
+    private toEntityPost(post: PostModel): PostEntity {
         const postStatus = post.status === 'active' ? PostStatusType.ACTIVE : post.status === 'end' ? PostStatusType.END : PostStatusType.EXPIRED;
         const dbPost = this.postRepository.create({
             postId: post.id,
@@ -34,13 +34,13 @@ export class PostRepository implements IPostRepository {
         return dbPost;
     }
     
-    async createPost(post:Post): Promise<Post> {
+    async createPost(post:PostModel): Promise<PostModel> {
         const postEntity = this.toEntityPost(post);
         const savedPost = await this.postRepository.save(postEntity);
         return this.toDomainPost(savedPost);
     }
 
-    async updatePost(post:Post): Promise<[Post | null, string]> {
+    async updatePost(post:PostModel): Promise<[PostModel | null, string]> {
         const existingPost = await this.postRepository.findOneBy({ postId: post.id });
         if (!existingPost) {
             return [null, "Post not found"];
@@ -55,7 +55,7 @@ export class PostRepository implements IPostRepository {
        return result.affected !== 0;
     }
 
-    async getPostById(id: string): Promise<[Post | null, string]> {
+    async getPostById(id: string): Promise<[PostModel | null, string]> {
         const postEntity = await this.postRepository.findOneBy({ postId: id });
         if (!postEntity) {
             return [null, "Post not found"];
@@ -63,7 +63,7 @@ export class PostRepository implements IPostRepository {
         return [this.toDomainPost(postEntity), "Post retrieved successfully"];
     }
 
-    async getPostByTitle(title: string): Promise<[Post | null, string]> {
+    async getPostByTitle(title: string): Promise<[PostModel | null, string]> {
        const postEntity = await this.postRepository.findOneBy({ title });
        if (!postEntity) {
            return [null, "Post not found"];
@@ -71,7 +71,7 @@ export class PostRepository implements IPostRepository {
          return [this.toDomainPost(postEntity), "Post retrieved successfully"];
     }
 
-    async getAllPosts(): Promise<Post[]> {
+    async getAllPosts(): Promise<PostModel[]> {
         const postEntities = await this.postRepository.find();
         return postEntities.map(postEntity => this.toDomainPost(postEntity));
     }

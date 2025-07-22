@@ -1,13 +1,13 @@
-import { User } from "../domain/entities/user";
-import { UserRepository } from "../infrastructure/repositories/user_repo";
+import { UserModel } from "../domain/entities/UserModel";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 import bcrypt from "bcrypt";
 
 export class UserUseCase {
-    constructor(private userRepo: UserRepository) {}
+    constructor(private userRepo: UserRepositoryImpl) {}
 
-    async registerUser(email: string, nickname: string, password: string, userType: string): Promise<User> {
+    async registerUser(email: string, nickname: string, password: string, userType: string): Promise<UserModel> {
         const passwordHash = await bcrypt.hash(password, 10);
-        const user = new User(null, email, nickname, passwordHash, userType);
+        const user = new UserModel(null, email, nickname, passwordHash, userType);
         return this.userRepo.registerUser(user);
     }
     async deleteUser(email: string): Promise<[boolean, string]> {
@@ -22,24 +22,24 @@ export class UserUseCase {
         }
         return [true, "User deleted successfully"];
     }
-    async updateUserInfo(userId: string, email: string, nickname: string, userType: string): Promise<User> {
-        const user = new User(userId, email, nickname, "", userType);
+    async updateUserInfo(userId: string, email: string, nickname: string, userType: string): Promise<UserModel> {
+        const user = new UserModel(userId, email, nickname, "", userType);
         return this.userRepo.updateUserInfo(user);
     }
-    async getUserById(userId: string): Promise<User | null> {
+    async getUserById(userId: string): Promise<UserModel | null> {
         return this.userRepo.findUserById(userId);
     }
-    async getUserByEmail(email: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<UserModel | null> {
         return this.userRepo.findUserByEmail(email);
     }
-    async getUserByNickname(nickname: string): Promise<User | null> {
+    async getUserByNickname(nickname: string): Promise<UserModel | null> {
         return this.userRepo.findUserByNickname(nickname);
     }
     async changePassword(userId: string, newPassword: string): Promise<boolean> {
         const passwordHash = await bcrypt.hash(newPassword, 10);
         return this.userRepo.changePassword(userId, passwordHash);
     }
-    async getAllUsers(): Promise<User[]> {
+    async getAllUsers(): Promise<UserModel[]> {
         return this.userRepo.findAllUsers();
     }
     async isNicknameAvailable(nickname: string): Promise<boolean> {

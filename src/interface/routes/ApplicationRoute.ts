@@ -1,13 +1,12 @@
 
 import { Router } from "express";
-import { AppUseCase } from "../../app/app_use_case";
-import { ApplicationRepo } from "../../infrastructure/repositories/application_repo";
-import { ApplicationController } from "../controllers/application_controller";
-import app from "../..";
+import { AppUseCase } from "../../app/AppUseCase";
+import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
+import { ApplicationController } from "../controllers/ApplicationController";
 
 const router = Router();
 
-const applicationUseCase = new AppUseCase(new ApplicationRepo());
+const applicationUseCase = new AppUseCase(new ApplicationRepositoryImpl());
 const applicationController = new ApplicationController(applicationUseCase);
 
 router.get("/findByPostId/:postId", applicationController.findApplicationsByPostId.bind(applicationController));

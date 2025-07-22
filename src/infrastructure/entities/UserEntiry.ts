@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, Unique, UpdateDateColumn } from "typeorm";
-import { PostEntity } from "./post_entity";
-import { ApplicationEntity } from "./application_entity";
-import { MessagesEntity } from "./messagesEntity";
-import { ReviewEntity } from "./review_entity";
+import { PostEntity } from "./PostEntity";
+import { ApplicationEntity } from "./ApplicationEntity";
+import { MessagesEntity } from "./MessageEntity";
+import { ReviewEntity } from "./ReviewEntiry";
 
 export enum UserType {
     INDVIDUALS = 'INDVIDUALS',

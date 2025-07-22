@@ -1,16 +1,16 @@
 import { IApplicationRepository } from "../../domain/interface_repositories/IApplicationRepository";
-import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/application_entity";
-import { AppDataSource } from "../../config/data_source";
-import { Application } from "../../domain/entities/application";
-import { PostEntity } from "../entities/post_entity";
-import { UserEntity } from "../entities/user_entity";
-import { Post } from "../../domain/entities/post";
+import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity";
+import { AppDataSource } from "../../config/DataSource";
+import { ApplicationModel } from "../../domain/entities/ApplicationModel";
+import { PostEntity } from "../entities/PostEntity";
+import { UserEntity } from "../entities/UserEntiry";
+import { PostModel } from "../../domain/entities/PostModel";
 
-export class ApplicationRepo implements IApplicationRepository {
+export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
 
-    private toDomainApplication(applicationEntity: ApplicationEntity): Application {
-        return new Application(
+    private toDomainApplication(applicationEntity: ApplicationEntity): ApplicationModel {
+        return new ApplicationModel(
             applicationEntity.appId,
             applicationEntity.platform,
             applicationEntity.status,
@@ -20,7 +20,7 @@ export class ApplicationRepo implements IApplicationRepository {
             applicationEntity.applicant.userId
         );
     }
-    private toEntityApplication(application: Application): ApplicationEntity {
+    private toEntityApplication(application: ApplicationModel): ApplicationEntity {
         const entity = new ApplicationEntity();
         const platform = application.platform == 'web' ? ApplicationsPlatform.WEB
             : (application.platform == 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID);
@@ -37,26 +37,26 @@ export class ApplicationRepo implements IApplicationRepository {
         return entity;
     }
 
-    public async findByPostId(postId: string): Promise<Application[]> {
+    public async findByPostId(postId: string): Promise<ApplicationModel[]> {
         return this.applicationRepository.find({
             where: { post: { postId } },
             relations: ['applicant', 'post', 'reviews']
         }).then(applications => applications.map(this.toDomainApplication.bind(this)));
     }
-    public async findByUserId(userId: string): Promise<Application[]> {
+    public async findByUserId(userId: string): Promise<ApplicationModel[]> {
         return this.applicationRepository.find({
             where: { applicant: { userId } },
             relations: ['applicant', 'post', 'reviews']
         }).then(applications => applications.map(this.toDomainApplication.bind(this)));
     }
-    async findPostListByUserId(userId: string): Promise<Post[]> {
+    async findPostListByUserId(userId: string): Promise<PostModel[]> {
         return this.applicationRepository.find({
             where: { applicant: { userId } },
             relations: ['post']
         }).then(applications => {
             return applications.map(app => {
                 const post = app.post;
-                return new Post(
+                return new PostModel(
                     post.postId,
                     post.author.userId,
                     post.title,
@@ -70,7 +70,7 @@ export class ApplicationRepo implements IApplicationRepository {
             });
         });
     }
-    public async findByUserNickname(nickname: string): Promise<Application[]> {
+    public async findByUserNickname(nickname: string): Promise<ApplicationModel[]> {
         return this.applicationRepository.find({
             where: { applicant: { nickname } },
             relations: ['applicant', 'post', 'reviews']
@@ -81,13 +81,13 @@ export class ApplicationRepo implements IApplicationRepository {
             where: { post: { postId } }
         });
     }
-    public async create(application: Application): Promise<Application> {
+    public async create(application: ApplicationModel): Promise<ApplicationModel> {
         const entity = this.toEntityApplication(application);
         return this.applicationRepository.save(entity).then(savedEntity => {
             return this.toDomainApplication(savedEntity);
         });
     }
-    public async update(application: Application): Promise<Application> {
+    public async update(application: ApplicationModel): Promise<ApplicationModel> {
         const entity = this.toEntityApplication(application);
 
         this.applicationRepository.update(entity.appId, entity);
@@ -110,7 +110,7 @@ export class ApplicationRepo implements IApplicationRepository {
             return true;
         });
     }
-    public async acceptUser(userId: string, postId: string): Promise<Application> {
+    public async acceptUser(userId: string, postId: string): Promise<ApplicationModel> {
         return this.applicationRepository.findOne({
             where: {
                 applicant: { userId },
@@ -128,7 +128,7 @@ export class ApplicationRepo implements IApplicationRepository {
             });
         });
     }
-    public async rejectUser(userId: string, postId: string): Promise<Application> {
+    public async rejectUser(userId: string, postId: string): Promise<ApplicationModel> {
         return this.applicationRepository.findOne({
             where: {
                 applicant: { userId },
@@ -151,7 +151,7 @@ export class ApplicationRepo implements IApplicationRepository {
             where: { post: { postId } }
         });
     }
-    public async findByPostIdAndUserIdAndStatus(postId: string, userId: string, status: string): Promise<Application | null> {
+    public async findByPostIdAndUserIdAndStatus(postId: string, userId: string, status: string): Promise<ApplicationModel | null> {
         return this.applicationRepository.findOne({
             where: {
                 post: { postId },
@@ -166,7 +166,7 @@ export class ApplicationRepo implements IApplicationRepository {
             return this.toDomainApplication(applicationEntity);
         });
     }
-    public async findByPostIdWithPagination(postId: string, page: number, limit: number): Promise<{ applications: Application[]; total: number; }> {
+    public async findByPostIdWithPagination(postId: string, page: number, limit: number): Promise<{ applications: ApplicationModel[]; total: number; }> {
         return this.applicationRepository.findAndCount({
             where: { post: { postId } },
             relations: ['applicant', 'post', 'reviews'],

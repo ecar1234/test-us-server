@@ -1,4 +1,4 @@
-export class Post {
+export class PostModel {
     constructor(
         public id: string | null,
         public authorId: string | null = null,

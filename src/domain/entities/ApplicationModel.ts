@@ -1,4 +1,4 @@
-export class Application {
+export class ApplicationModel {
     constructor(
         public readonly id: string | null,
         public platform: string,

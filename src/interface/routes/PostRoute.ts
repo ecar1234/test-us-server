@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { PostController } from "../controllers/post_controller";
-import { PostRepository } from "../../infrastructure/repositories/post_repo";
-import { PostUseCase } from "../../app/post_use_cast";
+import { PostController } from "../controllers/PostController";
+import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
+import { PostUseCase } from "../../app/PostUseCase";
 
 const route = Router();
 
-const postUseCase: PostUseCase = new PostUseCase(new PostRepository());
+const postUseCase: PostUseCase = new PostUseCase(new PostRepositoryImpl());
 const postController = new PostController(postUseCase);
 
 route.post('/create', postController.createPost.bind(postController));

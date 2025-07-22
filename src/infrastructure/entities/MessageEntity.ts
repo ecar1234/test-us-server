@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { UserEntity } from "./user_entity";
+import { UserEntity } from "./UserEntiry";
 
 @Entity('Messages')
 export class MessagesEntity {

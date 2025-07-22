@@ -1,12 +1,12 @@
 import express, { Router } from 'express';
-import { UserRepository } from '../../infrastructure/repositories/user_repo';
-import { UserUseCase } from '../../app/user_use_case';
-import { UserController } from '../controllers/user_controller';
+import { UserRepositoryImpl } from '../../infrastructure/repositories/UserRepositoryImpl';
+import { UserUseCase } from '../../app/UserUseCase';
+import { UserController } from '../controllers/UserController';
 
 const route: Router = express.Router();
 // post, app, message, review useCase 추가해서 user usecase에 주입 해야함.(목록 조회용)
 
-const userUseCase: UserUseCase = new UserUseCase(new UserRepository());
+const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 route.post('/register', userController.register.bind(userController));

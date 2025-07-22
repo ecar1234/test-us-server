@@ -1,4 +1,4 @@
-import { PostUseCase } from "../../app/post_use_cast";
+import { PostUseCase } from "../../app/PostUseCase";
 import { Request, Response } from "express";
 
 export class PostController {

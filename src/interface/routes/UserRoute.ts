@@ -1,10 +1,10 @@
-import { UserUseCase } from "../../app/user_use_case";
+import { UserUseCase } from "../../app/UserUseCase";
 import { Router } from 'express';
-import { UserController } from "../controllers/user_controller";
-import { UserRepository } from "../../infrastructure/repositories/user_repo";
+import { UserController } from "../controllers/UserController";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
 
 const route = Router();
-const userUseCase: UserUseCase = new UserUseCase(new UserRepository());
+const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 route.post('/update', userController.update.bind(userController));

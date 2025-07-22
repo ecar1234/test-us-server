@@ -1,9 +1,10 @@
-export class Messages{
+export class ReviewModel{
     constructor(
         public id: number,
+        public postId: number,
+        public userId: number,
         public content: string,
-        public senderId: number,
-        public receiverId: number,
+        public rating: number,
         public createdAt: Date = new Date(),
         public updatedAt: Date = new Date()
     ) {}

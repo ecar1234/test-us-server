@@ -1,23 +1,23 @@
-import { AppUseCase } from "../../app/app_use_case";
+import { AppUseCase } from "../../app/AppUseCase";
 import { Request, Response } from "express";
-import { Application } from "../../domain/entities/application";
+import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 
 export class ApplicationController {
     constructor(private appUseCase: AppUseCase) {}
 
     async findApplicationsByPostId(req: Request, res: Response): Promise<void> {
         const postId: string = req.params.postId;
-        const applications: Application[] = await this.appUseCase.findApplicationsByPostId(postId);
+        const applications: ApplicationModel[] = await this.appUseCase.findApplicationsByPostId(postId);
         res.status(200).json({applications : applications});
     }
     async findApplicationsByUserId(req: Request, res: Response): Promise<void> {
         const userId: string = req.params.userId;
-        const applications: Application[] = await this.appUseCase.findApplicationsByUserId(userId);
+        const applications: ApplicationModel[] = await this.appUseCase.findApplicationsByUserId(userId);
         res.status(200).json({applications : applications});
     }
     async findByUserNickname(req: Request, res: Response): Promise<void> {
         const nickname: string = req.params.nickname;
-        const applications: Application[] = await this.appUseCase.findByUserNickname(nickname);
+        const applications: ApplicationModel[] = await this.appUseCase.findByUserNickname(nickname);
         res.status(200).json({applications : applications});
     }
     async findPostListByUserId(req: Request, res: Response): Promise<void> {
@@ -32,13 +32,13 @@ export class ApplicationController {
     }
     async createApplication(req: Request, res: Response): Promise<void> {
         const { id, platform, status, appliedAt, updateAt, postId, applicantId } = req.body;
-        const applicationData = new Application(id, platform, status, appliedAt, updateAt, postId, applicantId);
+        const applicationData = new ApplicationModel(id, platform, status, appliedAt, updateAt, postId, applicantId);
         const application = await this.appUseCase.createApplication(applicationData);
         res.status(201).json(application);
     }
     async updateApplication(req: Request, res: Response): Promise<void> {
         const { id, platform, status, appliedAt, updateAt, postId, applicantId } = req.body;
-        const applicationData = new Application(id, platform, status, appliedAt, updateAt, postId, applicantId);
+        const applicationData = new ApplicationModel(id, platform, status, appliedAt, updateAt, postId, applicantId);
         const updatedApplication = await this.appUseCase.updateApplication(applicationData);
         res.status(200).json(updatedApplication);
     }

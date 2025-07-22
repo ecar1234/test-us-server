@@ -1,12 +1,12 @@
-import { User } from "../entities/user";
+import { UserModel } from "../entities/UserModel";
 
 export interface IUserRepository {
-    registerUser(user: User): Promise<User>;
+    registerUser(user: UserModel): Promise<UserModel>;
     deleteUser(userId: string): Promise<boolean>;
-    updateUserInfo(user: User): Promise<User>;
-    findUserById(userId: string): Promise<User | null>;
-    findUserByEmail(email: string): Promise<User | null>;
-    findUserByNickname(nickname: string): Promise<User | null>;
+    updateUserInfo(user: UserModel): Promise<UserModel>;
+    findUserById(userId: string): Promise<UserModel | null>;
+    findUserByEmail(email: string): Promise<UserModel | null>;
+    findUserByNickname(nickname: string): Promise<UserModel | null>;
     changePassword(userId: string, newPassword: string): Promise<boolean>;
-    findAllUsers(): Promise<User[]>;
+    findAllUsers(): Promise<UserModel[]>;
 }

@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { PostEntity } from "./post_entity";
-import { UserEntity } from "./user_entity";
-import { ReviewEntity } from "./review_entity";
+import { PostEntity } from "./PostEntity";
+import { UserEntity } from "./UserEntiry";
+import { ReviewEntity } from "./ReviewEntiry";
 
 // 신청 상태를 정의하는 Enum
 export enum ApplicationStatus {

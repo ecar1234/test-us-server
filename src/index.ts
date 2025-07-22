@@ -1,9 +1,9 @@
 import express from 'express';
-import { AppDataSource } from './config/data_source';
-import AuthRoute from './interface/routes/auth_route';
-import UserRoute from './interface/routes/user_route'; 
-import PostRoute from './interface/routes/post_route';
-import ApplicationRoute from './interface/routes/app_route';
+import { AppDataSource } from './config/DataSource';
+import AuthRoute from './interface/routes/AuthRoute';
+import UserRoute from './interface/routes/UserRoute'; 
+import PostRoute from './interface/routes/PostRoute';
+import ApplicationRoute from './interface/routes/ApplicationRoute';
 
 const app = express();
 const port = 3000;
