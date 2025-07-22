@@ -1,10 +1,11 @@
-import { ApplicationEntity } from "../../infrastructure/entities/application_entity";
 import { Application } from "../entities/application";
+import { Post } from "../entities/post";
 
 export interface IApplicationRepository {
     findByPostId(postId: string): Promise<Application[]>;
     findByUserId(userId: string): Promise<Application[]>;
-    applicantCountByPostId(postId: string): Promise<number>;
+    findByUserNickname(nickname: string): Promise<Application[]>;
+    findPostListByUserId(userId: string): Promise<Post[]>;
     create(application: Application): Promise<Application>;
     update(application: Application): Promise<Application>;
     delete(id: string): Promise<boolean>;

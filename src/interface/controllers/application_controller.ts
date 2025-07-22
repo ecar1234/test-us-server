@@ -6,28 +6,39 @@ export class ApplicationController {
     constructor(private appUseCase: AppUseCase) {}
 
     async findApplicationsByPostId(req: Request, res: Response): Promise<void> {
-        const { postId } = req.body;
+        const postId: string = req.params.postId;
         const applications: Application[] = await this.appUseCase.findApplicationsByPostId(postId);
         res.status(200).json({applications : applications});
     }
     async findApplicationsByUserId(req: Request, res: Response): Promise<void> {
-        const userId: string = req.body.userId;
+        const userId: string = req.params.userId;
         const applications: Application[] = await this.appUseCase.findApplicationsByUserId(userId);
         res.status(200).json({applications : applications});
     }
-    // 여기서 부터 점검 해야함. get, post 중 선택 필요. Get일 경우 user, post, 수정 필요.
+    async findByUserNickname(req: Request, res: Response): Promise<void> {
+        const nickname: string = req.params.nickname;
+        const applications: Application[] = await this.appUseCase.findByUserNickname(nickname);
+        res.status(200).json({applications : applications});
+    }
+    async findPostListByUserId(req: Request, res: Response): Promise<void> {
+        const userId: string = req.params.userId;
+        const posts = await this.appUseCase.findPostListByUserId(userId);
+        res.status(200).json({posts : posts});
+    }
     async countApplicantsByPostId(req: Request, res: Response): Promise<void> {
-        const postId = req.params.postId;
+        const postId: string = req.params.postId;
         const count = await this.appUseCase.countApplicantsByPostId(postId);
         res.status(200).json({ count });
     }
     async createApplication(req: Request, res: Response): Promise<void> {
-        const applicationData = req.body;
+        const { id, platform, status, appliedAt, updateAt, postId, applicantId } = req.body;
+        const applicationData = new Application(id, platform, status, appliedAt, updateAt, postId, applicantId);
         const application = await this.appUseCase.createApplication(applicationData);
         res.status(201).json(application);
     }
     async updateApplication(req: Request, res: Response): Promise<void> {
-        const applicationData = req.body;
+        const { id, platform, status, appliedAt, updateAt, postId, applicantId } = req.body;
+        const applicationData = new Application(id, platform, status, appliedAt, updateAt, postId, applicantId);
         const updatedApplication = await this.appUseCase.updateApplication(applicationData);
         res.status(200).json(updatedApplication);
     }
@@ -57,10 +68,10 @@ export class ApplicationController {
         res.status(application ? 200 : 404).json(application);
     }
     async findApplicationsWithPagination(req: Request, res: Response): Promise<void> {
-        const postId = req.params.postId;
-        const page = parseInt(req.query.page as string, 10) || 1;
-        const limit = parseInt(req.query.limit as string, 10) || 10;
-        const result = await this.appUseCase.findApplicationsWithPagination(postId, page, limit);
+        const { postId, page, limit } = req.body;
+        const conversionPage = parseInt(page as string) || 1;
+        const conversionLimit = parseInt(limit as string) || 10;
+        const result = await this.appUseCase.findApplicationsWithPagination(postId, conversionPage, conversionLimit);
         res.status(200).json(result);
     }
 }

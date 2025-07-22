@@ -4,6 +4,7 @@ import { AppDataSource } from "../../config/data_source";
 import { Application } from "../../domain/entities/application";
 import { PostEntity } from "../entities/post_entity";
 import { UserEntity } from "../entities/user_entity";
+import { Post } from "../../domain/entities/post";
 
 export class ApplicationRepo implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
@@ -21,13 +22,13 @@ export class ApplicationRepo implements IApplicationRepository {
     }
     private toEntityApplication(application: Application): ApplicationEntity {
         const entity = new ApplicationEntity();
-        const platform = application.platform == 'web' ? ApplicationsPlatform.WEB 
-        : (application.platform == 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID);
-        const status = application.status == 'pending' ? ApplicationStatus.PENDING 
-        : (application.status == 'accepted' ? ApplicationStatus.ACCEPTED : ApplicationStatus.REJECTED);
+        const platform = application.platform == 'web' ? ApplicationsPlatform.WEB
+            : (application.platform == 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID);
+        const status = application.status == 'pending' ? ApplicationStatus.PENDING
+            : (application.status == 'accepted' ? ApplicationStatus.ACCEPTED : ApplicationStatus.REJECTED);
 
         entity.appId = application.id;
-        entity.platform = platform; 
+        entity.platform = platform;
         entity.status = status;
         entity.appliedAt = application.appliedAt || new Date();
         entity.updatedAt = application.updatedAt || null;
@@ -48,7 +49,28 @@ export class ApplicationRepo implements IApplicationRepository {
             relations: ['applicant', 'post', 'reviews']
         }).then(applications => applications.map(this.toDomainApplication.bind(this)));
     }
-    public async findbyUserNickname(nickname: string): Promise<Application[]> {
+    async findPostListByUserId(userId: string): Promise<Post[]> {
+        return this.applicationRepository.find({
+            where: { applicant: { userId } },
+            relations: ['post']
+        }).then(applications => {
+            return applications.map(app => {
+                const post = app.post;
+                return new Post(
+                    post.postId,
+                    post.author.userId,
+                    post.title,
+                    post.subtitle,
+                    post.contents,
+                    post.status,
+                    post.period,
+                    post.createdAt,
+                    post.updatedAt
+                );
+            });
+        });
+    }
+    public async findByUserNickname(nickname: string): Promise<Application[]> {
         return this.applicationRepository.find({
             where: { applicant: { nickname } },
             relations: ['applicant', 'post', 'reviews']
@@ -67,7 +89,7 @@ export class ApplicationRepo implements IApplicationRepository {
     }
     public async update(application: Application): Promise<Application> {
         const entity = this.toEntityApplication(application);
-        
+
         this.applicationRepository.update(entity.appId, entity);
 
         return this.applicationRepository.findOne({

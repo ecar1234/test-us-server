@@ -1,4 +1,5 @@
 import { Application } from "../domain/entities/application";
+import { Post } from "../domain/entities/post";
 import { ApplicationRepo } from "../infrastructure/repositories/application_repo";
 
 export class AppUseCase {
@@ -10,6 +11,14 @@ export class AppUseCase {
 
     async findApplicationsByUserId(userId: string): Promise<Application[]> {
         return this.applicationRepository.findByUserId(userId);
+    }
+
+    async findByUserNickname(nickname: string): Promise<Application[]> {
+        return this.applicationRepository.findByUserNickname(nickname);
+    }
+
+    async findPostListByUserId(userId: string): Promise<Post[]> {
+        return this.applicationRepository.findPostListByUserId(userId);
     }
 
     async countApplicantsByPostId(postId: string): Promise<number> {

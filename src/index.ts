@@ -3,6 +3,7 @@ import { AppDataSource } from './config/data_source';
 import AuthRoute from './interface/routes/auth_route';
 import UserRoute from './interface/routes/user_route'; 
 import PostRoute from './interface/routes/post_route';
+import ApplicationRoute from './interface/routes/app_route';
 
 const app = express();
 const port = 3000;
@@ -19,6 +20,7 @@ AppDataSource.initialize()
             app.use('/api/v1/auth', AuthRoute);
             app.use('/api/v1/user', UserRoute);
             app.use('/api/v1/post', PostRoute);
+            app.use('api/v1/application', ApplicationRoute);
         });
     })
     .catch((error) => console.error("DB 연결 실패:", error));
