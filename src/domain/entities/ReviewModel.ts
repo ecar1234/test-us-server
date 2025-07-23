@@ -1,11 +1,12 @@
 export class ReviewModel{
     constructor(
-        public id: number,
-        public postId: number,
-        public userId: number,
-        public content: string,
+        public readonly reviewId: string,
         public rating: number,
-        public createdAt: Date = new Date(),
-        public updatedAt: Date = new Date()
+        public comment: string | null,
+        public reviewType: 'PRODUCT_RATING' | 'PARTICIPANT_ATTITUDE_RATING',
+        public readonly createdAt: Date,
+        public readonly applicationId: string,
+        public readonly reviewerUserId: string,
+        public readonly reviewedUserId: string
     ) {}
 }

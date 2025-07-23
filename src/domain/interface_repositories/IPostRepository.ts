@@ -7,4 +7,5 @@ export interface IPostRepository {
     getPostById(id: string): Promise<[PostModel | null, string]>;
     getPostByTitle(title: string): Promise<[PostModel | null, string]>;
     getAllPosts(): Promise<PostModel[]>;
+    // 닉네임으로 찾기, 게시물의 속한 리뷰 보기 추가가 필요해 보임
 }
