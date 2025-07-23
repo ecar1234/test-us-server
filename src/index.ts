@@ -5,6 +5,7 @@ import UserRoute from './interface/routes/UserRoute';
 import PostRoute from './interface/routes/PostRoute';
 import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
+import MessageRoute from './interface/routes/MessageRoute';
 
 const app = express();
 const port = 3000;
@@ -22,7 +23,8 @@ AppDataSource.initialize()
             app.use('/api/v1/user', UserRoute);
             app.use('/api/v1/post', PostRoute);
             app.use('api/v1/application', ApplicationRoute);
-            app.use('api/v1/review', ReviewRoute)
+            app.use('api/v1/review', ReviewRoute);
+            app.use('api/v1/message', MessageRoute);
         });
     })
     .catch((error) => console.error("DB 연결 실패:", error));

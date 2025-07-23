@@ -1,10 +1,12 @@
 export class MessageModel{
     constructor(
-        public id: number,
+        public readonly id: string | null,
         public content: string,
-        public senderId: number,
-        public receiverId: number,
-        public createdAt: Date = new Date(),
-        public updatedAt: Date = new Date()
+        public readonly createdAt: Date = new Date(),
+        public readAt: Date | null,
+        public deleteSender: boolean | null,
+        public deleteReceiver: boolean = false,
+        public senderId: string,
+        public receiverId: string
     ) {}
 }
