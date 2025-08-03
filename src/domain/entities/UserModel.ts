@@ -9,6 +9,10 @@ export class UserModel {
         public userName: string,
         public birth: Date,
         public readonly createdAt: Date | null = null,
-        public updatedAt: Date | null = null
+        public updatedAt: Date | null = null,
+        public posts: string[] = [],
+        public applications: string[] = [],
+        // public sentMessages: string[] = [],
+        // public receiveMessages: string[] = [],
     ) {}
 }

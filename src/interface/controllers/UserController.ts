@@ -7,7 +7,7 @@ export class UserController {
     async register(req: Request, res: Response): Promise<void> {
         try {
             const { email, nickname, password, userType, userName, birth } = req.body;
-            console.log(userType);
+            // console.log(userType);
             const user = await this.userUseCase.registerUser(email, nickname, password, userType, userName, birth);
             res.status(201).json({ user: { userId: user.userId, email: user.email, nickname: user.nickname, userType: user.userType, userName: user.userName, birth: user.birth, createdAt: user.createdAt } });
         } catch (error) {
@@ -113,6 +113,19 @@ export class UserController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
+    }
+
+    async getPostsByNickname(req: Request, res: Response): Promise<void> {
+        try {
+            const nickname: string = req.params.nickname;
+            const posts = await this.userUseCase.getPostsByNickname(nickname);
+            
+            res.status(200).json({ posts: posts });
+            
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+
     }
 
     async changePassword(req: Request, res: Response): Promise<void> {

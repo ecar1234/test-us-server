@@ -2,15 +2,17 @@ import { UserUseCase } from "../../app/UserUseCase";
 import { Router } from 'express';
 import { UserController } from "../controllers/UserController";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
+import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
 
 const route = Router();
-const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl());
+const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new PostRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 route.post('/update', userController.update.bind(userController));
 route.get('/getUserById/:id', userController.getUserById.bind(userController));
 route.get('/getUserByEmail/:email', userController.getUserByEmail.bind(userController));
 route.get('/getUserByNickname/:nickname', userController.getUserByNickname.bind(userController));
+route.get('/getPostsByNickname/:nickname', userController.getPostsByNickname.bind(userController));
 route.put('/changePassword', userController.changePassword.bind(userController));
 route.get('/getAllUsers', userController.getAllUsers.bind(userController));
 route.get('/isNicknameAvailable/:nickname', userController.isNicknameAvailable.bind(userController));
