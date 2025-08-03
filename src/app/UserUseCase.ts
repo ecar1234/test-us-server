@@ -5,25 +5,27 @@ import bcrypt from "bcrypt";
 export class UserUseCase {
     constructor(private userRepo: UserRepositoryImpl) {}
 
-    async registerUser(email: string, nickname: string, password: string, userType: string): Promise<UserModel> {
+    async registerUser(email: string, nickname: string, password: string, userType: string, userName: string, birth: Date): Promise<UserModel> {
         const passwordHash = await bcrypt.hash(password, 10);
-        const user = new UserModel(null, email, nickname, passwordHash, userType);
+        const user = new UserModel(null, email, nickname, passwordHash, userType, null, userName, birth);
         return this.userRepo.registerUser(user);
     }
-    async deleteUser(email: string): Promise<[boolean, string]> {
-        const user = await this.userRepo.findUserByEmail(email);
-        if (!user) {
-            return [false, "User not found"];
-        }
+    async deleteUser(userId: string): Promise<[boolean, string]> {
+        // console.log(userId);
+        // const user = await this.userRepo.findUserByEmail(userId);
+        // if (!user) {
+        //     return [false, "User not found"];
+        // }
         
-        const isDeleted = await this.userRepo.deleteUser(user.userId);
+        const isDeleted = await this.userRepo.deleteUser(userId);
         if (!isDeleted) {
             return [false, "Failed to delete user"];
         }
         return [true, "User deleted successfully"];
     }
-    async updateUserInfo(userId: string, email: string, nickname: string, userType: string): Promise<UserModel> {
-        const user = new UserModel(userId, email, nickname, "", userType);
+    async updateUserInfo(userId: string, nickname: string, userType: string, userName: string, birth: Date): Promise<UserModel> {
+        // console.log("use case : ", birth);
+        const user = new UserModel(userId, null, nickname, null, userType, null, userName, birth);
         return this.userRepo.updateUserInfo(user);
     }
     async getUserById(userId: string): Promise<UserModel | null> {

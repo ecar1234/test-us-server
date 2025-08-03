@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserEntity } from "./UserEntiry";
+import { UserEntity } from "./UserEntity";
 import { ApplicationEntity } from "./ApplicationEntity";
 
 export enum PostStatusType {

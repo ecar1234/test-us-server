@@ -7,9 +7,9 @@
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/data_source.ts",
-    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/config/data_source.ts src/migration/AutoGen",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/data_source.ts"
+    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
+    "migration:generate": "ts-node ./node_modules/typeorm/cli.js migration:generate -d src/config/DataSource.ts src/migration/AutoGen",
+    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/DataSource.ts"
   },
   "keywords": [],
   "author": "",

@@ -2,7 +2,7 @@ import { AppDataSource } from "../../config/DataSource";
 import { MessageModel } from "../../domain/entities/MessageModel";
 import { IMessageRepository } from "../../domain/interface_repositories/IMessageRepository";
 import { MessagesEntity } from "../entities/MessageEntity";
-import { UserEntity } from "../entities/UserEntiry";
+import { UserEntity } from "../entities/UserEntity";
 
 
 export class MessageRepositoryImpl implements IMessageRepository {

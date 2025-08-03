@@ -8,13 +8,13 @@ const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 route.post('/update', userController.update.bind(userController));
-route.post('/getUserById', userController.getUserById.bind(userController));
-route.post('/getUserByEmail', userController.getUserByEmail.bind(userController));
-route.post('/getUserByNickname', userController.getUserByNickname.bind(userController));
-route.post('/changePassword', userController.changePassword.bind(userController));
+route.get('/getUserById/:id', userController.getUserById.bind(userController));
+route.get('/getUserByEmail/:email', userController.getUserByEmail.bind(userController));
+route.get('/getUserByNickname/:nickname', userController.getUserByNickname.bind(userController));
+route.put('/changePassword', userController.changePassword.bind(userController));
 route.get('/getAllUsers', userController.getAllUsers.bind(userController));
-route.get('/isNicknameAvailable', userController.isNicknameAvailable.bind(userController));
-route.get('/isEmailAvailable', userController.isEmailAvailable.bind(userController));
+route.get('/isNicknameAvailable/:nickname', userController.isNicknameAvailable.bind(userController));
+route.get('/isEmailAvailable/:email', userController.isEmailAvailable.bind(userController));
 route.post('/isPasswordValid', userController.isPasswordValid.bind(userController));
 
 export default route;

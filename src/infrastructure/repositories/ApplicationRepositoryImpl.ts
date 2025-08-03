@@ -3,7 +3,7 @@ import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../e
 import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import { PostEntity } from "../entities/PostEntity";
-import { UserEntity } from "../entities/UserEntiry";
+import { UserEntity } from "../entities/UserEntity";
 import { PostModel } from "../../domain/entities/PostModel";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {

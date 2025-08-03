@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { UserEntity } from "./UserEntiry";
+import { UserEntity } from "./UserEntity";
 
 @Entity('Messages')
 @Unique(['messageId'])

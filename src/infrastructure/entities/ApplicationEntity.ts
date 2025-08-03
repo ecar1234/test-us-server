@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { PostEntity } from "./PostEntity";
-import { UserEntity } from "./UserEntiry";
+import { UserEntity } from "./UserEntity";
 import { ReviewEntity } from "./ReviewEntiry";
 
 // 신청 상태를 정의하는 Enum

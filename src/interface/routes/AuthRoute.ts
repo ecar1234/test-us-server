@@ -10,6 +10,7 @@ const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 route.post('/register', userController.register.bind(userController));
+route.post('/login', userController.login.bind(userController));
 route.post('/delete', userController.delete.bind(userController));
 
 export default route;
