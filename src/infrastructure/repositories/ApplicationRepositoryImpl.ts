@@ -61,6 +61,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
                     post.author.userId,
                     post.title,
                     post.subtitle,
+                    post.platform,
                     post.contents,
                     post.status,
                     post.period,

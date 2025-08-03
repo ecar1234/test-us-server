@@ -1,6 +1,8 @@
 import { AppDataSource } from "../../config/DataSource";
 import { ReviewModel } from "../../domain/entities/ReviewModel";
 import { IReviewRepository } from "../../domain/interface_repositories/IReview_repository";
+import { ApplicationEntity } from "../entities/ApplicationEntity";
+import { UserEntity } from "../entities/UserEntity";
 import { ReviewEntity, ReviewType } from "../entities/ReviewEntiry";
 
 
@@ -26,7 +28,9 @@ export class ReviewRepositoryImpl implements IReviewRepository {
         reviewEntity.comment = reviewModel.comment;
         reviewEntity.reviewType = reviewType;
         reviewEntity.createdAt = reviewModel.createdAt;
-        // Assuming application, reviewer, and reviewed are set elsewhere
+        reviewEntity.application = { appId: reviewModel.applicationId } as ApplicationEntity;
+        reviewEntity.reviewer = { userId: reviewModel.reviewerUserId } as UserEntity;
+        reviewEntity.reviewed = { userId: reviewModel.reviewedUserId } as UserEntity;
         return reviewEntity;
     }
     async createReview(review: ReviewModel): Promise<ReviewModel> {

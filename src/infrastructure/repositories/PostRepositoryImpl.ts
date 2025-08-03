@@ -2,34 +2,44 @@ import { AppDataSource } from "../../config/DataSource";
 import { PostModel } from "../../domain/entities/PostModel";
 import { IPostRepository } from "../../domain/interface_repositories/IPostRepository";
 import { PostEntity, PostStatusType } from "../entities/PostEntity";
+import { UserEntity } from "../entities/UserEntity";
 
 
 export class PostRepositoryImpl implements IPostRepository {
     private postRepository = AppDataSource.getRepository(PostEntity);
+    // private userRepository = AppDataSource.getRepository(UserEntity);
+    
     private toDomainPost(postEntity: PostEntity): PostModel {
+        // console.log(postEntity);
+        const status = postEntity.status === PostStatusType.ACTIVE ? 'active' : (postEntity.status === PostStatusType.END ? 'end' : (postEntity.status === PostStatusType.EXPIRED ? 'expired' : 'delete' ));
         return new PostModel(
             postEntity.postId,
-            postEntity.author ? postEntity.author.userId : null,
+            postEntity.author && postEntity.author.userId,
             postEntity.title,
             postEntity.subtitle,
+            postEntity.platform,
             postEntity.contents,
-            postEntity.status,
+            status,
             postEntity.period,
             postEntity.createdAt,
-            postEntity.updatedAt
+            postEntity.updatedAt,
+            postEntity.applications && postEntity.applications.map(application => application.appId)
         );
     }
     private toEntityPost(post: PostModel): PostEntity {
-        const postStatus = post.status === 'active' ? PostStatusType.ACTIVE : post.status === 'end' ? PostStatusType.END : PostStatusType.EXPIRED;
+        const postStatus = post.status === 'active' ? PostStatusType.ACTIVE : (post.status === 'end' ? PostStatusType.END : PostStatusType.EXPIRED);
         const dbPost = this.postRepository.create({
-            postId: post.id,
+            ...(post.id && {postId : post.id}),
+            ...(post.authorId && { author: { userId: post.authorId } }),
             title: post.title,
             subtitle: post.subtitle,
-            contents: post.content,
+            platform: post.platform,
+            contents: post.contents,
             status: postStatus,
             period: post.period,
             createdAt: post.createdAt ? post.createdAt : new Date(),
-            updatedAt: post.updatedAt ? post.updatedAt : new Date()
+            updatedAt: post.updatedAt ? post.updatedAt : new Date(),
+            ...( post.appilcations && {applications: post.appilcations.map(appId => ({ appId }))})
         });
         return dbPost;
     }
@@ -40,39 +50,85 @@ export class PostRepositoryImpl implements IPostRepository {
         return this.toDomainPost(savedPost);
     }
 
-    async updatePost(post:PostModel): Promise<[PostModel | null, string]> {
-        const existingPost = await this.postRepository.findOneBy({ postId: post.id });
-        if (!existingPost) {
-            return [null, "Post not found"];
+    async updatePost(post:PostModel): Promise<PostModel> {
+        const postEntity = await this.postRepository.findOne({
+            where: { postId: post.id },
+            relations: ['author', 'applications']
+        });
+        if (!postEntity) {
+            throw new Error("Post not found");
         }
-        const updatedPostEntity = this.toEntityPost(post);
-        const updatedPost = await this.postRepository.save(updatedPostEntity);
-        return [this.toDomainPost(updatedPost), "Post updated successfully"];
+        // console.log(post);
+
+        postEntity.title = post.title;
+        postEntity.subtitle = post.subtitle;
+        postEntity.platform = post.platform;
+        postEntity.contents = post.contents;
+        postEntity.status = post.status === "active" ? PostStatusType.ACTIVE : (post.status === "end" ? PostStatusType.END : PostStatusType.EXPIRED);
+        // postEntity.period = post.period;
+
+        const updatedPost = await this.postRepository.save(postEntity);
+        
+        return this.toDomainPost(updatedPost);
     }
 
     async deletePost(id: string): Promise<boolean> {
-       const result = await this.postRepository.delete({ postId: id });
-       return result.affected !== 0;
-    }
-
-    async getPostById(id: string): Promise<[PostModel | null, string]> {
-        const postEntity = await this.postRepository.findOneBy({ postId: id });
-        if (!postEntity) {
-            return [null, "Post not found"];
-        }
-        return [this.toDomainPost(postEntity), "Post retrieved successfully"];
-    }
-
-    async getPostByTitle(title: string): Promise<[PostModel | null, string]> {
-       const postEntity = await this.postRepository.findOneBy({ title });
-       if (!postEntity) {
-           return [null, "Post not found"];
+       const result = await this.postRepository.findOneBy({ postId: id });
+       if (!result) {
+           throw new Error("Post not found");
        }
-         return [this.toDomainPost(postEntity), "Post retrieved successfully"];
+       result.status = PostStatusType.DELETE;
+       await this.postRepository.save(result);
+       return true;
     }
+
+    async getPostById(id: string): Promise<PostModel> {
+        const postEntity = await this.postRepository.findOne({
+            where: { postId: id },
+            relations: ['author', 'applications']
+        });
+        if (!postEntity) {
+            throw new Error("Post not found");
+        }
+        return this.toDomainPost(postEntity);
+    }
+
+    async getPostByTitle(title: string): Promise<PostModel> {
+       const postEntity = await this.postRepository.findOne({
+           where: { title },
+           relations: ['author', 'applications']
+       });
+       if (!postEntity) {
+           throw new Error("Post not found");
+       }
+         return this.toDomainPost(postEntity);
+    }
+
+    async getPostsByAuthor(authorId: string): Promise<PostModel[]> {
+        const postEntities = await this.postRepository.find({
+            where: { author: { userId: authorId } },
+            relations: ['author', 'applications']
+        });
+        
+        return postEntities.map(entity => this.toDomainPost(entity));
+    }   
+    
+    // async getPostsByNickname(nickname: string): Promise<PostModel[]> {
+    //     const userEntity = await this.userRepository.findOne({
+    //         where: { nickname },
+    //         relations: ['posts']
+    //     });
+    //     if (!userEntity) {
+    //         throw new Error("User not found");
+    //     }
+    //     return userEntity.posts.map(postEntity => this.toDomainPost(postEntity));
+    // }
+
 
     async getAllPosts(): Promise<PostModel[]> {
-        const postEntities = await this.postRepository.find();
+        const postEntities = await this.postRepository.find({
+            relations: ['author', 'applications']
+        });
         return postEntities.map(postEntity => this.toDomainPost(postEntity));
     }
 }

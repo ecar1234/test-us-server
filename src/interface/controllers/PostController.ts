@@ -6,9 +6,10 @@ export class PostController {
 
     async createPost(req: Request, res: Response): Promise<void> {
         try {
-            const { title, subtitle, content } = req.body;
-            const post = await this.postUseCase.createPost(title, subtitle, content);
-            res.status(201).json(post);
+            // authorId는 인증된 사용자 세션(예: req.user.id)에서 가져오는 것이 더 좋습니다.
+            const { authorId, title, subtitle, platform, contents } = req.body;
+            const post = await this.postUseCase.createPost(authorId, title, subtitle, platform, contents);
+            res.status(201).json({post : post});
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -16,12 +17,12 @@ export class PostController {
    
     async updatePost(req: Request, res: Response): Promise<void> {
         try {
-            const { id, authorId, title, subtitle, content, status } = req.body;
-            const [updatedPost, message] = await this.postUseCase.updatePost(id, authorId, title, subtitle, content, status);
+            const { postId, authorId, title, subtitle, platform, contents, status } = req.body;
+            const updatedPost = await this.postUseCase.updatePost(postId, authorId, title, subtitle, platform, contents, status);
             if (updatedPost) {
-                res.status(200).json({ post: updatedPost, message });
+                res.status(200).json({ post: updatedPost, message: "Post updated successfully" });
             } else {
-                res.status(404).json({ error: message });
+                res.status(404).json({ error: "Post not found" });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -30,10 +31,10 @@ export class PostController {
 
     async deletePost(req: Request, res: Response): Promise<void> {
         try {
-            const { id } = req.body;
-            const success = await this.postUseCase.deletePost(id);
+            const { postId } = req.body;
+            const success = await this.postUseCase.deletePost(postId);
             if (success) {
-                res.status(200).json({ message: "Post deleted successfully" });
+                res.status(200).json({ result: success, message: "Post deleted successfully" });
             } else {
                 res.status(404).json({ error: "Post not found" });
             }
@@ -45,11 +46,11 @@ export class PostController {
     async getPostById(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const [post, message] = await this.postUseCase.getPostById(id);
+            const post = await this.postUseCase.getPostById(id);
             if (post) {
-                res.status(200).json({ post, message });
+                res.status(200).json({ post: post });
             } else {
-                res.status(404).json({ error: message });
+                res.status(404).json({ error: "Post not found" });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -59,11 +60,11 @@ export class PostController {
     async getPostByTitle(req: Request, res: Response): Promise<void> {
         try {
             const { title } = req.params;
-            const [post, message] = await this.postUseCase.getPostByTitle(title);
+            const post = await this.postUseCase.getPostByTitle(title);
             if (post) {
-                res.status(200).json({ post, message });
+                res.status(200).json({ post: post });
             } else {
-                res.status(404).json({ error: message });
+                res.status(404).json({ error: "Post not found" });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -73,7 +74,7 @@ export class PostController {
     async getAllPosts(req: Request, res: Response): Promise<void> {
         try {
             const posts = await this.postUseCase.getAllPosts();
-            res.status(200).json(posts);
+            res.status(200).json({posts: posts});
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -83,7 +84,7 @@ export class PostController {
         try {
             const { authorId } = req.params;
             const posts = await this.postUseCase.getPostsByAuthor(authorId);
-            res.status(200).json(posts);
+            res.status(200).json({posts: posts});
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

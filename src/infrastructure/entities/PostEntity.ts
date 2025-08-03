@@ -6,6 +6,7 @@ export enum PostStatusType {
     ACTIVE = 'active',
     END = 'end',
     EXPIRED = 'expired',
+    DELETE = 'delete'
 }
 
 @Entity('Post')
@@ -23,10 +24,13 @@ export class PostEntity {
     @Column("varchar", { length: 100 })
     subtitle: string
 
+    @Column({ type: 'simple-array', nullable: false })
+    platform: string[]
+
     @Column('text')
     contents: string
 
-    @Column({ type: 'enum', enum: ['active', 'end', 'expired'], default: 'active' })
+    @Column({ type: 'enum', enum: PostStatusType, default: 'active' })
     status: PostStatusType
 
     @Column('int', { default: 7 })
