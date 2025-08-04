@@ -5,7 +5,7 @@ import { MessagesEntity } from "./MessageEntity";
 import { ReviewEntity } from "./ReviewEntiry";
 
 export enum UserType {
-    INDVIDUALS = 'INDVIDUALS',
+    INDIVIDUALS = 'INDIVIDUALS',
     COMPANIES = 'COMPANIES',
 }
 export enum UserStatus {
@@ -32,10 +32,10 @@ export class UserEntity {
     @Column('varchar', { length: 20 , nullable: true })
     userName: string
 
-    @Column({ type: 'datetime', nullable: true })
+    @Column({ type: 'date', nullable: true })
     birth: Date
 
-    @Column({ type: 'enum', enum: UserType, default: UserType.INDVIDUALS })
+    @Column({ type: 'enum', enum: UserType, default: UserType.INDIVIDUALS })
     type: UserType
 
     @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })

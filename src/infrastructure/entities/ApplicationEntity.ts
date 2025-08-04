@@ -8,6 +8,7 @@ export enum ApplicationStatus {
     PENDING = 'pending',
     ACCEPTED = 'accepted',
     REJECTED = 'rejected',
+    CANCEL = 'cancel'
 }
 export enum ApplicationsPlatform {
     WEB = 'web',
@@ -18,8 +19,8 @@ export enum ApplicationsPlatform {
 @Entity('Application')
 @Unique(['post', 'applicant'])
 export class ApplicationEntity {
-    @PrimaryGeneratedColumn('uuid')
-    appId: string
+    @PrimaryGeneratedColumn('increment')
+    appId: number
 
     @Column({type: 'enum', enum: ApplicationsPlatform, default: ApplicationsPlatform.WEB})
     platform: ApplicationsPlatform
@@ -32,7 +33,7 @@ export class ApplicationEntity {
     status: ApplicationStatus;
 
     @CreateDateColumn()
-    appliedAt: Date; // 신청 일시
+    appliedAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;

@@ -14,7 +14,7 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.email,
             userEntity.nickname,
             userEntity.password_hash,
-            userEntity.type === UserType.INDVIDUALS ? 'INDVIDUALS' : 'COMPANIES',
+            userEntity.type === UserType.INDIVIDUALS ? 'INDIVIDUALS' : 'COMPANIES',
             userEntity.status === UserStatus.ACTIVE ? 'ACTIVE' : 'INACTIVE',
             userEntity.userName,
             userEntity.birth,
@@ -34,7 +34,7 @@ export class UserRepositoryImpl implements IUserRepository {
             email: user.email,
             password_hash: user.password,
             nickname: user.nickname,
-            type: user.userType === 'INDVIDUALS' ? UserType.INDVIDUALS : UserType.COMPANIES,
+            type: user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS : UserType.COMPANIES,
             status: user.status === 'ACTIVE' ? UserStatus.ACTIVE : UserStatus.INACTIVE,
             userName: user.userName,
             birth: user.birth,
@@ -74,7 +74,7 @@ export class UserRepositoryImpl implements IUserRepository {
 
         // DB에서 조회한 엔티티의 속성을 직접 수정합니다.
         userEntity.nickname = user.nickname;
-        userEntity.type = user.userType === 'INDVIDUALS' ? UserType.INDVIDUALS : UserType.COMPANIES;
+        userEntity.type = user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS : UserType.COMPANIES;
         userEntity.userName = user.userName;
         userEntity.birth = user.birth;
 

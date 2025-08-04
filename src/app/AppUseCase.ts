@@ -5,31 +5,13 @@ import { ApplicationRepositoryImpl } from "../infrastructure/repositories/Applic
 export class AppUseCase {
     constructor(private applicationRepository: ApplicationRepositoryImpl) {}
 
-    async findApplicationsByPostId(postId: string): Promise<ApplicationModel[]> {
-        return this.applicationRepository.findByPostId(postId);
-    }
-
-    async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
-        return this.applicationRepository.findByUserId(userId);
-    }
-
-    async findByUserNickname(nickname: string): Promise<ApplicationModel[]> {
-        return this.applicationRepository.findByUserNickname(nickname);
-    }
-
-    async findPostListByUserId(userId: string): Promise<PostModel[]> {
-        return this.applicationRepository.findPostListByUserId(userId);
-    }
-
-    async countApplicantsByPostId(postId: string): Promise<number> {
-        return this.applicationRepository.applicantCountByPostId(postId);
-    }
-
-    async createApplication(application: ApplicationModel): Promise<ApplicationModel> {
+    async createApplication(userId: string, postId: string, platform: string, status: string = 'pending'): Promise<ApplicationModel> {
+        const application = new ApplicationModel(null, platform, status, null, null, postId, userId);
         return this.applicationRepository.create(application);
     }
 
-    async updateApplication(application: ApplicationModel): Promise<ApplicationModel> {
+    async updateApplication(postId: string, userId: string, platform: string, status: string): Promise<ApplicationModel> {
+        const application = new ApplicationModel(null, platform, status, null, null, postId, userId);
         return this.applicationRepository.update(application);
     }
 
@@ -43,17 +25,5 @@ export class AppUseCase {
 
     async rejectUser(userId: string, postId: string): Promise<ApplicationModel> {
         return this.applicationRepository.rejectUser(userId, postId);
-    }
-
-    async countApplicationsByPostId(postId: string): Promise<number> {
-        return this.applicationRepository.countByPostId(postId);
-    }
-
-    async findApplicationByPostAndUserAndStatus(postId: string, userId: string, status: string): Promise<ApplicationModel | null> {
-        return this.applicationRepository.findByPostIdAndUserIdAndStatus(postId, userId, status);
-    }
-
-    async findApplicationsWithPagination(postId: string, page: number, limit: number): Promise<{ applications: ApplicationModel[]; total: number }> {
-        return this.applicationRepository.findByPostIdWithPagination(postId, page, limit);
     }
 }

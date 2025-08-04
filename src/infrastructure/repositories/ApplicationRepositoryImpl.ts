@@ -2,9 +2,7 @@ import { IApplicationRepository } from "../../domain/interface_repositories/IApp
 import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity";
 import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { PostEntity } from "../entities/PostEntity";
-import { UserEntity } from "../entities/UserEntity";
-import { PostModel } from "../../domain/entities/PostModel";
+import createError from "http-errors";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
@@ -12,8 +10,10 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     private toDomainApplication(applicationEntity: ApplicationEntity): ApplicationModel {
         return new ApplicationModel(
             applicationEntity.appId,
-            applicationEntity.platform,
-            applicationEntity.status,
+            applicationEntity.platform === ApplicationsPlatform.WEB ? 'web' : (applicationEntity.platform === ApplicationsPlatform.IOS ? 'ios' : 'android'),
+            applicationEntity.status === ApplicationStatus.PENDING ? 'pending' :
+                (applicationEntity.status === ApplicationStatus.ACCEPTED ? 'accepted' :
+                    (applicationEntity.status === ApplicationStatus.REJECTED ? 'rejected' : 'cancel')),
             applicationEntity.appliedAt,
             applicationEntity.updatedAt,
             applicationEntity.post.postId,
@@ -21,87 +21,37 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         );
     }
     private toEntityApplication(application: ApplicationModel): ApplicationEntity {
-        const entity = new ApplicationEntity();
-        const platform = application.platform == 'web' ? ApplicationsPlatform.WEB
-            : (application.platform == 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID);
-        const status = application.status == 'pending' ? ApplicationStatus.PENDING
-            : (application.status == 'accepted' ? ApplicationStatus.ACCEPTED : ApplicationStatus.REJECTED);
-
-        entity.appId = application.id;
-        entity.platform = platform;
-        entity.status = status;
-        entity.appliedAt = application.appliedAt || new Date();
-        entity.updatedAt = application.updatedAt || null;
-        entity.post = { postId: application.postId } as PostEntity;
-        entity.applicant = { userId: application.applicantId } as UserEntity;
-        return entity;
-    }
-
-    public async findByPostId(postId: string): Promise<ApplicationModel[]> {
-        return this.applicationRepository.find({
-            where: { post: { postId } },
-            relations: ['applicant', 'post', 'reviews']
-        }).then(applications => applications.map(this.toDomainApplication.bind(this)));
-    }
-    public async findByUserId(userId: string): Promise<ApplicationModel[]> {
-        return this.applicationRepository.find({
-            where: { applicant: { userId } },
-            relations: ['applicant', 'post', 'reviews']
-        }).then(applications => applications.map(this.toDomainApplication.bind(this)));
-    }
-    async findPostListByUserId(userId: string): Promise<PostModel[]> {
-        return this.applicationRepository.find({
-            where: { applicant: { userId } },
-            relations: ['post']
-        }).then(applications => {
-            return applications.map(app => {
-                const post = app.post;
-                return new PostModel(
-                    post.postId,
-                    post.author.userId,
-                    post.title,
-                    post.subtitle,
-                    post.platform,
-                    post.contents,
-                    post.status,
-                    post.period,
-                    post.createdAt,
-                    post.updatedAt
-                );
-            });
+        return this.applicationRepository.create({
+            ...(application.id && { appId: application.id }),
+            platform: application.platform === 'web' ? ApplicationsPlatform.WEB : (application.platform === 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID),
+            status: application.status === 'pending' ? ApplicationStatus.PENDING :
+                (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
+                    (ApplicationStatus.REJECTED ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL)),
+            post: { postId: application.postId },
+            applicant: { userId: application.applicantId },
         });
     }
-    public async findByUserNickname(nickname: string): Promise<ApplicationModel[]> {
-        return this.applicationRepository.find({
-            where: { applicant: { nickname } },
-            relations: ['applicant', 'post', 'reviews']
-        }).then(applications => applications.map(this.toDomainApplication.bind(this)));
-    }
-    public async applicantCountByPostId(postId: string): Promise<number> {
-        return this.applicationRepository.count({
-            where: { post: { postId } }
-        });
-    }
+
+
     public async create(application: ApplicationModel): Promise<ApplicationModel> {
-        const entity = this.toEntityApplication(application);
-        return this.applicationRepository.save(entity).then(savedEntity => {
-            return this.toDomainApplication(savedEntity);
-        });
+        const entity = await this.applicationRepository.findOne({ where: { post: { postId: application.postId }, applicant: { userId: application.applicantId } }, relations: ['post', 'applicant'] });
+        if(entity){
+            throw createError(409, "Application already exists");
+        }
+        const appEntity = this.toEntityApplication(application);
+        const savedEntity = await this.applicationRepository.save(appEntity);
+        return this.toDomainApplication(savedEntity);
     }
     public async update(application: ApplicationModel): Promise<ApplicationModel> {
-        const entity = this.toEntityApplication(application);
+        const entity = await this.applicationRepository.findOne({ where: { post: { postId: application.postId }, applicant: { userId: application.applicantId } }, relations: ['post', 'applicant'] });
 
-        this.applicationRepository.update(entity.appId, entity);
+        entity.platform = application.platform === 'web' ? ApplicationsPlatform.WEB : (application.platform === 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID);
+        entity.status = application.status === 'pending' ? ApplicationStatus.PENDING :
+            (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
+                (application.status === 'rejected' ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL))
 
-        return this.applicationRepository.findOne({
-            where: { appId: entity.appId },
-            relations: ['applicant', 'post', 'reviews']
-        }).then(updatedEntity => {
-            if (!updatedEntity) {
-                throw new Error(`Application with id ${entity.appId} not found`);
-            }
-            return this.toDomainApplication(updatedEntity);
-        });
+        await this.applicationRepository.save(entity);
+        return this.toDomainApplication(entity);
     }
     public async delete(id: string): Promise<boolean> {
         return this.applicationRepository.delete(id).then(result => {
@@ -147,38 +97,4 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             });
         });
     }
-    public async countByPostId(postId: string): Promise<number> {
-        return this.applicationRepository.count({
-            where: { post: { postId } }
-        });
-    }
-    public async findByPostIdAndUserIdAndStatus(postId: string, userId: string, status: string): Promise<ApplicationModel | null> {
-        return this.applicationRepository.findOne({
-            where: {
-                post: { postId },
-                applicant: { userId },
-                status: status as ApplicationStatus
-            },
-            relations: ['applicant', 'post', 'reviews']
-        }).then(applicationEntity => {
-            if (!applicationEntity) {
-                return null;
-            }
-            return this.toDomainApplication(applicationEntity);
-        });
-    }
-    public async findByPostIdWithPagination(postId: string, page: number, limit: number): Promise<{ applications: ApplicationModel[]; total: number; }> {
-        return this.applicationRepository.findAndCount({
-            where: { post: { postId } },
-            relations: ['applicant', 'post', 'reviews'],
-            skip: (page - 1) * limit,
-            take: limit
-        }).then(([applications, total]) => {
-            return {
-                applications: applications.map(this.toDomainApplication.bind(this)),
-                total
-            };
-        });
-    }
-
 }
