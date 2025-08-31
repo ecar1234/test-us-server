@@ -36,6 +36,9 @@ export class PostEntity {
     @Column('int', { default: 7 })
     period: number
 
+    @Column({type: 'int', default: 0})
+    views: number
+
     @CreateDateColumn()
     createdAt: Date
 

@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const PostController_1 = require("../controllers/PostController");
+const PostRepositoryImpl_1 = require("../../infrastructure/repositories/PostRepositoryImpl");
+const PostUseCase_1 = require("../../app/PostUseCase");
+const route = (0, express_1.Router)();
+const postUseCase = new PostUseCase_1.PostUseCase(new PostRepositoryImpl_1.PostRepositoryImpl());
+const postController = new PostController_1.PostController(postUseCase);
+route.post('/create', postController.createPost.bind(postController));
+route.put('/update', postController.updatePost.bind(postController));
+route.post('/delete', postController.deletePost.bind(postController));
+route.get('/getPostById/:id', postController.getPostById.bind(postController));
+route.get('/getPostByTitle/:title', postController.getPostByTitle.bind(postController));
+route.get('/getAllPosts', postController.getAllPosts.bind(postController));
+route.get('/getPostsByAuthor/:authorId', postController.getPostsByAuthor.bind(postController));
+// route.get('/getPostByNickname/:nickname', postController.getPostsByNickname.bind(postController));
+exports.default = route;

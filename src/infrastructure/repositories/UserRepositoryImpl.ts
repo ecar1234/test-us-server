@@ -2,7 +2,7 @@ import { AppDataSource } from "../../config/DataSource";
 import { PostModel } from "../../domain/entities/PostModel";
 import { UserModel } from "../../domain/entities/UserModel";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
-import { UserEntity, UserStatus, UserType } from "../entities/UserEntity";
+import { UserEntity, UserRole, UserStatus, UserType } from "../entities/UserEntity";
 
 export class UserRepositoryImpl implements IUserRepository {
 
@@ -16,6 +16,7 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.password_hash,
             userEntity.type === UserType.INDIVIDUALS ? 'INDIVIDUALS' : 'COMPANIES',
             userEntity.status === UserStatus.ACTIVE ? 'ACTIVE' : 'INACTIVE',
+            this.getUserRoleString(userEntity.role),
             userEntity.userName,
             userEntity.birth,
             userEntity.createdAt,
@@ -36,6 +37,7 @@ export class UserRepositoryImpl implements IUserRepository {
             nickname: user.nickname,
             type: user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS : UserType.COMPANIES,
             status: user.status === 'ACTIVE' ? UserStatus.ACTIVE : UserStatus.INACTIVE,
+            role: this.getUserRole(user.role),
             userName: user.userName,
             birth: user.birth,
             ...(user.posts && { posts: user.posts.map(post => ({ postId: post })) }),
@@ -47,6 +49,63 @@ export class UserRepositoryImpl implements IUserRepository {
         });
         return dbUser;
     }
+    private getUserRole(role: string): UserRole {
+        switch (role) {
+            case 'PROGRAMMER':
+                return UserRole.PROGRAMMER;
+            case 'DESIGNER':
+                return UserRole.DESIGNER;
+            case 'PUBLISHER':
+                return UserRole.PUBLISHER;
+            case 'PLANNER':
+                return UserRole.PLANNER;
+            case 'MANAGER':
+                return UserRole.MANAGER;
+            case 'MARKETER':
+                return UserRole.MARKETER;
+            case 'ANALYST':
+                return UserRole.ANALYST;
+            case 'OPERATER':
+                return UserRole.OPERATER;
+            case 'PM':
+                return UserRole.PM;
+            case 'QA':
+                return UserRole.QA;
+            case 'CS':
+                return UserRole.CS;
+            default:
+                throw new Error('Invalid role');
+        }
+    }
+    private getUserRoleString(role: UserRole): string {
+        switch (role) {
+            case UserRole.PROGRAMMER:
+                return 'PROGRAMMER';
+            case UserRole.DESIGNER:
+                return 'DESIGNER';
+            case UserRole.PUBLISHER:
+                return 'PUBLISHER';
+            case UserRole.PLANNER:
+                return 'PLANNER';
+            case UserRole.MANAGER:
+                return 'MANAGER';
+            case UserRole.MARKETER:
+                return 'MARKETER';
+            case 'ANALYST':
+                return 'ANALYST';
+            case UserRole.OPERATER:
+                return 'OPERATER'
+            case UserRole.PM:
+                return 'PM';
+            case UserRole.QA:
+                return 'QA';
+            case UserRole.CS:
+                return 'CS';
+            default:
+                throw new Error('Invalid role');
+        }
+    }
+
 
     async registerUser(user: UserModel): Promise<UserModel> {
         const dbUser = this.toEntityUser(user);
@@ -63,7 +122,6 @@ export class UserRepositoryImpl implements IUserRepository {
         user.status = UserStatus.INACTIVE;
         await this.userRepository.save(user);
         return true;
-        // return this.userRepository.delete({ userId }).then(result => result.affected !== 0);
     }
     async updateUserInfo(user: UserModel): Promise<UserModel> {
         // console.log("Impl : ", user);

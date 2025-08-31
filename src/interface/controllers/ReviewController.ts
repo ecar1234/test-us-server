@@ -22,7 +22,7 @@ export class ReviewController {
     }
     async getReviewsByApplicationId(req: Request, res: Response): Promise<void> {
         const appId: string = req.params.applicationId;
-        const result: ReviewModel[] = await this.reviewUseCase.getReviewsByApplicationId(appId);
+        const result: ReviewModel[] = await this.reviewUseCase.getReviewsByApplicationId(parseInt(appId));
 
         res.status(200).json({ reviews: result });
     }

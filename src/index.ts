@@ -1,15 +1,23 @@
+import * as dotenv from 'dotenv';
+const dotenvResult = dotenv.config(); // dotenv.config()의 결과를 변수에 저장
+
+console.log('--- Diagnostics from index.ts ---');
+console.log('Dotenv load result:', dotenvResult);
+console.log('process.env.DATA_BASE_USER_NAME:', process.env.DATA_BASE_USER_NAME);
+console.log('---------------------------------');
+
 import express, { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from './config/DataSource';
 import AuthRoute from './interface/routes/AuthRoute';
-import UserRoute from './interface/routes/UserRoute'; 
+import UserRoute from './interface/routes/UserRoute';
 import PostRoute from './interface/routes/PostRoute';
 import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
-import { isHttpError } from 'http-errors';
 
 const app = express();
-const port = 3000;
+const port = parseInt(process.env.SERVER_PORT);
+
 
 app.use(express.json());
 
@@ -17,9 +25,10 @@ AppDataSource.initialize()
     .then(() => {
         console.log("DB 연결 성공!!");
 
-        app.listen(port, () => {
-            console.log("서버 실행 중: http://localhost:3000");
+        app.listen(port, '0.0.0.0',() => {
+            console.log(`서버 실행 중: 0.0.0.0:${port}`);
             // API 라우트 설정
+            // app.use('/', (res: Response)=>{res.send("Hello World!")});
             app.use('/api/v1/auth', AuthRoute);
             app.use('/api/v1/user', UserRoute);
             app.use('/api/v1/post', PostRoute);

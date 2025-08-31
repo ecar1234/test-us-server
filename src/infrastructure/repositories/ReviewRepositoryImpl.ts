@@ -42,7 +42,7 @@ export class ReviewRepositoryImpl implements IReviewRepository {
         return this.reviewDataSource.findOne({ where: { reviewId } })
             .then(reviewEntity => reviewEntity ? this.toDomainReview(reviewEntity) : null);
     }
-    async getReviewsByApplicationId(applicationId: string): Promise<ReviewModel[]> {
+    async getReviewsByApplicationId(applicationId: number): Promise<ReviewModel[]> {
         return this.reviewDataSource.find({ where: { application: { appId: applicationId } } })
             .then(reviewEntities => reviewEntities.map(this.toDomainReview.bind(this)));
     }

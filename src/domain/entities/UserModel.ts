@@ -6,6 +6,7 @@ export class UserModel {
         public password: string,
         public userType: string,
         public status: string = 'ACTIVE',
+        public role: string,
         public userName: string,
         public birth: Date,
         public readonly createdAt: Date | null = null,

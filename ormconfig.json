@@ -1,0 +1,12 @@
+{
+  "type": "mysql2",
+  "host": "localhost",
+  "port": 3306,
+  "synchronize": false,
+  "logging": true,
+  "cli": {
+    "entitiesDir": "src/infrastructure/entities/*.{js,ts}",
+    "migrationsDir": "src/migration/*.{js,ts}"
+  },
+  "require": ["dotenv/config"]
+}

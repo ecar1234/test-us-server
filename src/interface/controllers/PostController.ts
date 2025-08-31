@@ -2,30 +2,31 @@ import { PostUseCase } from "../../app/PostUseCase";
 import { Request, Response } from "express";
 
 export class PostController {
-    constructor(private postUseCase: PostUseCase) {}
+    constructor(private postUseCase: PostUseCase) { }
 
     async createPost(req: Request, res: Response): Promise<void> {
         try {
             // authorId는 인증된 사용자 세션(예: req.user.id)에서 가져오는 것이 더 좋습니다.
-            const { authorId, title, subtitle, platform, contents } = req.body;
-            const post = await this.postUseCase.createPost(authorId, title, subtitle, platform, contents);
-            res.status(201).json({post : post});
+            const { author, title, subtitle, platform, contents } = req.body;
+            
+            const post = await this.postUseCase.createPost(author, title, subtitle, platform, contents);
+            res.status(200).json({ status: 200, post: post });
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ status: 500, error: error.message });
         }
     }
-   
+
     async updatePost(req: Request, res: Response): Promise<void> {
         try {
             const { postId, authorId, title, subtitle, platform, contents, status } = req.body;
             const updatedPost = await this.postUseCase.updatePost(postId, authorId, title, subtitle, platform, contents, status);
             if (updatedPost) {
-                res.status(200).json({ post: updatedPost, message: "Post updated successfully" });
+                res.status(200).json({ status: 200, post: updatedPost, message: "Post updated successfully" });
             } else {
-                res.status(404).json({ error: "Post not found" });
+                res.status(404).json({ status: 404, error: "Post not found" });
             }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ status: 500, error: error.message });
         }
     }
 
@@ -34,9 +35,9 @@ export class PostController {
             const { postId } = req.body;
             const success = await this.postUseCase.deletePost(postId);
             if (success) {
-                res.status(200).json({ result: success, message: "Post deleted successfully" });
+                res.status(200).json({ status: 200, result: success, message: "Post deleted successfully" });
             } else {
-                res.status(404).json({ error: "Post not found" });
+                res.status(404).json({ status: 404, error: "Post not found" });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -48,9 +49,9 @@ export class PostController {
             const { id } = req.params;
             const post = await this.postUseCase.getPostById(id);
             if (post) {
-                res.status(200).json({ post: post });
+                res.status(200).json({ status: 200, post: post });
             } else {
-                res.status(404).json({ error: "Post not found" });
+                res.status(404).json({ status: 404, error: "Post not found" });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -62,29 +63,77 @@ export class PostController {
             const { title } = req.params;
             const post = await this.postUseCase.getPostByTitle(title);
             if (post) {
-                res.status(200).json({ post: post });
+                res.status(200).json({ status: 200, post: post });
             } else {
-                res.status(404).json({ error: "Post not found" });
+                res.status(404).json({ status: 404, error: "Post not found" });
             }
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
 
-    async getAllPosts(req: Request, res: Response): Promise<void> {
+    // async getAllPosts(req: Request, res: Response): Promise<void> {
+    //     try {
+    //         const posts = await this.postUseCase.getAllPosts();
+    //         res.status(200).json({ status: 200, posts: posts });
+    //     } catch (error) {
+    //         res.status(500).json({ error: error.message });
+    //     }
+    // }
+
+    async getInitPosts(req: Request, res: Response): Promise<void> {
         try {
-            const posts = await this.postUseCase.getAllPosts();
-            res.status(200).json({posts: posts});
+            const posts = await this.postUseCase.getInitPosts();
+
+            res.status(200).json({ status: 200, webPosts: posts[0], mobilePosts: posts[1], favoritePosts: posts[2] });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-    }   
+    }
+
+    async getWebPosts(req: Request, res: Response): Promise<void> {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+
+            const webPosts = await this.postUseCase.getWebPostsPaginations(page);
+            // console.log(webPosts);
+            res.status(200).json({ status: 200, posts: webPosts });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+    async getMobilePosts(req: Request, res: Response): Promise<void> {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+
+            const mobilePosts = await this.postUseCase.getMobilePostsPaginations(page);
+            // console.log(mobilePosts);
+
+            res.status(200).json({ status: 200, posts: mobilePosts });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async getPostsPaginations(req: Request, res: Response): Promise<void> {
+        try {
+            const page = parseInt(req.query.page as string) || 1;
+
+            const posts = await this.postUseCase.getPostsPaginations(page);
+            // console.log(posts);
+
+            res.status(200).json({ status: 200, posts: posts });
+            // console.log(posts);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 
     async getPostsByAuthor(req: Request, res: Response): Promise<void> {
         try {
             const { authorId } = req.params;
             const posts = await this.postUseCase.getPostsByAuthor(authorId);
-            res.status(200).json({posts: posts});
+            res.status(200).json({ status: 200, posts: posts });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

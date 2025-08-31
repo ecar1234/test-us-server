@@ -1,6 +1,7 @@
 import { PostModel } from "../domain/entities/PostModel";
 import { UserModel } from "../domain/entities/UserModel";
 import { PostEntity } from "../infrastructure/entities/PostEntity";
+import { UserStatus } from "../infrastructure/entities/UserEntity";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 import bcrypt from "bcrypt";
@@ -8,10 +9,14 @@ import bcrypt from "bcrypt";
 export class UserUseCase {
     constructor(private userRepo: UserRepositoryImpl, private postRepo: PostRepositoryImpl) { }
 
-    async registerUser(email: string, nickname: string, password: string, userType: string, userName: string, birth: Date): Promise<UserModel> {
+    async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date): Promise<[UserModel , number]> {
+        const findUser = await this.userRepo.findUserByEmail(email);
+        if (findUser) {
+            return [findUser, 409];
+        }
         const passwordHash = await bcrypt.hash(password, 10);
-        const user = new UserModel(null, email, nickname, passwordHash, userType, null, userName, birth);
-        return this.userRepo.registerUser(user);
+        const user = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth);
+        return [await this.userRepo.registerUser(user), 200];
     }
     async deleteUser(userId: string): Promise<[boolean, string]> {
         // console.log(userId);
@@ -26,9 +31,9 @@ export class UserUseCase {
         }
         return [true, "User deleted successfully"];
     }
-    async updateUserInfo(userId: string, nickname: string, userType: string, userName: string, birth: Date): Promise<UserModel> {
+    async updateUserInfo(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date): Promise<UserModel> {
         // console.log("use case : ", birth);
-        const user = new UserModel(userId, null, nickname, null, userType, null, userName, birth);
+        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth);
         return this.userRepo.updateUserInfo(user);
     }
     async getUserById(userId: string): Promise<UserModel | null> {

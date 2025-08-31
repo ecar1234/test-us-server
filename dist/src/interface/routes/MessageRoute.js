@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const MessageUseCase_1 = require("../../app/MessageUseCase");
+const MessageRepositoryImpl_1 = require("../../infrastructure/repositories/MessageRepositoryImpl");
+const MessageController_1 = require("../controllers/MessageController");
+const router = (0, express_1.Router)();
+const messageUseCase = new MessageUseCase_1.MessageUseCase(new MessageRepositoryImpl_1.MessageRepositoryImpl);
+const messageController = new MessageController_1.MessageController(messageUseCase);
+router.post('/sendMessage', messageController.sendMessage.bind(messageController));
+router.post('/getMessage', messageController.getMessage.bind(messageController));
+router.get('/getSendMessages/:userId', messageController.getAllSendMessage.bind(messageController));
+router.get('/getReceiveMessages/:userId', messageController.getAllReceiveMessage.bind(messageController));
+router.post('deleteMessage', messageController.deleteMessage.bind(messageController));
+exports.default = router;

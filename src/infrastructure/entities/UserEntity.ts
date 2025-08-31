@@ -13,6 +13,19 @@ export enum UserStatus {
     INACTIVE = 'INACTIVE',
     DELETED = 'DELETED',
 }
+export enum UserRole {
+    PROGRAMMER='PROGRAMMER',
+    DESIGNER='DESIGNER',
+    PUBLISHER='PUBLISHER',
+    PLANNER='PLANNER',
+    MANAGER='MANAGER',
+    MARKETER='MARKETER',
+    ANALYST='ANALYST',
+    OPERATER='OPERATER',
+    PM='PM',
+    QA='QA',
+    CS='CS'
+}
 
 @Entity('User')
 @Unique(['email', 'nickname'])
@@ -37,6 +50,9 @@ export class UserEntity {
 
     @Column({ type: 'enum', enum: UserType, default: UserType.INDIVIDUALS })
     type: UserType
+
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.PROGRAMMER })
+    role: UserRole
 
     @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
     status: UserStatus
