@@ -53,13 +53,14 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         await this.applicationRepository.save(entity);
         return this.toDomainApplication(entity);
     }
-    public async delete(id: string): Promise<boolean> {
-        return this.applicationRepository.delete(id).then(result => {
-            if (result.affected === 0) {
-                throw new Error(`Application with id ${id} not found`);
-            }
-            return true;
-        });
+    public async cancel(id: number): Promise<ApplicationModel> {
+        const findApp = await this.applicationRepository.findOne({ where: { appId: id }, relations: ['post', 'applicant'] });
+        if (!findApp) {
+            throw new Error("Application not found");
+        }
+        findApp.status = ApplicationStatus.CANCEL;
+        await this.applicationRepository.save(findApp);
+        return this.toDomainApplication(findApp);
     }
     public async acceptUser(userId: string, postId: string): Promise<ApplicationModel> {
         return this.applicationRepository.findOne({
@@ -96,5 +97,14 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
                 return this.toDomainApplication(savedEntity);
             });
         });
+    }
+
+    public async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
+        const applicationEntities = await this.applicationRepository.find({
+            where: { applicant: { userId } },
+            relations: ['applicant', 'post', 'reviews']
+        });
+        return applicationEntities.map(entity => this.toDomainApplication(entity));
+    
     }
 }

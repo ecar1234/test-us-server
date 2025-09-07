@@ -18,8 +18,8 @@ export class PostController {
 
     async updatePost(req: Request, res: Response): Promise<void> {
         try {
-            const { postId, authorId, title, subtitle, platform, contents, status } = req.body;
-            const updatedPost = await this.postUseCase.updatePost(postId, authorId, title, subtitle, platform, contents, status);
+            const { id, author, title, subtitle, platform, contents, status } = req.body;
+            const updatedPost = await this.postUseCase.updatePost(id, author, title, subtitle, platform, contents, status);
             if (updatedPost) {
                 res.status(200).json({ status: 200, post: updatedPost, message: "Post updated successfully" });
             } else {
@@ -32,8 +32,8 @@ export class PostController {
 
     async deletePost(req: Request, res: Response): Promise<void> {
         try {
-            const { postId } = req.body;
-            const success = await this.postUseCase.deletePost(postId);
+            const { id } = req.body;
+            const success = await this.postUseCase.deletePost(id);
             if (success) {
                 res.status(200).json({ status: 200, result: success, message: "Post deleted successfully" });
             } else {

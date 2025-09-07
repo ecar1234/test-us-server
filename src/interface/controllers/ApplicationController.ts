@@ -1,16 +1,17 @@
 import { AppUseCase } from "../../app/AppUseCase";
 import { Request, Response } from "express";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
+import { PostModel } from "../../domain/entities/PostModel";
 
 export class ApplicationController {
     constructor(private appUseCase: AppUseCase) { }
 
     async createApplication(req: Request, res: Response): Promise<void> {
         try {
-            const { userId, postId, platfrom } = req.body;
+            const { appUserId, postId, platfrom, status } = req.body;
 
-            const application = await this.appUseCase.createApplication(userId, postId, platfrom);
-            res.status(200).json({ status: 200, application: application });
+            const result: [ApplicationModel, PostModel] = await this.appUseCase.createApplication(appUserId, postId, platfrom);
+            res.status(200).json({ status: 200, application: result[0], post: result[1] });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
 
@@ -18,20 +19,20 @@ export class ApplicationController {
     }
     async updateApplication(req: Request, res: Response): Promise<void> {
         try {
-            const { userId, postId, platform, status } = req.body;
+            const { appUserId, postId, platform, status } = req.body;
 
-            const updatedApplication = await this.appUseCase.updateApplication(postId, userId, platform, status);
-            res.status(200).json({ stuatus: 200, updatedApplication: updatedApplication });
+            const result: [ApplicationModel, PostModel] = await this.appUseCase.updateApplication(postId, appUserId, platform, status);
+            res.status(200).json({ status: 200, application: result[0], post: result[1] });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message })
         }
     }
-    async deleteApplication(req: Request, res: Response): Promise<void> {
+    async cancelApplication(req: Request, res: Response): Promise<void> {
         try {
-            const applicationId = req.params.id;
-            const result = await this.appUseCase.deleteApplication(applicationId);
+            const applicationId = req.body.applicationId;
+            const result = await this.appUseCase.cancelApplication(applicationId);
             if (result) {
-                res.status(200).json({ stauts: 200, success: result });
+                res.status(200).json({ status: 200, application: result[0], post: result[1] });
             } else {
                 res.status(404).json({ status: 404, error: "Application not found" });
             }
@@ -55,6 +56,15 @@ export class ApplicationController {
             res.status(200).json({ status: 200, application: application });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+    async findApplicationsByUserId(req: Request, res: Response): Promise<void> {
+        try {
+            const userId = req.params.userId;
+            const applications = await this.appUseCase.findApplicationsByUserId(userId);
+            res.status(200).json({ status: 200, applications: applications });
+        } catch (error) {
+
         }
     }
 }

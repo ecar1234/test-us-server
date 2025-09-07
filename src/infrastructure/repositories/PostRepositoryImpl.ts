@@ -10,6 +10,7 @@ export class PostRepositoryImpl implements IPostRepository {
     // private userRepository = AppDataSource.getRepository(UserEntity);
 
     private toDomainPost(postEntity: PostEntity): PostModel {
+        // console.log("postEntity : ",postEntity);
         const authorInfo = postEntity.author
             ? { userId: postEntity.author.userId, nickname: postEntity.author.nickname }
             : null;
@@ -30,8 +31,9 @@ export class PostRepositoryImpl implements IPostRepository {
         );
     }
     private toEntityPost(post: PostModel): PostEntity {
+        // console.log("post model : ", post);
         const postStatus = post.status === 'active' ? PostStatusType.ACTIVE : (post.status === 'end' ? PostStatusType.END : PostStatusType.EXPIRED);
-        
+
         let authorRelation: { userId: string } | undefined = undefined;
         if (post.author) {
             if (typeof post.author === 'string') {
@@ -65,25 +67,9 @@ export class PostRepositoryImpl implements IPostRepository {
     }
 
     async updatePost(post: PostModel): Promise<PostModel> {
-        const postEntity = await this.postRepository.findOne({
-            where: { postId: post.id },
-            relations: ['author', 'applications']
-        });
-        if (!postEntity) {
-            throw new Error("Post not found");
-        }
-        // console.log(post);
-
-        postEntity.title = post.title;
-        postEntity.subtitle = post.subtitle;
-        postEntity.platform = post.platform;
-        postEntity.contents = post.contents;
-        postEntity.status = post.status === "active" ? PostStatusType.ACTIVE : (post.status === "end" ? PostStatusType.END : PostStatusType.EXPIRED);
-        // postEntity.period = post.period;
-
-        const updatedPost = await this.postRepository.save(postEntity);
-
-        return this.toDomainPost(updatedPost);
+        const postEntity = this.toEntityPost(post);
+        await this.postRepository.save(postEntity);
+        return this.toDomainPost(postEntity);
     }
 
     async deletePost(id: string): Promise<boolean> {
@@ -122,7 +108,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async getFavoritePostsPaginations(page: number): Promise<PostModel[]> {
         const favoritePosts = await this.postRepository.find({
             relations: ['author', 'applications'],
-            where: { views: MoreThan(0) },
+            where: { views: MoreThan(0), status: PostStatusType.ACTIVE },
             order: { views: 'DESC' },
             skip: (page - 1) * 10,
             take: 10
@@ -131,10 +117,12 @@ export class PostRepositoryImpl implements IPostRepository {
     }
     async getPostsPaginations(page: number): Promise<PostModel[]> {
         const posts = await this.postRepository.find({
+            where: { status: PostStatusType.ACTIVE },
             relations: ['author', 'applications'],
             skip: (page - 1) * 10,
             take: 10
         });
+        // console.log(posts);
         return posts.map(postEntity => this.toDomainPost(postEntity));
     }
 

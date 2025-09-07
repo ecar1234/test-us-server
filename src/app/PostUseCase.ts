@@ -10,8 +10,8 @@ export class PostUseCase {
         const post = new PostModel(null, author.userId, title, subtitle, platform, contents, status, period);
         return this.postRepository.createPost(post);
     }
-    async updatePost(id: string, authorId: string, title: string, subtitle: string, platform: string[], contents: string, status: string = 'active'): Promise<PostModel> {
-        const post = new PostModel(id, authorId, title, subtitle, platform, contents, status);
+    async updatePost(id: string, author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, status: string = 'active'): Promise<PostModel> {
+        const post = new PostModel(id, author.userId, title, subtitle, platform, contents, status);
         return this.postRepository.updatePost(post);
     }
     async deletePost(id: string): Promise<boolean> {
@@ -42,7 +42,10 @@ export class PostUseCase {
         return await this.postRepository.getFavoritePostsPaginations(page);
     }
     async getPostsPaginations(page: number):Promise<PostModel[]>{
-        return await this.postRepository.getPostsPaginations(page);
+
+        const posts = await this.postRepository.getPostsPaginations(page);
+        // console.log(posts);
+        return posts;
     }
     async getPostsByAuthor(authorId: string): Promise<PostModel[]> {
         return this.postRepository.getPostsByAuthor(authorId);
