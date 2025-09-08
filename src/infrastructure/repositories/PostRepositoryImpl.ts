@@ -113,6 +113,7 @@ export class PostRepositoryImpl implements IPostRepository {
             skip: (page - 1) * 10,
             take: 10
         });
+        // console.log(favoritePosts);
         return favoritePosts.map(postEntity => this.toDomainPost(postEntity));
     }
     async getPostsPaginations(page: number): Promise<PostModel[]> {
@@ -135,8 +136,9 @@ export class PostRepositoryImpl implements IPostRepository {
             throw new Error("Post not found");
         }
         postEntity.views += 1;
-        await this.postRepository.save(postEntity);
-        return this.toDomainPost(postEntity);
+        const newPost = await this.postRepository.save(postEntity);
+        // console.log(newPost);
+        return this.toDomainPost(newPost);
     }
 
     async getPostByTitle(title: string): Promise<PostModel> {

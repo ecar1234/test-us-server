@@ -85,7 +85,7 @@ export class PostController {
         try {
             const posts = await this.postUseCase.getInitPosts();
 
-            res.status(200).json({ status: 200, webPosts: posts[0], mobilePosts: posts[1], favoritePosts: posts[2] });
+            res.status(200).json({ status: 200, favoritePosts: posts[0], posts: posts[1] });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
