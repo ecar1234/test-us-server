@@ -25,6 +25,7 @@ export class PostRepositoryImpl implements IPostRepository {
             status,
             postEntity.period,
             postEntity.views,
+            postEntity.images,
             postEntity.createdAt,
             postEntity.updatedAt,
             postEntity.applications && postEntity.applications.map(application => application.appId)
@@ -53,6 +54,7 @@ export class PostRepositoryImpl implements IPostRepository {
             status: postStatus,
             period: post.period,
             views: post.views,
+            images: post.images,
             createdAt: post.createdAt ? post.createdAt : new Date(),
             updatedAt: post.updatedAt ? post.updatedAt : new Date(),
             ...(post.appilcations && { applications: post.appilcations.map(appId => ({ appId })) })
@@ -108,9 +110,8 @@ export class PostRepositoryImpl implements IPostRepository {
     async getFavoritePostsPaginations(page: number): Promise<PostModel[]> {
         const favoritePosts = await this.postRepository.find({
             relations: ['author', 'applications'],
-            where: { views: MoreThan(0), status: PostStatusType.ACTIVE },
+            where: { views: MoreThan(50), status: PostStatusType.ACTIVE },
             order: { views: 'DESC' },
-            skip: (page - 1) * 10,
             take: 10
         });
         // console.log(favoritePosts);

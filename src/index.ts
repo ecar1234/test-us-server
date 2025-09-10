@@ -14,12 +14,16 @@ import PostRoute from './interface/routes/PostRoute';
 import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
+import ImagesRoute from './interface/routes/ImagesRoute';
+import { Env } from './config/env';
 
 const app = express();
 const port = parseInt(process.env.SERVER_PORT);
 
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(Env.UPLOAD_URL));
 
 AppDataSource.initialize()
     .then(() => {
@@ -35,6 +39,9 @@ AppDataSource.initialize()
             app.use('/api/v1/application', ApplicationRoute);
             app.use('/api/v1/review', ReviewRoute);
             app.use('/api/v1/message', MessageRoute);
+            app.use('/api/v1/images', ImagesRoute);
+
+            // ');
 
             // 중앙 에러 처리 미들웨어
             app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

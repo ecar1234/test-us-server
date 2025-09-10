@@ -39,6 +39,9 @@ export class PostEntity {
     @Column({type: 'int', default: 0})
     views: number
 
+    @Column({ type: 'simple-array', nullable: true })
+    images: string[]
+
     @CreateDateColumn()
     createdAt: Date
 
