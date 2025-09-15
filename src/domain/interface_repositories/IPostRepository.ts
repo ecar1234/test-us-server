@@ -7,8 +7,8 @@ export interface IPostRepository {
     getPostById(id: string): Promise<PostModel>;
     getPostByTitle(title: string): Promise<PostModel>;
     getPostsByAuthor(authorId: string): Promise<PostModel[]>;
-    getWebPostsPaginations(page: number): Promise<PostModel[]>;
-    getMobilePostsPaginations(page: number): Promise<PostModel[]>;
+    // getWebPostsPaginations(page: number): Promise<PostModel[]>;
+    // getMobilePostsPaginations(page: number): Promise<PostModel[]>;
     getFavoritePostsPaginations(page: number): Promise<PostModel[]>;
     getPostsPaginations(page: number): Promise<PostModel[]>;
     // getPostsByNickname(nickname: string): Promise<PostModel[]>;

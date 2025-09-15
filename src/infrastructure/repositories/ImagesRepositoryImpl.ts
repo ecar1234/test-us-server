@@ -2,12 +2,13 @@ import { AppDataSource } from "../../config/DataSource";
 import { ImagesModel } from "../../domain/entities/ImagesModel";
 import { IImagesRepository } from "../../domain/interface_repositories/IImagesRepository";
 import { ImagesEntity } from "../entities/ImagesEntity";
+import { PostEntity } from "../entities/PostEntity";
 
 
 export class ImagesRepositoryImpl implements IImagesRepository {
     private imageRepo = AppDataSource.getRepository(ImagesEntity);
 
-    private toDomainModel(entity: ImagesEntity){
+    private toDomainModel(entity: ImagesEntity) {
         return new ImagesModel(
             entity.id,
             entity.filename,
@@ -15,20 +16,24 @@ export class ImagesRepositoryImpl implements IImagesRepository {
             entity.mimetype,
             entity.size,
             entity.url,
+            entity.post.postId,
             entity.createdAt,
             entity.updatedAt
         );
     }
-    private toEntityModel(model: ImagesModel){
+    private toEntityModel(model: ImagesModel) {
         const entity = new ImagesEntity();
-        entity.id = model.id;
+        // 'id'는 자동 생성되므로, 업데이트 시에만 값을 설정합니다.
+        if (model.id) {
+            entity.id = model.id;
+        }
         entity.filename = model.filename;
         entity.originalname = model.originalname;
         entity.mimetype = model.mimetype;
         entity.size = model.size;
         entity.url = model.url;
-        entity.createdAt = model.createdAt;
-        entity.updatedAt = model.updatedAt;
+        entity.post = { postId: model.postId } as PostEntity;
+
         return entity;
     }
 
@@ -45,11 +50,11 @@ export class ImagesRepositoryImpl implements IImagesRepository {
         throw new Error("Method not implemented.");
     }
     async imagesDelete(info: number[]): Promise<boolean> {
-       try {
-        await this.imageRepo.delete(info);
-        return true;
-       } catch (e) {
-        throw new Error(e.toString());
-       }
+        try {
+            await this.imageRepo.delete(info);
+            return true;
+        } catch (e) {
+            throw new Error(e.toString());
+        }
     }
 }

@@ -16,6 +16,7 @@ export class ImagesController {
         if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
             res.status(400).json({ message: 'No image files uploaded.' });
         }
+        const { postId } = req.body;
         const files = req.files as Express.Multer.File[];
         const images = files.map((file: Express.Multer.File) =>
         ({
@@ -26,11 +27,11 @@ export class ImagesController {
             url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
         })
         );
-        const result = await this.imagesUseCase.imagesResistation(images);
+        const result = await this.imagesUseCase.imagesResistation(images, postId);
         // console.log(result);
         const urls = result.map(image => ({id : image.id, url : image.url}));
 
-        res.status(200).json({ state: 200, urls: urls });
+        res.status(200).json({ status: 200, images: urls });
 
     }
 

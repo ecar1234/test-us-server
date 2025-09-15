@@ -35,24 +35,24 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
 
     public async create(application: ApplicationModel): Promise<ApplicationModel> {
         const entity = await this.applicationRepository.findOne({ where: { post: { postId: application.postId }, applicant: { userId: application.applicantId } }, relations: ['post', 'applicant'] });
-        if(entity){
+        if (entity) {
             throw createError(409, "Application already exists");
         }
         const appEntity = this.toEntityApplication(application);
         const savedEntity = await this.applicationRepository.save(appEntity);
+        // console.log(savedEntity);
         return this.toDomainApplication(savedEntity);
     }
+
     public async update(application: ApplicationModel): Promise<ApplicationModel> {
-        const entity = await this.applicationRepository.findOne({ where: { post: { postId: application.postId }, applicant: { userId: application.applicantId } }, relations: ['post', 'applicant'] });
+        const entity = this.toEntityApplication(application);
+        const result = await this.applicationRepository.save(entity);
 
-        entity.platform = application.platform === 'web' ? ApplicationsPlatform.WEB : (application.platform === 'ios' ? ApplicationsPlatform.IOS : ApplicationsPlatform.ANDROID);
-        entity.status = application.status === 'pending' ? ApplicationStatus.PENDING :
-            (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
-                (application.status === 'rejected' ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL))
-
-        await this.applicationRepository.save(entity);
-        return this.toDomainApplication(entity);
+        await this.applicationRepository.save(result);
+        console.log('result', result)
+        return this.toDomainApplication(result);
     }
+
     public async cancel(id: number): Promise<ApplicationModel> {
         const findApp = await this.applicationRepository.findOne({ where: { appId: id }, relations: ['post', 'applicant'] });
         if (!findApp) {
@@ -105,6 +105,6 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             relations: ['applicant', 'post', 'reviews']
         });
         return applicationEntities.map(entity => this.toDomainApplication(entity));
-    
+
     }
 }

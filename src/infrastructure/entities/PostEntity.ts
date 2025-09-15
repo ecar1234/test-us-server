@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserEntity } from "./UserEntity";
 import { ApplicationEntity } from "./ApplicationEntity";
+import { ImagesEntity } from "./ImagesEntity";
 
 export enum PostStatusType {
     ACTIVE = 'active',
@@ -39,14 +40,14 @@ export class PostEntity {
     @Column({type: 'int', default: 0})
     views: number
 
-    @Column({ type: 'simple-array', nullable: true })
-    images: string[]
-
     @CreateDateColumn()
     createdAt: Date
-
+    
     @UpdateDateColumn()
     updatedAt: Date
+    
+    @OneToMany(() => ImagesEntity, image => image.post, { cascade: ['insert', 'update'], eager: true, nullable: true })
+    images: ImagesEntity[]
 
     @OneToMany(() => ApplicationEntity, application => application.post)
     applications: ApplicationEntity[]

@@ -33,7 +33,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage, limits: { fileSize: 1024 * 1024 * 5 },  });
 
 
-route.post('/upload', authMiddleware, upload.array('images', 4), imagesController.uploadImages.bind(imagesController));
+route.post('/uploads', authMiddleware, upload.array('images', 4), imagesController.uploadImages.bind(imagesController));
 route.put('/update', authMiddleware, upload.array('images', 4), imagesController.uploadImages.bind(imagesController));
 route.get('/download/', authMiddleware, imagesController.downloadImage.bind(imagesController));
 route.delete('/delete/:id', authMiddleware, imagesController.deleteImage.bind(imagesController));

@@ -7,9 +7,9 @@ export class PostController {
     async createPost(req: Request, res: Response): Promise<void> {
         try {
             // authorId는 인증된 사용자 세션(예: req.user.id)에서 가져오는 것이 더 좋습니다.
-            const { author, title, subtitle, platform, contents } = req.body;
+            const { author, title, subtitle, platform, contents, images } = req.body;
             
-            const post = await this.postUseCase.createPost(author, title, subtitle, platform, contents);
+            const post = await this.postUseCase.createPost(author, title, subtitle, platform, contents, images);
             res.status(200).json({ status: 200, post: post });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -91,29 +91,29 @@ export class PostController {
         }
     }
 
-    async getWebPosts(req: Request, res: Response): Promise<void> {
-        try {
-            const page = parseInt(req.query.page as string) || 1;
+    // async getWebPosts(req: Request, res: Response): Promise<void> {
+    //     try {
+    //         const page = parseInt(req.query.page as string) || 1;
 
-            const webPosts = await this.postUseCase.getWebPostsPaginations(page);
-            // console.log(webPosts);
-            res.status(200).json({ status: 200, posts: webPosts });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
-    async getMobilePosts(req: Request, res: Response): Promise<void> {
-        try {
-            const page = parseInt(req.query.page as string) || 1;
+    //         const webPosts = await this.postUseCase.getWebPostsPaginations(page);
+    //         // console.log(webPosts);
+    //         res.status(200).json({ status: 200, posts: webPosts });
+    //     } catch (error) {
+    //         res.status(500).json({ error: error.message });
+    //     }
+    // }
+    // async getMobilePosts(req: Request, res: Response): Promise<void> {
+    //     try {
+    //         const page = parseInt(req.query.page as string) || 1;
 
-            const mobilePosts = await this.postUseCase.getMobilePostsPaginations(page);
-            // console.log(mobilePosts);
+    //         const mobilePosts = await this.postUseCase.getMobilePostsPaginations(page);
+    //         // console.log(mobilePosts);
 
-            res.status(200).json({ status: 200, posts: mobilePosts });
-        } catch (error) {
-            res.status(500).json({ error: error.message });
-        }
-    }
+    //         res.status(200).json({ status: 200, posts: mobilePosts });
+    //     } catch (error) {
+    //         res.status(500).json({ error: error.message });
+    //     }
+    // }
 
     async getPostsPaginations(req: Request, res: Response): Promise<void> {
         try {

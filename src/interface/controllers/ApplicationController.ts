@@ -8,9 +8,9 @@ export class ApplicationController {
 
     async createApplication(req: Request, res: Response): Promise<void> {
         try {
-            const { appUserId, postId, platfrom, status } = req.body;
+            const { applicantId, postId, platfrom } = req.body;
 
-            const result: [ApplicationModel, PostModel] = await this.appUseCase.createApplication(appUserId, postId, platfrom);
+            const result: [ApplicationModel, PostModel] = await this.appUseCase.createApplication(applicantId, postId, platfrom);
             res.status(200).json({ status: 200, application: result[0], post: result[1] });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -19,9 +19,10 @@ export class ApplicationController {
     }
     async updateApplication(req: Request, res: Response): Promise<void> {
         try {
-            const { appUserId, postId, platform, status } = req.body;
+            const {id ,applicantId, postId, platform, status } = req.body;
 
-            const result: [ApplicationModel, PostModel] = await this.appUseCase.updateApplication(postId, appUserId, platform, status);
+            const result: [ApplicationModel, PostModel] = await this.appUseCase.updateApplication(id, postId, applicantId, platform, status);
+            console.log(result);
             res.status(200).json({ status: 200, application: result[0], post: result[1] });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message })

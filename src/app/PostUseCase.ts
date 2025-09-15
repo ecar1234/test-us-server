@@ -6,8 +6,8 @@ import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositor
 export class PostUseCase {
     constructor(private postRepository: PostRepositoryImpl, private userRepository: UserRepositoryImpl) { }
 
-    async createPost(author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, status: string = 'active', period: number = 7): Promise<PostModel> {
-        const post = new PostModel(null, author.userId, title, subtitle, platform, contents, status, period);
+    async createPost(author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, images: object[], status: string = 'active', period: number = 7): Promise<PostModel> {
+        const post = new PostModel(null, author.userId, title, subtitle, platform, contents, status, period, 0, images);
         return this.postRepository.createPost(post);
     }
     async updatePost(id: string, author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, status: string = 'active'): Promise<PostModel> {
@@ -33,12 +33,12 @@ export class PostUseCase {
         const favoritePosts = await this.postRepository.getFavoritePostsPaginations(1);
         return [favoritePosts, posts];
     }
-    async getWebPostsPaginations(page: number): Promise<PostModel[]> {
-        return await this.postRepository.getWebPostsPaginations(page);
-    }
-    async getMobilePostsPaginations(page: number): Promise<PostModel[]> {
-        return await this.postRepository.getMobilePostsPaginations(page);
-    }
+    // async getWebPostsPaginations(page: number): Promise<PostModel[]> {
+    //     return await this.postRepository.getWebPostsPaginations(page);
+    // }
+    // async getMobilePostsPaginations(page: number): Promise<PostModel[]> {
+    //     return await this.postRepository.getMobilePostsPaginations(page);
+    // }
     async getFavoritePostsPaginations(page: number): Promise<PostModel[]> {
         return await this.postRepository.getFavoritePostsPaginations(page);
     }

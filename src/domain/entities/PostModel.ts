@@ -9,7 +9,7 @@ export class PostModel {
         public status: string = 'active',
         public period: number = 7,
         public views: number = 0,
-        public images: string[] = [],
+        public images: object[] = [],
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null,
         public appilcations: number[] = []

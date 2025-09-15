@@ -84,32 +84,32 @@ export class PostRepositoryImpl implements IPostRepository {
         return true;
     }
 
-    async getWebPostsPaginations(page: number): Promise<PostModel[]> {
-        const webPosts = await this.postRepository.find({
-            where: { platform: 'web' },
-            relations: ['author', 'applications'],
-            skip: (page - 1) * 10,
-            take: 10
-        });
-        return webPosts.map(postEntity => this.toDomainPost(postEntity));
-    }
-    async getMobilePostsPaginations(page: number): Promise<PostModel[]> {
-        const mobilePosts = await this.postRepository
-            .createQueryBuilder('post')
-            .leftJoinAndSelect('post.author', 'author')
-            .leftJoinAndSelect('post.applications', 'applications')
-            .where("FIND_IN_SET(:ios, post.platform) > 0 OR FIND_IN_SET(:android, post.platform) > 0", {
-                ios: 'ios',
-                android: 'android',
-            })
-            .skip((page - 1) * 10)
-            .take(10)
-            .getMany();
-        return mobilePosts.map(postEntity => this.toDomainPost(postEntity));
-    }
+    // async getWebPostsPaginations(page: number): Promise<PostModel[]> {
+    //     const webPosts = await this.postRepository.find({
+    //         where: { platform: 'web' },
+    //         relations: ['author', 'applications'],
+    //         skip: (page - 1) * 10,
+    //         take: 10
+    //     });
+    //     return webPosts.map(postEntity => this.toDomainPost(postEntity));
+    // }
+    // async getMobilePostsPaginations(page: number): Promise<PostModel[]> {
+    //     const mobilePosts = await this.postRepository
+    //         .createQueryBuilder('post')
+    //         .leftJoinAndSelect('post.author', 'author')
+    //         .leftJoinAndSelect('post.applications', 'applications')
+    //         .where("FIND_IN_SET(:ios, post.platform) > 0 OR FIND_IN_SET(:android, post.platform) > 0", {
+    //             ios: 'ios',
+    //             android: 'android',
+    //         })
+    //         .skip((page - 1) * 10)
+    //         .take(10)
+    //         .getMany();
+    //     return mobilePosts.map(postEntity => this.toDomainPost(postEntity));
+    // }
     async getFavoritePostsPaginations(page: number): Promise<PostModel[]> {
         const favoritePosts = await this.postRepository.find({
-            relations: ['author', 'applications'],
+            relations: ['author', 'applications', 'images'],
             where: { views: MoreThan(50), status: PostStatusType.ACTIVE },
             order: { views: 'DESC' },
             take: 10
@@ -120,7 +120,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async getPostsPaginations(page: number): Promise<PostModel[]> {
         const posts = await this.postRepository.find({
             where: { status: PostStatusType.ACTIVE },
-            relations: ['author', 'applications'],
+            relations: ['author', 'applications', 'images'],
             skip: (page - 1) * 10,
             take: 10
         });
@@ -131,7 +131,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async getPostById(id: string): Promise<PostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: id },
-            relations: ['author', 'applications']
+            relations: ['author', 'applications', 'images']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -145,7 +145,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async getPostByTitle(title: string): Promise<PostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { title },
-            relations: ['author', 'applications']
+            relations: ['author', 'applications', 'images']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -156,7 +156,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async getPostsByAuthor(authorId: string): Promise<PostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { author: { userId: authorId } },
-            relations: ['author', 'applications']
+            relations: ['author', 'applications', 'images']
         });
 
         return postEntities.map(entity => this.toDomainPost(entity));

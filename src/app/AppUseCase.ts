@@ -1,3 +1,4 @@
+import { parse } from "path";
 import { ApplicationModel } from "../domain/entities/ApplicationModel";
 import { PostModel } from "../domain/entities/PostModel";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
@@ -20,14 +21,15 @@ export class AppUseCase {
             result[0] = appResult;
             result[1] = post;
         }
-        console.log(result)
+        // console.log(result)
         
         return result;
     }
 
-    async updateApplication(postId: string, userId: string, platform: string, status: string): Promise<[ApplicationModel, PostModel]> {
+    async updateApplication(id: string, postId: string, userId: string, platform: string, status: string): Promise<[ApplicationModel, PostModel]> {
         const result: [ApplicationModel, PostModel] = [null, null];
-        const application = new ApplicationModel(null, platform, status, null, null, postId, userId);
+        const application = new ApplicationModel(parseInt(id), platform, status, null, null, postId, userId);
+        // console.log(application);
         const appResult = await this.applicationRepository.update(application);
         if(appResult == null){
             throw new Error("application update failed");
@@ -37,7 +39,7 @@ export class AppUseCase {
             result[0] = appResult;
             result[1] = post;
         }
-        console.log(result);
+        console.log('use case result', result);
         return result
     }
 
@@ -52,7 +54,7 @@ export class AppUseCase {
             result[0] = application;
             result[1] = post;
         }
-        console.log(result);
+        // console.log(result);
         return result
     }
 

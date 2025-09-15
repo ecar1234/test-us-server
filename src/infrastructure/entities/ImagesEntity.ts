@@ -1,28 +1,33 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { PostEntity } from "./PostEntity";
 
 @Entity('Images')
 export class ImagesEntity {
     @PrimaryGeneratedColumn()
-    id: number;
+    id: number
 
     @Column()
-    filename!: string;
+    filename!: string
 
     @Column()
-    originalname!: string;
+    originalname!: string
 
     @Column()
-    mimetype!: string;
+    mimetype!: string
 
     @Column()
-    size: string
+    size: number
 
     @Column()
-    url!: string;
+    url!: string
 
     @CreateDateColumn()
-    createdAt: Date;
+    createdAt: Date
 
     @UpdateDateColumn()
-    updatedAt: Date;
+    updatedAt: Date
+
+    @ManyToOne(() => PostEntity, post => post.images, { onDelete: 'SET NULL', nullable: true })
+    @JoinColumn({ name: 'postId' })
+    post: PostEntity;
 }
