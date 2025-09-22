@@ -1,35 +1,82 @@
+import { Env } from "../config/env";
 import { ImagesModel } from "../domain/entities/ImagesModel";
 import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
 import fs from "fs";
+import path from "path";
+import { URL } from "url";
+import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
+import { PostModel } from "../domain/entities/PostModel";
+
+// 컨트롤러에서 전달되는 데이터의 타입을 명확하게 정의합니다.
+interface UploadedImageInfo {
+    filename: string;
+    originalname: string;
+    mimetype: string;
+    size: number;
+    url: string;
+}
+
+interface ImageToDelete {
+    id: number;
+    url: string;
+}
 
 
 export class ImagesUseCase {
     constructor(
-        private imagesRepo: ImagesRepositoryImpl
-    ){}
+        private imagesRepo: ImagesRepositoryImpl,
+        private postRepo: PostRepositoryImpl
+    ) { }
 
-    async imagesResistation(images: object[], postId: string): Promise<ImagesModel[]>{
-        const models: ImagesModel[] = images.map((image: any) => {
-            return new ImagesModel( null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId );
+    async imagesRegister(images: UploadedImageInfo[], postId: string): Promise<PostModel> {
+        const models: ImagesModel[] = images.map((image) => {
+            return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId);
         });
-        // console.log(models);
-        return this.imagesRepo.imagesResistation(models);
+        await this.imagesRepo.imagesRegister(models, postId);
+
+        const post = await this.postRepo.getPostById(postId);
+        return post;
     }
+
+    async imagesUpdate(deleteImages: ImageToDelete[], newImages: UploadedImageInfo[], postId: string): Promise<PostModel> {
+        // Repository에는 삭제할 이미지의 ID만 필요합니다.
+
+        if (deleteImages && deleteImages.length > 0) {
+            const modelsToDelete = deleteImages.map(img => img.id);
+            const deleteResult = this.imagesRepo.imagesDelete(modelsToDelete);
+
+            if (deleteResult) {
+                const deletePromises = deleteImages.map(async (image) => {
+                    try {
+                        // URL에서 파일명을 안전하게 추출합니다.
+                        const filename = path.basename(new URL(image.url).pathname);
+                        console.log('filename', filename);
+                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        console.log('imagePath', imagePath);
+                        await fs.promises.unlink(imagePath);
+                    } catch (error) {
+                        // 파일이 이미 없거나(ENOENT) 다른 오류 발생 시, 에러를 기록하되 전체 요청을 실패시키지는 않습니다.
+                        if (error.code !== 'ENOENT') {
+                            console.error(`Failed to delete image file with URL ${image.url}: ${error.message}`);
+                        }
+                    }
+                });
+                await Promise.all(deletePromises);
+            }
+        }
+        if(newImages && newImages.length > 0){
+            const modelsToSave: ImagesModel[] = newImages.map((image) => {
+                return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId);
+            });
+            await this.imagesRepo.imagesUpdate(modelsToSave, postId);
+
+        }
     
-    async imagesUpdate(images: object[]): Promise<ImagesModel[]>{
-        
-        const models: ImagesModel[] = images.map((image: any) => {
-            if(fs.existsSync(image.path)) fs.unlinkSync(image.path);
-            return new ImagesModel( image.id, image.filename, image.originalname, image.mimetype, image.size, image.url, null );
-        });
-        return this.imagesRepo.imagesUpdate(models);
+        const post = await this.postRepo.getPostById(postId);
+        return post;
     }
 
-    async imagesDownload(id: number): Promise<ImagesModel>{
+    async imagesDownload(id: number): Promise<ImagesModel> {
         return this.imagesRepo.imagesDownload(id);
-    }
-
-    async imagesDelete(info: number[]): Promise<boolean>{
-        return this.imagesRepo.imagesDelete(info);
     }
 }

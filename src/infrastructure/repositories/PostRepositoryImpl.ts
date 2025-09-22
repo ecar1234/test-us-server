@@ -69,9 +69,25 @@ export class PostRepositoryImpl implements IPostRepository {
     }
 
     async updatePost(post: PostModel): Promise<PostModel> {
-        const postEntity = this.toEntityPost(post);
-        await this.postRepository.save(postEntity);
-        return this.toDomainPost(postEntity);
+        const postEntity = await this.postRepository.findOne({
+            where: { postId: post.id },
+            relations: ["author", "applications", "images"],
+        });
+
+        if (!postEntity) {
+            throw new Error("Post not found");
+        }
+
+        // 필요한 필드만 업데이트합니다. 관계(images)는 직접 건드리지 않습니다.
+        postEntity.title = post.title;
+        postEntity.subtitle = post.subtitle;
+        postEntity.platform = post.platform;
+        postEntity.contents = post.contents;
+        postEntity.status = post.status === 'active' ? PostStatusType.ACTIVE : (post.status === 'end' ? PostStatusType.END : PostStatusType.EXPIRED);
+        if (post.period !== undefined) postEntity.period = post.period;
+
+        const updatedPost = await this.postRepository.save(postEntity);
+        return this.toDomainPost(updatedPost);
     }
 
     async deletePost(id: string): Promise<boolean> {

@@ -1,8 +1,8 @@
 import { ImagesModel } from "../entities/ImagesModel";
 
 export interface IImagesRepository {
-    imagesResistation(images: ImagesModel[]): Promise<ImagesModel[]>;
-    imagesUpdate(images: ImagesModel[]): Promise<ImagesModel[]>;
+    imagesRegister(images: ImagesModel[], postId: string): Promise<ImagesModel[]>;
+    imagesUpdate(images: ImagesModel[], postId: string): Promise<ImagesModel[]>;
     imagesDownload(id: number): Promise<ImagesModel>;
-    imagesDelete(info: number[]): Promise<boolean>;
+    imagesDelete(deleteImages: number[]): Promise<boolean>;
 }

@@ -46,7 +46,7 @@ export class PostEntity {
     @UpdateDateColumn()
     updatedAt: Date
     
-    @OneToMany(() => ImagesEntity, image => image.post, { cascade: ['insert', 'update'], eager: true, nullable: true })
+    @OneToMany(() => ImagesEntity, image => image.post, { cascade: [ 'update', 'remove' ], eager: true, nullable: true })
     images: ImagesEntity[]
 
     @OneToMany(() => ApplicationEntity, application => application.post)

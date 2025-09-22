@@ -27,7 +27,7 @@ export class ImagesEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @ManyToOne(() => PostEntity, post => post.images, { onDelete: 'SET NULL', nullable: true })
+    @ManyToOne(() => PostEntity, post => post.images, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'postId' })
     post: PostEntity;
 }
