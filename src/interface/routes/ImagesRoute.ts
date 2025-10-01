@@ -31,12 +31,13 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage, limits: { fileSize: 1024 * 1024 * 5 },  });
+const uploadWithFiles = multer({ storage: storage, limits: { fileSize: 1024 * 1024 * 5 } });
+const uploadOnlyText = multer({ limits: { fileSize: 1024 * 1024 * 5 } }); // 파일 저장을 위한 storage 설정이 없음
 
 
-route.post('/uploads', authMiddleware, upload.array('images', 4), imagesController.uploadImages.bind(imagesController));
-route.put('/update', authMiddleware, upload.array('images', 4), imagesController.updateImages.bind(imagesController));
+route.post('/uploads', authMiddleware, uploadWithFiles.array('images', 4), imagesController.uploadImages.bind(imagesController));
+route.put('/update', authMiddleware, uploadWithFiles.array('images', 4), imagesController.updateImages.bind(imagesController));
 // route.get('/download/', authMiddleware, imagesController.downloadImage.bind(imagesController));
-// route.post('/delete/', authMiddleware, imagesController.deleteImage.bind(imagesController));
+route.delete('/delete/', authMiddleware, uploadOnlyText.none(), imagesController.deleteImage.bind(imagesController));
 
 export default route;

@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:server": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev:workers": "ts-node-dev --respawn --transpile-only src/workers/workers.ts",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:workers\"",
     "build": "tsc",
     "start": "node dist/index.js",
     "migration:run": "dotenv -e .env -- ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
@@ -18,9 +20,12 @@
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
+    "bull": "^4.16.5",
+    "bullmq": "^5.58.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "ioredis": "^5.8.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "mysql2": "^3.14.1",
@@ -32,6 +37,7 @@
     "@types/express": "^5.0.3",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.12",
+    "concurrently": "^9.2.1",
     "dotenv-cli": "^10.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"

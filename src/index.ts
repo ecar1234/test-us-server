@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv';
 const dotenvResult = dotenv.config(); // dotenv.config()의 결과를 변수에 저장
 
-console.log('--- Diagnostics from index.ts ---');
-console.log('Dotenv load result:', dotenvResult);
-console.log('process.env.DATA_BASE_USER_NAME:', process.env.DATA_BASE_USER_NAME);
-console.log('---------------------------------');
+// console.log('--- Diagnostics from index.ts ---');
+// console.log('Dotenv load result:', dotenvResult);
+// console.log('process.env.DATA_BASE_USER_NAME:', process.env.DATA_BASE_USER_NAME);
+// console.log('---------------------------------');
 
 import express, { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from './config/DataSource';
@@ -15,6 +15,7 @@ import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
 import ImagesRoute from './interface/routes/ImagesRoute';
+import JobStateRoute from './interface/routes/JobStateRoute';
 import { Env } from './config/env';
 
 const app = express();
@@ -31,8 +32,7 @@ AppDataSource.initialize()
 
         app.listen(port, '0.0.0.0',() => {
             console.log(`서버 실행 중: 0.0.0.0:${port}`);
-            // API 라우트 설정
-            // app.use('/', (res: Response)=>{res.send("Hello World!")});
+            
             app.use('/api/v1/auth', AuthRoute);
             app.use('/api/v1/user', UserRoute);
             app.use('/api/v1/post', PostRoute);
@@ -40,8 +40,7 @@ AppDataSource.initialize()
             app.use('/api/v1/review', ReviewRoute);
             app.use('/api/v1/message', MessageRoute);
             app.use('/api/v1/images', ImagesRoute);
-
-            // ');
+            app.use('/api/v1/jobState', JobStateRoute);
 
             // 중앙 에러 처리 미들웨어
             app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

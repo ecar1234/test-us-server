@@ -31,6 +31,7 @@ export class PostUseCase {
         // const mobilePosts = await this.postRepository.getMobilePostsPaginations(1);
         const posts = await this.postRepository.getPostsPaginations(1);
         const favoritePosts = await this.postRepository.getFavoritePostsPaginations(1);
+        console.log([favoritePosts, posts]);
         return [favoritePosts, posts];
     }
     // async getWebPostsPaginations(page: number): Promise<PostModel[]> {

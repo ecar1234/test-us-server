@@ -4,6 +4,7 @@ import { PostModel } from "../../domain/entities/PostModel";
 import { IPostRepository } from "../../domain/interface_repositories/IPostRepository";
 import { PostEntity, PostStatusType } from "../entities/PostEntity";
 import { UserModel } from "../../domain/entities/UserModel";
+import { redisClient } from "../../config/RedisConfig";
 
 export class PostRepositoryImpl implements IPostRepository {
     private postRepository = AppDataSource.getRepository(PostEntity);
@@ -65,6 +66,10 @@ export class PostRepositoryImpl implements IPostRepository {
     async createPost(post: PostModel): Promise<PostModel> {
         const postEntity = this.toEntityPost(post);
         const savedPost = await this.postRepository.save(postEntity);
+
+        // 새 게시물 추가 시, 첫 페이지 캐시를 삭제합니다.
+        await redisClient.del('posts:page:1');
+
         return this.toDomainPost(savedPost);
     }
 
@@ -87,6 +92,15 @@ export class PostRepositoryImpl implements IPostRepository {
         if (post.period !== undefined) postEntity.period = post.period;
 
         const updatedPost = await this.postRepository.save(postEntity);
+
+        // 게시물 업데이트 시, 관련 캐시를 모두 삭제합니다.
+        // 더 정교한 전략을 사용할 수도 있지만, 모든 페이지 캐시를 지우는 것이 가장 간단하고 확실합니다.
+        const keys = await redisClient.keys('posts:page:*');
+        if (keys.length > 0) {
+            await redisClient.del(keys);
+        }
+        await redisClient.del('favoritePosts');
+
         return this.toDomainPost(updatedPost);
     }
 
@@ -97,6 +111,14 @@ export class PostRepositoryImpl implements IPostRepository {
         }
         result.status = PostStatusType.DELETE;
         await this.postRepository.save(result);
+
+        // 게시물 삭제 시, 관련 캐시를 모두 삭제합니다.
+        const keys = await redisClient.keys('posts:page:*');
+        if (keys.length > 0) {
+            await redisClient.del(keys);
+        }
+        await redisClient.del('favoritePosts');
+
         return true;
     }
 
@@ -124,23 +146,47 @@ export class PostRepositoryImpl implements IPostRepository {
     //     return mobilePosts.map(postEntity => this.toDomainPost(postEntity));
     // }
     async getFavoritePostsPaginations(page: number): Promise<PostModel[]> {
+        const cachedKey = `favoritePosts`;
+        const cachedData = await redisClient.get(cachedKey);
+        if (cachedData) {
+            const parseredData: PostEntity[] = JSON.parse(cachedData);
+            return parseredData.map(postEntity => this.toDomainPost(postEntity));
+        }
+
         const favoritePosts = await this.postRepository.find({
             relations: ['author', 'applications', 'images'],
             where: { views: MoreThan(50), status: PostStatusType.ACTIVE },
             order: { views: 'DESC' },
             take: 10
         });
+
+        if(favoritePosts.length){
+            await redisClient.set(cachedKey, JSON.stringify(favoritePosts), 'EX', 60 * 10);
+        }
         // console.log(favoritePosts);
         return favoritePosts.map(postEntity => this.toDomainPost(postEntity));
     }
     async getPostsPaginations(page: number): Promise<PostModel[]> {
+        const cacheKey = `posts:page:${page}`;
+        const cachedPosts = await redisClient.get(cacheKey);
+
+        if (cachedPosts) {
+            const parsedPosts: PostEntity[] = JSON.parse(cachedPosts);
+            return parsedPosts.map(postEntity => this.toDomainPost(postEntity));
+        }
+        
         const posts = await this.postRepository.find({
             where: { status: PostStatusType.ACTIVE },
             relations: ['author', 'applications', 'images'],
+            order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
             take: 10
         });
-        // console.log(posts);
+
+        if (posts.length > 0) {
+            await redisClient.set(cacheKey, JSON.stringify(posts), 'EX', 60 * 10); // 10분 동안 캐시
+        }
+
         return posts.map(postEntity => this.toDomainPost(postEntity));
     }
 

@@ -16,7 +16,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
                     (applicationEntity.status === ApplicationStatus.REJECTED ? 'rejected' : 'cancel')),
             applicationEntity.appliedAt,
             applicationEntity.updatedAt,
-            applicationEntity.post.postId,
+            applicationEntity.post && applicationEntity.post.postId,
             applicationEntity.applicant.userId
         );
     }
@@ -104,6 +104,10 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             where: { applicant: { userId } },
             relations: ['applicant', 'post', 'reviews']
         });
+        if(!applicationEntities){
+            throw new Error("Application not found");
+        }
+        // console.log(applicationEntities);
         return applicationEntities.map(entity => this.toDomainApplication(entity));
 
     }

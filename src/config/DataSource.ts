@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { Env } from "./env";
+import * as mysql2 from "mysql2";
 import * as path from "path";
 
 const env = Env;
@@ -16,6 +17,10 @@ export const AppDataSource = new DataSource({
     database: env.DATA_BASE_NAME,
     synchronize: false, // dev용, 배포시 false
     logging: true,
+    driver: mysql2,
+    // authPlugins: {
+    //     mysql_native_password: () => require('mysql2/lib/auth_plugins/mysql_native_password')({}),
+    // },
     entities: [path.join(__dirname, "..", "infrastructure/entities/*.{js,ts}")],
     migrations: [path.join(__dirname, "..", "migration/*.{js,ts}")],
 });

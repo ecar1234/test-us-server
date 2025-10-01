@@ -76,7 +76,35 @@ export class ImagesUseCase {
         return post;
     }
 
-    async imagesDownload(id: number): Promise<ImagesModel> {
-        return this.imagesRepo.imagesDownload(id);
+    async imagesDelete(deleteImages: ImageToDelete[]): Promise<boolean>{
+        if (deleteImages && deleteImages.length > 0) {
+            const modelsToDelete = deleteImages.map(img => img.id);
+            const deleteResult = this.imagesRepo.imagesDelete(modelsToDelete);
+
+            if (deleteResult) {
+                const deletePromises = deleteImages.map(async (image) => {
+                    try {
+                        // URL에서 파일명을 안전하게 추출합니다.
+                        const filename = path.basename(new URL(image.url).pathname);
+                        console.log('filename', filename);
+                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        console.log('imagePath', imagePath);
+                        await fs.promises.unlink(imagePath);
+                    } catch (error) {
+                        // 파일이 이미 없거나(ENOENT) 다른 오류 발생 시, 에러를 기록하되 전체 요청을 실패시키지는 않습니다.
+                        if (error.code !== 'ENOENT') {
+                            console.error(`Failed to delete image file with URL ${image.url}: ${error.message}`);
+                        }
+                    }
+                });
+                await Promise.all(deletePromises);
+
+                return true;
+            }else {
+                return false;
+            }
+        }else{
+            return false;
+        }
     }
 }

@@ -1,5 +1,6 @@
 import { PostUseCase } from "../../app/PostUseCase";
 import { Request, Response } from "express";
+import { getInitPostsQueue } from "../../config/RedisConfig";
 
 export class PostController {
     constructor(private postUseCase: PostUseCase) { }
@@ -83,11 +84,15 @@ export class PostController {
 
     async getInitPosts(req: Request, res: Response): Promise<void> {
         try {
-            const posts = await this.postUseCase.getInitPosts();
+            const job = await getInitPostsQueue.add('getInitPosts', { page: 1 });
+            // const posts = await this.postUseCase.getInitPosts();
 
-            res.status(200).json({ status: 200, favoritePosts: posts[0], posts: posts[1] });
+            // res.status(200).json({ status: 200, favoritePosts: posts[0], posts: posts[1] });
+            res.status(202).json({ status: 202, state: 'pending', jobId: job.id });
+            return;
+
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(501).json({ error: error.message });
         }
     }
 

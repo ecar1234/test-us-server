@@ -2,6 +2,7 @@ import { AppUseCase } from "../../app/AppUseCase";
 import { Request, Response } from "express";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import { PostModel } from "../../domain/entities/PostModel";
+import { getApplicationsByIdQueue } from "../../config/RedisConfig";
 
 export class ApplicationController {
     constructor(private appUseCase: AppUseCase) { }
@@ -61,9 +62,16 @@ export class ApplicationController {
     }
     async findApplicationsByUserId(req: Request, res: Response): Promise<void> {
         try {
-            const userId = req.params.userId;
-            const applications = await this.appUseCase.findApplicationsByUserId(userId);
-            res.status(200).json({ status: 200, applications: applications });
+            
+            const job = await getApplicationsByIdQueue.add('getApplicationsByIdQueue', { userId: req.params.userId });
+            
+            res.status(202).json({ status: 202, state: 'pending', jobId: job.id});
+
+            // const { userId } = req.params;
+            // // console.log(userId);
+            // const applications = await this.appUseCase.findApplicationsByUserId(userId);
+            // // console.log(applications);
+            // res.status(200).json({ status: 200, applications: applications });
         } catch (error) {
 
         }

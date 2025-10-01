@@ -78,8 +78,12 @@ export class ImagesRepositoryImpl implements IImagesRepository {
     }
     async imagesDelete(deleteImages: number[]): Promise<boolean> {
         try {
-            await this.imageRepo.delete(deleteImages);
-            return true;
+            const res = await this.imageRepo.delete(deleteImages);
+            if(res.affected === 0){
+                return true;
+            }else {
+                return false;
+            }
         } catch (e) {
             throw new Error(e.toString());
         }
