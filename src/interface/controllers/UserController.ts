@@ -96,6 +96,18 @@ export class UserController {
         }
     }
 
+    async getUsersByIds(req: Request, res: Response): Promise<void> {
+        try {
+            const { ids } = req.body;
+            const data = await this.userUseCase.getUsersByIds(ids);
+            // console.log('controller : ', users);
+            res.status(200).json({ status: 200, users: data});
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+
+    }
+
     async getUserByEmail(req: Request, res: Response): Promise<void> {
         try {
             const email: string = req.params.email;

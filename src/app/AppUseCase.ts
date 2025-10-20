@@ -58,12 +58,29 @@ export class AppUseCase {
         return result
     }
 
-    async acceptUser(userId: string, postId: string): Promise<ApplicationModel> {
-        return this.applicationRepository.acceptUser(userId, postId);
+    async acceptUser(userId: string, postId: string): Promise<[ApplicationModel, PostModel]> {
+        const application = await this.applicationRepository.acceptUser(userId, postId);
+        if(application == null){
+            throw new Error("application accept failed");
+        }
+        const post = await this.postRepository.getPostById(application.postId);
+        if(post == null){
+            throw new Error("post not found");
+        }
+        return [application, post];
+        
     }
 
-    async rejectUser(userId: string, postId: string): Promise<ApplicationModel> {
-        return this.applicationRepository.rejectUser(userId, postId);
+    async rejectUser(userId: string, postId: string): Promise<[ApplicationModel, PostModel]> {
+        const  application = await this.applicationRepository.rejectUser(userId, postId);
+        if(application == null){
+            throw new Error("application reject failed");
+        }
+        const post = await this.postRepository.getPostById(application.postId);
+        if(post == null){
+            throw new Error("post not found");
+        }
+        return [application, post];
     }
 
     async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {

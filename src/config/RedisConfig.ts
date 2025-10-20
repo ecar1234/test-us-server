@@ -7,7 +7,7 @@ import { RedisEnv } from './env';
 const redisConfig = {
   port: parseInt(RedisEnv.REDIS_PORT || '6379'),
   host: RedisEnv.REDIS_HOST || 'localhost',
-  password: RedisEnv.REDIS_PASSWORD || '',
+  // password: RedisEnv.REDIS_PASSWORD || '',
   maxRetriesPerRequest: null, 
 };
 

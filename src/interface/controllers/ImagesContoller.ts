@@ -71,10 +71,10 @@ export class ImagesController {
         const { deleteImages } = req.body;
         try {
             const result = await this.imagesUseCase.imagesDelete(deleteImages);
-            res.status(200).json({ state: 200, result: result });
+            res.status(200).json({ status: 200, result: result });
             return;
         } catch (error) {
-            res.status(500).json({ state: 500, error: error.message });
+            res.status(500).json({ status: 500, error: error.message });
         }
 
     }

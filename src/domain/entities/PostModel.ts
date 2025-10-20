@@ -1,3 +1,5 @@
+import { ApplicationModel } from "./ApplicationModel";
+
 export class PostModel {
     constructor(
         public id: string | null,
@@ -12,6 +14,6 @@ export class PostModel {
         public images: object[] = [],
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null,
-        public appilcations: number[] = []
+        public applications: ApplicationModel[] | number[] = []
     ) {}
 }

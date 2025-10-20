@@ -1,11 +1,13 @@
 import { AppDataSource } from "../../config/DataSource";
+import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import { PostModel } from "../../domain/entities/PostModel";
 import { UserModel } from "../../domain/entities/UserModel";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
 import { UserEntity, UserRole, UserStatus, UserType } from "../entities/UserEntity";
+import { In } from "typeorm";
+
 
 export class UserRepositoryImpl implements IUserRepository {
-
     private userRepository = AppDataSource.getRepository(UserEntity);
     private toDomainUser(userEntity: UserEntity): UserModel {
         // console.log(userEntity);
@@ -21,8 +23,9 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.birth,
             userEntity.createdAt,
             userEntity.updatedAt,
-            userEntity.posts && userEntity.posts.map(post => post.postId),
-            userEntity.applications && userEntity.applications.map(application => application.appId),
+            userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
+            userEntity.applications ? userEntity.applications.map(
+                applicationEntity => new ApplicationModel(applicationEntity.appId, applicationEntity.platform, applicationEntity.status, applicationEntity.appliedAt, applicationEntity.updatedAt, applicationEntity.post.postId, applicationEntity.applicant.userId)) : [],
             // userEntity.sentMessages && userEntity.sentMessages.map(message => message.messageId),
             // userEntity.receiveMessages && userEntity.receiveMessages.map(message => message.messageId),
             // userEntity.givenReviews && userEntity.givenReviews.map(review => review.reviewId),
@@ -41,7 +44,7 @@ export class UserRepositoryImpl implements IUserRepository {
             userName: user.userName,
             birth: user.birth,
             ...(user.posts && { posts: user.posts.map(post => ({ postId: post })) }),
-            ...(user.applications && { applications: user.applications.map(application => ({ appId: application })) }),
+            ...(user.applications && { applications: user.applications.map(application => ({ appId: application.id })) }),
             // ...(user.sentMessages && { sentMessages: user.sentMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.receiveMessages && { receiveMessages: user.receiveMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.givenReviews && { givenReviews: user.givenReviews.map(review => ({ reviewId: review.id })) }),
@@ -144,6 +147,16 @@ export class UserRepositoryImpl implements IUserRepository {
     findUserById(userId: string): Promise<UserModel | null> {
         return this.userRepository.findOne({ where: { userId } })
             .then(userEntity => userEntity ? this.toDomainUser(userEntity) : null);
+    }
+    async findUsersByIds(ids: string[]): Promise<UserModel[]> {
+        const users = await this.userRepository.find({
+            where: { userId: In(ids) }, relations: ['applications', 'applications.post', 'applications.applicant', 'applications.reviews']
+        });
+        if (!users) {
+            return [];
+        }
+        // console.log(users[0].applications[0]);
+        return users.map((user) => this.toDomainUser(user));
     }
     findUserByEmail(email: string): Promise<UserModel | null> {
         return this.userRepository.findOne({ where: { email } })

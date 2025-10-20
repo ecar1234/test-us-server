@@ -3,11 +3,13 @@ import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../e
 import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import createError from "http-errors";
+import { In } from "typeorm";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
 
-    private toDomainApplication(applicationEntity: ApplicationEntity): ApplicationModel {
+    public toDomainApplication(applicationEntity: ApplicationEntity): ApplicationModel {
+        // applicant 객체가 존재하고 userId가 있는지 확인하는 방어 코드 추가
         return new ApplicationModel(
             applicationEntity.appId,
             applicationEntity.platform === ApplicationsPlatform.WEB ? 'web' : (applicationEntity.platform === ApplicationsPlatform.IOS ? 'ios' : 'android'),
@@ -17,7 +19,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             applicationEntity.appliedAt,
             applicationEntity.updatedAt,
             applicationEntity.post && applicationEntity.post.postId,
-            applicationEntity.applicant.userId
+            applicationEntity.applicant?.userId
         );
     }
     private toEntityApplication(application: ApplicationModel): ApplicationEntity {
@@ -40,16 +42,24 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         }
         const appEntity = this.toEntityApplication(application);
         const savedEntity = await this.applicationRepository.save(appEntity);
-        // console.log(savedEntity);
-        return this.toDomainApplication(savedEntity);
+
+        // 저장 후 관계가 포함된 완전한 엔티티를 다시 조회합니다.
+        const newApp = await this.applicationRepository.findOne({
+            where: { appId: savedEntity.appId },
+            relations: ['post', 'applicant']
+        });
+        return this.toDomainApplication(newApp);
     }
 
     public async update(application: ApplicationModel): Promise<ApplicationModel> {
         const entity = this.toEntityApplication(application);
-        const result = await this.applicationRepository.save(entity);
+        const savedResult = await this.applicationRepository.save(entity);
 
-        await this.applicationRepository.save(result);
-        console.log('result', result)
+        // 업데이트 후 관계가 포함된 완전한 엔티티를 다시 조회합니다.
+        const result = await this.applicationRepository.findOne({
+            where: { appId: savedResult.appId },
+            relations: ['post', 'applicant']
+        });
         return this.toDomainApplication(result);
     }
 
@@ -81,22 +91,21 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         });
     }
     public async rejectUser(userId: string, postId: string): Promise<ApplicationModel> {
-        return this.applicationRepository.findOne({
+        const application = await this.applicationRepository.findOne({
             where: {
                 applicant: { userId },
                 post: { postId },
-                status: ApplicationStatus.PENDING
             },
             relations: ['applicant', 'post', 'reviews']
-        }).then(applicationEntity => {
-            if (!applicationEntity) {
-                throw new Error(`Application not found for user ${userId} and post ${postId}`);
-            }
-            applicationEntity.status = ApplicationStatus.REJECTED;
-            return this.applicationRepository.save(applicationEntity).then(savedEntity => {
-                return this.toDomainApplication(savedEntity);
-            });
         });
+
+        if(!application){
+            throw new Error(`Application not found for user ${userId} and post ${postId}`);
+        }
+
+        application.status = ApplicationStatus.REJECTED;
+        await this.applicationRepository.save(application);
+        return this.toDomainApplication(application);
     }
 
     public async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
@@ -110,5 +119,13 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         // console.log(applicationEntities);
         return applicationEntities.map(entity => this.toDomainApplication(entity));
 
+    }
+
+    public async getPostApplicantsInfo(applicationIds: number[]): Promise<ApplicationModel[]> {
+        const applicants = await this.applicationRepository.find({
+            where: { appId: In(applicationIds) },
+            relations: ['applicant', 'post', 'reviews']
+        });
+        return applicants.map(entity => this.toDomainApplication(entity));
     }
 }

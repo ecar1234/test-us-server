@@ -1,17 +1,21 @@
-import { In, MoreThan } from "typeorm";
+import { In, MoreThan, Not } from "typeorm";
 import { AppDataSource } from "../../config/DataSource";
 import { PostModel } from "../../domain/entities/PostModel";
 import { IPostRepository } from "../../domain/interface_repositories/IPostRepository";
 import { PostEntity, PostStatusType } from "../entities/PostEntity";
 import { UserModel } from "../../domain/entities/UserModel";
 import { redisClient } from "../../config/RedisConfig";
+import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
 
 export class PostRepositoryImpl implements IPostRepository {
     private postRepository = AppDataSource.getRepository(PostEntity);
+    private applicationRepository: ApplicationRepositoryImpl;
     // private userRepository = AppDataSource.getRepository(UserEntity);
-
+    constructor() {
+        this.applicationRepository = new ApplicationRepositoryImpl();
+    }
     private toDomainPost(postEntity: PostEntity): PostModel {
-        // console.log("postEntity : ",postEntity);
+        // console.log("to postEntity : ",postEntity);
         const authorInfo = postEntity.author
             ? { userId: postEntity.author.userId, nickname: postEntity.author.nickname }
             : null;
@@ -29,7 +33,7 @@ export class PostRepositoryImpl implements IPostRepository {
             postEntity.images,
             postEntity.createdAt,
             postEntity.updatedAt,
-            postEntity.applications && postEntity.applications.map(application => application.appId)
+            postEntity.applications ? postEntity.applications.map(app => this.applicationRepository.toDomainApplication(app)) : []
         );
     }
     private toEntityPost(post: PostModel): PostEntity {
@@ -40,8 +44,11 @@ export class PostRepositoryImpl implements IPostRepository {
         if (post.author) {
             if (typeof post.author === 'string') {
                 authorRelation = { userId: post.author };
-            } else if (typeof post.author === 'object' && post.author !== null && 'userId' in post.author) {
+            } else if (typeof post.author === 'object' && post.author !== null && 'userId' in post.author && post.author.userId) {
+                // post.author.userId가 falsy(undefined, null, 빈 문자열 등)가 아닌지 확인합니다.
                 authorRelation = { userId: post.author.userId };
+            } else {
+                // author 객체는 있지만 userId가 유효하지 않은 경우에 대한 방어 코드
             }
         }
 
@@ -58,7 +65,7 @@ export class PostRepositoryImpl implements IPostRepository {
             images: post.images,
             createdAt: post.createdAt ? post.createdAt : new Date(),
             updatedAt: post.updatedAt ? post.updatedAt : new Date(),
-            ...(post.appilcations && { applications: post.appilcations.map(appId => ({ appId })) })
+            ...(post.applications && { applications: post.applications.map(appId => ({ appId })) })
         });
         return dbPost;
     }
@@ -76,7 +83,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async updatePost(post: PostModel): Promise<PostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: post.id },
-            relations: ["author", "applications", "images"],
+            relations: ["author", "applications", "applications.applicant", "applications.post", "images"],
         });
 
         if (!postEntity) {
@@ -122,29 +129,6 @@ export class PostRepositoryImpl implements IPostRepository {
         return true;
     }
 
-    // async getWebPostsPaginations(page: number): Promise<PostModel[]> {
-    //     const webPosts = await this.postRepository.find({
-    //         where: { platform: 'web' },
-    //         relations: ['author', 'applications'],
-    //         skip: (page - 1) * 10,
-    //         take: 10
-    //     });
-    //     return webPosts.map(postEntity => this.toDomainPost(postEntity));
-    // }
-    // async getMobilePostsPaginations(page: number): Promise<PostModel[]> {
-    //     const mobilePosts = await this.postRepository
-    //         .createQueryBuilder('post')
-    //         .leftJoinAndSelect('post.author', 'author')
-    //         .leftJoinAndSelect('post.applications', 'applications')
-    //         .where("FIND_IN_SET(:ios, post.platform) > 0 OR FIND_IN_SET(:android, post.platform) > 0", {
-    //             ios: 'ios',
-    //             android: 'android',
-    //         })
-    //         .skip((page - 1) * 10)
-    //         .take(10)
-    //         .getMany();
-    //     return mobilePosts.map(postEntity => this.toDomainPost(postEntity));
-    // }
     async getFavoritePostsPaginations(page: number): Promise<PostModel[]> {
         const cachedKey = `favoritePosts`;
         const cachedData = await redisClient.get(cachedKey);
@@ -154,7 +138,7 @@ export class PostRepositoryImpl implements IPostRepository {
         }
 
         const favoritePosts = await this.postRepository.find({
-            relations: ['author', 'applications', 'images'],
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images'],
             where: { views: MoreThan(50), status: PostStatusType.ACTIVE },
             order: { views: 'DESC' },
             take: 10
@@ -177,7 +161,7 @@ export class PostRepositoryImpl implements IPostRepository {
         
         const posts = await this.postRepository.find({
             where: { status: PostStatusType.ACTIVE },
-            relations: ['author', 'applications', 'images'],
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
             take: 10
@@ -192,8 +176,8 @@ export class PostRepositoryImpl implements IPostRepository {
 
     async getPostById(id: string): Promise<PostModel> {
         const postEntity = await this.postRepository.findOne({
-            where: { postId: id },
-            relations: ['author', 'applications', 'images']
+            where: { postId: id, status: PostStatusType.ACTIVE},
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -204,10 +188,31 @@ export class PostRepositoryImpl implements IPostRepository {
         return this.toDomainPost(newPost);
     }
 
+    async getUserRecuritmentPosts(userId: string): Promise<PostModel[]> {
+        const redisKey = `userPosts:${userId}`;
+        const cachedData = await redisClient.get(redisKey);
+        if (cachedData) {
+            const parsedData: PostEntity[] = JSON.parse(cachedData);
+            return parsedData.map(postEntity => this.toDomainPost(postEntity));
+        }
+
+        const postEntities = await this.postRepository.find({
+            where: { author: { userId }, status: Not(PostStatusType.DELETE)},
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
+        });
+
+        if(postEntities.length > 0){
+            await redisClient.set(redisKey, JSON.stringify(postEntities), 'EX', 60 * 10);
+        }
+
+        return postEntities.map(postEntity => this.toDomainPost(postEntity));
+
+    }
+
     async getPostByTitle(title: string): Promise<PostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { title },
-            relations: ['author', 'applications', 'images']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -218,7 +223,7 @@ export class PostRepositoryImpl implements IPostRepository {
     async getPostsByAuthor(authorId: string): Promise<PostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { author: { userId: authorId } },
-            relations: ['author', 'applications', 'images']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
         });
 
         return postEntities.map(entity => this.toDomainPost(entity));

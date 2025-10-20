@@ -5,6 +5,7 @@ export interface IPostRepository {
     updatePost(post:PostModel): Promise<PostModel>;
     deletePost(id: string): Promise<boolean>;
     getPostById(id: string): Promise<PostModel>;
+    getUserRecuritmentPosts(userId: string): Promise<PostModel[]>;
     getPostByTitle(title: string): Promise<PostModel>;
     getPostsByAuthor(authorId: string): Promise<PostModel[]>;
     // getWebPostsPaginations(page: number): Promise<PostModel[]>;

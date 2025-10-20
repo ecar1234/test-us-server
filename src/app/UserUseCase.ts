@@ -1,13 +1,14 @@
 import { PostModel } from "../domain/entities/PostModel";
-import { UserModel } from "../domain/entities/UserModel";
+import { TResUserAndReivews, UserModel } from "../domain/entities/UserModel";
 import { PostEntity } from "../infrastructure/entities/PostEntity";
 import { UserStatus } from "../infrastructure/entities/UserEntity";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
+import { ReviewRepositoryImpl } from "../infrastructure/repositories/ReviewRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 import bcrypt from "bcrypt";
 
 export class UserUseCase {
-    constructor(private userRepo: UserRepositoryImpl, private postRepo: PostRepositoryImpl) { }
+    constructor(private userRepo: UserRepositoryImpl, private postRepo: PostRepositoryImpl, private reviewRepo: ReviewRepositoryImpl) { }
 
     async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date): Promise<[UserModel , number]> {
         const findUser = await this.userRepo.findUserByEmail(email);
@@ -38,6 +39,16 @@ export class UserUseCase {
     }
     async getUserById(userId: string): Promise<UserModel | null> {
         return this.userRepo.findUserById(userId);
+    }
+    async getUsersByIds(userIds: string[]): Promise<TResUserAndReivews[]> {
+        const users = await this.userRepo.findUsersByIds(userIds);
+        const reviews = await this.reviewRepo.getUserReviewAverage(userIds);
+        // console.log('use case : ', users);
+        return users.map(user => {
+            const userReviews = reviews.filter(review => review.reviewerUserId === user.userId);
+            const averageRating = userReviews.length > 0 ? userReviews.reduce((sum, review) => sum + review.rating, 0) / userReviews.length : 0;
+            return { user, averageRating, reviewCount: userReviews.length };
+        });
     }
     async getUserByEmail(email: string): Promise<UserModel | null> {
         return this.userRepo.findUserByEmail(email);

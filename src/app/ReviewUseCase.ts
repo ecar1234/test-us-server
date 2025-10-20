@@ -11,16 +11,17 @@ export class ReviewUseCase {
     async getReviewById(reviewId: string):Promise<ReviewModel | null>{
         return this.reviewRepo.getReviewById(reviewId);
     }
-    async getReviewsByApplicationId(applicationId: number): Promise<ReviewModel[]>{
-        return this.reviewRepo.getReviewsByApplicationId(applicationId);
-    }
-    async getReviewsByReviewerUserId(reviewerUserId: string): Promise<ReviewModel[]>{
-        return this.reviewRepo.getReviewsByReviewedUserId(reviewerUserId);
-    }
-    async getReviewsByReviewedUserId(reviewedUserId: string): Promise<ReviewModel[]>{
-        return this.reviewRepo.getReviewsByReviewedUserId(reviewedUserId);
-    }
-    async deleteReview(reviewId: string): Promise<boolean>{
-        return this.reviewRepo.deleteReview(reviewId);
-    }
+    
+    // async getReviewsByApplicationId(applicationId: number): Promise<ReviewModel[]>{
+    //     return this.reviewRepo.getReviewsByApplicationId(applicationId);
+    // }
+    // async getReviewsByReviewerUserId(reviewerUserId: string): Promise<ReviewModel[]>{
+    //     return this.reviewRepo.getReviewsByReviewedUserId(reviewerUserId);
+    // }
+    // async getReviewsByReviewedUserId(reviewedUserId: string): Promise<ReviewModel[]>{
+    //     return this.reviewRepo.getReviewsByReviewedUserId(reviewedUserId);
+    // }
+    // async deleteReview(reviewId: string): Promise<boolean>{
+    //     return this.reviewRepo.deleteReview(reviewId);
+    // }
 }

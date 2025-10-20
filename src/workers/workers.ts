@@ -42,7 +42,8 @@ AppDataSource.initialize().then(() => {
             const { page } = job.data;
             const postRepository = new PostRepositoryImpl();
             const userRepository = new UserRepositoryImpl();
-            const useCase = new PostUseCase(postRepository, userRepository);
+            const applicationRepository = new ApplicationRepositoryImpl();
+            const useCase = new PostUseCase(postRepository, userRepository, applicationRepository);
             const posts = await useCase.getInitPosts();
             // console.log(posts);
             return {
@@ -57,8 +58,8 @@ AppDataSource.initialize().then(() => {
         console.log('success job id : ', job.id);
     });
     applicationWorker.on('failed', (job, err) => { 
-        console.log(err);
-        console.log('failed job id : ', job.id);
+        // console.log(err);
+        console.log('applicationWorker failed job id : ', job.id);
     });
 
     getInitPostsWorker.on('completed', (job, result) => {
@@ -66,8 +67,8 @@ AppDataSource.initialize().then(() => {
         console.log('success job id : ', job.id);
     });
     getInitPostsWorker.on('failed', (job, err) => {
-        console.log(err);
-        console.log('failed job id : ', job.id);
+        // console.log(err);
+        console.log('getInitPostsWorker failed job id : ', job.id);
     });
 
     // export { applicationWorker, getInitPostsWorker };

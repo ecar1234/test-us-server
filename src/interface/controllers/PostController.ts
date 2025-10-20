@@ -59,6 +59,16 @@ export class PostController {
         }
     }
 
+    async getUserRecuritmentPosts(req: Request, res: Response): Promise<void> {
+        try {
+            const { userId } = req.params;
+            const posts = await this.postUseCase.getUserRecuritmentPosts(userId);
+            res.status(200).json({ status: 200, posts: posts });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     async getPostByTitle(req: Request, res: Response): Promise<void> {
         try {
             const { title } = req.params;
@@ -73,15 +83,6 @@ export class PostController {
         }
     }
 
-    // async getAllPosts(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const posts = await this.postUseCase.getAllPosts();
-    //         res.status(200).json({ status: 200, posts: posts });
-    //     } catch (error) {
-    //         res.status(500).json({ error: error.message });
-    //     }
-    // }
-
     async getInitPosts(req: Request, res: Response): Promise<void> {
         try {
             const job = await getInitPostsQueue.add('getInitPosts', { page: 1 });
@@ -95,30 +96,6 @@ export class PostController {
             res.status(501).json({ error: error.message });
         }
     }
-
-    // async getWebPosts(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const page = parseInt(req.query.page as string) || 1;
-
-    //         const webPosts = await this.postUseCase.getWebPostsPaginations(page);
-    //         // console.log(webPosts);
-    //         res.status(200).json({ status: 200, posts: webPosts });
-    //     } catch (error) {
-    //         res.status(500).json({ error: error.message });
-    //     }
-    // }
-    // async getMobilePosts(req: Request, res: Response): Promise<void> {
-    //     try {
-    //         const page = parseInt(req.query.page as string) || 1;
-
-    //         const mobilePosts = await this.postUseCase.getMobilePostsPaginations(page);
-    //         // console.log(mobilePosts);
-
-    //         res.status(200).json({ status: 200, posts: mobilePosts });
-    //     } catch (error) {
-    //         res.status(500).json({ error: error.message });
-    //     }
-    // }
 
     async getPostsPaginations(req: Request, res: Response): Promise<void> {
         try {

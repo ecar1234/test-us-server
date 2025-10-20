@@ -1,10 +1,12 @@
+import { ApplicationModel } from "../domain/entities/ApplicationModel";
 import { PostModel } from "../domain/entities/PostModel";
 import { UserEntity } from "../infrastructure/entities/UserEntity";
+import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 
 export class PostUseCase {
-    constructor(private postRepository: PostRepositoryImpl, private userRepository: UserRepositoryImpl) { }
+    constructor(private postRepository: PostRepositoryImpl, private userRepository: UserRepositoryImpl, private applicationRepository: ApplicationRepositoryImpl) { }
 
     async createPost(author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, images: object[], status: string = 'active', period: number = 7): Promise<PostModel> {
         const post = new PostModel(null, author.userId, title, subtitle, platform, contents, status, period, 0, images);
@@ -19,6 +21,10 @@ export class PostUseCase {
     }
     async getPostById(id: string): Promise<PostModel> {
         return this.postRepository.getPostById(id);
+    }
+    async getUserRecuritmentPosts(userId: string): Promise<PostModel[]> {
+        // 이제 Repository에서 모든 변환을 처리하므로, UseCase는 간단히 데이터를 요청하기만 하면 됩니다.
+        return this.postRepository.getUserRecuritmentPosts(userId);
     }
     async getPostByTitle(title: string): Promise<PostModel> {
         return this.postRepository.getPostByTitle(title);

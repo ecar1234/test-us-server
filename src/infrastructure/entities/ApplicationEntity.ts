@@ -14,6 +14,7 @@ export enum ApplicationsPlatform {
     WEB = 'web',
     IOS = 'ios',
     ANDROID = 'android',
+    GAME = 'game'
 }
 
 @Entity('Application')

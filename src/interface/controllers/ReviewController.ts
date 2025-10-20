@@ -20,28 +20,40 @@ export class ReviewController {
 
         res.status(result ? 200 : 404).json({ review: result });
     }
-    async getReviewsByApplicationId(req: Request, res: Response): Promise<void> {
-        const appId: string = req.params.applicationId;
-        const result: ReviewModel[] = await this.reviewUseCase.getReviewsByApplicationId(parseInt(appId));
+    // async getUserReviewAverage(req: Request, res: Response): Promise<void> {
+    //     // Assuming the request body is { userIds: string[] }
+    //     const { userIds } = req.body;
+        
+    //     if (!userIds || !Array.isArray(userIds)) {
+    //         res.status(400).json({ status: 400, message: "Invalid input: 'userIds' array is required in the request body." });
+    //         return;
+    //     }
+        
+    //     const reviewSummaries = await this.reviewUseCase.getUserReviewAverage(userIds);
+    //     res.status(200).json({ status: 200, reviewData: reviewSummaries });
+    // }
+    // async getReviewsByApplicationId(req: Request, res: Response): Promise<void> {
+    //     const appId: string = req.params.applicationId;
+    //     const result: ReviewModel[] = await this.reviewUseCase.getReviewsByApplicationId(parseInt(appId));
 
-        res.status(200).json({ reviews: result });
-    }
-    async getReviewsByReviewerUserId(req: Request, res: Response): Promise<void> {
-        const reviewerId: string = req.params.reviewerId;
-        const result: ReviewModel[] = await this.reviewUseCase.getReviewsByReviewerUserId(reviewerId);
+    //     res.status(200).json({ reviews: result });
+    // }
+    // async getReviewsByReviewerUserId(req: Request, res: Response): Promise<void> {
+    //     const reviewerId: string = req.params.reviewerId;
+    //     const result: ReviewModel[] = await this.reviewUseCase.getReviewsByReviewerUserId(reviewerId);
 
-        res.status(200).json({ reviews: result });
-    }
-    async getReviewsByReviewedUserId(req: Request, res: Response): Promise<void> {
-        const reviewedId: string = req.params.reviewedId;
-        const result : ReviewModel[] = await this.reviewUseCase.getReviewsByReviewedUserId(reviewedId);
+    //     res.status(200).json({ reviews: result });
+    // }
+    // async getReviewsByReviewedUserId(req: Request, res: Response): Promise<void> {
+    //     const reviewedId: string = req.params.reviewedId;
+    //     const result : ReviewModel[] = await this.reviewUseCase.getReviewsByReviewedUserId(reviewedId);
 
-        res.status(200).json({ reviews : result });
-    }
-    async deleteReview(req: Request, res: Response): Promise<void> {
-        const reviewId: string = req.params.reviewId;
-        const result: boolean = await this.reviewUseCase.deleteReview(reviewId);
+    //     res.status(200).json({ reviews : result });
+    // }
+    // async deleteReview(req: Request, res: Response): Promise<void> {
+    //     const reviewId: string = req.params.reviewId;
+    //     const result: boolean = await this.reviewUseCase.deleteReview(reviewId);
 
-        res.status(result ? 200 : 404).json({ result : result ? 'success delete review' : 'delete failed' });
-    }
+    //     res.status(result ? 200 : 404).json({ result : result ? 'success delete review' : 'delete failed' });
+    // }
 }
