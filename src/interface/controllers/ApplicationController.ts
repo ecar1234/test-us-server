@@ -1,7 +1,7 @@
 import { AppUseCase } from "../../app/AppUseCase";
 import { Request, Response } from "express";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { PostModel } from "../../domain/entities/PostModel";
+import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
 import { getApplicationsByIdQueue } from "../../config/RedisConfig";
 
 export class ApplicationController {
@@ -11,7 +11,7 @@ export class ApplicationController {
         try {
             const { applicantId, postId, platfrom } = req.body;
 
-            const result: [ApplicationModel, PostModel] = await this.appUseCase.createApplication(applicantId, postId, platfrom);
+            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.createApplication(applicantId, postId, platfrom);
             res.status(200).json({ status: 200, application: result[0], post: result[1] });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -22,7 +22,7 @@ export class ApplicationController {
         try {
             const {id ,applicantId, postId, platform, status } = req.body;
 
-            const result: [ApplicationModel, PostModel] = await this.appUseCase.updateApplication(id, postId, applicantId, platform, status);
+            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.updateApplication(id, postId, applicantId, platform, status);
             console.log(result);
             res.status(200).json({ status: 200, application: result[0], post: result[1] });
         } catch (error) {

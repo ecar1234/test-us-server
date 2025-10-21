@@ -1,5 +1,4 @@
 import { ApplicationModel } from "../entities/ApplicationModel";
-import { PostModel } from "../entities/PostModel";
 
 export interface IApplicationRepository {
     create(application: ApplicationModel): Promise<ApplicationModel>;

@@ -10,7 +10,7 @@ import express, { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from './config/DataSource';
 import AuthRoute from './interface/routes/AuthRoute';
 import UserRoute from './interface/routes/UserRoute';
-import PostRoute from './interface/routes/PostRoute';
+import RecruitmentPostRoute from './interface/routes/RecruitmentPostRoute';
 import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
@@ -35,7 +35,7 @@ AppDataSource.initialize()
             
             app.use('/api/v1/auth', AuthRoute);
             app.use('/api/v1/user', UserRoute);
-            app.use('/api/v1/post', PostRoute);
+            app.use('/api/v1/recruitmentPost', RecruitmentPostRoute);
             app.use('/api/v1/application', ApplicationRoute);
             app.use('/api/v1/review', ReviewRoute);
             app.use('/api/v1/message', MessageRoute);

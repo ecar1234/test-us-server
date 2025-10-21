@@ -3,7 +3,7 @@ import { AppDataSource } from "../../config/DataSource";
 import { ImagesModel } from "../../domain/entities/ImagesModel";
 import { IImagesRepository } from "../../domain/interface_repositories/IImagesRepository";
 import { ImagesEntity } from "../entities/ImagesEntity";
-import { PostEntity } from "../entities/PostEntity";
+import { PostEntity } from "../entities/RecruitmentPostEntity";
 
 
 export class ImagesRepositoryImpl implements IImagesRepository {

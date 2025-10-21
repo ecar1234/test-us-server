@@ -2,12 +2,12 @@ import { UserUseCase } from "../../app/UserUseCase";
 import { Router } from 'express';
 import { UserController } from "../controllers/UserController";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
-import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
 import { ReviewRepositoryImpl } from "../../infrastructure/repositories/ReviewRepositoryImpl";
 
 const route = Router();
-const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new PostRepositoryImpl(), new ReviewRepositoryImpl());
+const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new ReviewRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 route.post('/update', authMiddleware, userController.update.bind(userController));

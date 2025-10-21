@@ -4,8 +4,8 @@ import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepos
 import fs from "fs";
 import path from "path";
 import { URL } from "url";
-import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
-import { PostModel } from "../domain/entities/PostModel";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
 
 // 컨트롤러에서 전달되는 데이터의 타입을 명확하게 정의합니다.
 interface UploadedImageInfo {
@@ -25,10 +25,10 @@ interface ImageToDelete {
 export class ImagesUseCase {
     constructor(
         private imagesRepo: ImagesRepositoryImpl,
-        private postRepo: PostRepositoryImpl
+        private postRepo: RecruitmentPostRepositoryImpl
     ) { }
 
-    async imagesRegister(images: UploadedImageInfo[], postId: string): Promise<PostModel> {
+    async imagesRegister(images: UploadedImageInfo[], postId: string): Promise<RecruitmentPostModel> {
         const models: ImagesModel[] = images.map((image) => {
             return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId);
         });
@@ -38,7 +38,7 @@ export class ImagesUseCase {
         return post;
     }
 
-    async imagesUpdate(deleteImages: ImageToDelete[], newImages: UploadedImageInfo[], postId: string): Promise<PostModel> {
+    async imagesUpdate(deleteImages: ImageToDelete[], newImages: UploadedImageInfo[], postId: string): Promise<RecruitmentPostModel> {
         // Repository에는 삭제할 이미지의 ID만 필요합니다.
 
         if (deleteImages && deleteImages.length > 0) {

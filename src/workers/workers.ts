@@ -5,8 +5,8 @@ import { redisClient } from "../config/RedisConfig";
 import { Worker } from "bullmq";
 import { AppUseCase } from "../app/AppUseCase";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
-import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
-import { PostUseCase } from "../app/PostUseCase";
+import { PostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { PostUseCase } from "../app/RecruitmentPostUseCase";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 import { AppDataSource } from '../config/DataSource';
 

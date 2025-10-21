@@ -1,14 +1,14 @@
 import { parse } from "path";
 import { ApplicationModel } from "../domain/entities/ApplicationModel";
-import { PostModel } from "../domain/entities/PostModel";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
-import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 
 export class AppUseCase {
-    constructor(private applicationRepository: ApplicationRepositoryImpl, private postRepository: PostRepositoryImpl) {}
+    constructor(private applicationRepository: ApplicationRepositoryImpl, private postRepository: RecruitmentPostRepositoryImpl) {}
 
-    async createApplication(userId: string, postId: string, platform: string, status: string = 'pending'): Promise<[ApplicationModel, PostModel]> {
-        const result: [ApplicationModel, PostModel] = [null, null];
+    async createApplication(userId: string, postId: string, platform: string, status: string = 'pending'): Promise<[ApplicationModel, RecruitmentPostModel]> {
+        const result: [ApplicationModel, RecruitmentPostModel] = [null, null];
         const application = new ApplicationModel(null, platform, status, null, null, postId, userId);
         const appResult = await this.applicationRepository.create(application);
         if(appResult == null){
@@ -26,8 +26,8 @@ export class AppUseCase {
         return result;
     }
 
-    async updateApplication(id: string, postId: string, userId: string, platform: string, status: string): Promise<[ApplicationModel, PostModel]> {
-        const result: [ApplicationModel, PostModel] = [null, null];
+    async updateApplication(id: string, postId: string, userId: string, platform: string, status: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
+        const result: [ApplicationModel, RecruitmentPostModel] = [null, null];
         const application = new ApplicationModel(parseInt(id), platform, status, null, null, postId, userId);
         // console.log(application);
         const appResult = await this.applicationRepository.update(application);
@@ -43,8 +43,8 @@ export class AppUseCase {
         return result
     }
 
-    async cancelApplication(id: string): Promise<[ApplicationModel, PostModel]> {
-        const result: [ApplicationModel, PostModel] = [null, null];
+    async cancelApplication(id: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
+        const result: [ApplicationModel, RecruitmentPostModel] = [null, null];
         const application = await this.applicationRepository.cancel( parseInt(id));
         if(application == null){
             throw new Error("application cancel failed");
@@ -58,7 +58,7 @@ export class AppUseCase {
         return result
     }
 
-    async acceptUser(userId: string, postId: string): Promise<[ApplicationModel, PostModel]> {
+    async acceptUser(userId: string, postId: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
         const application = await this.applicationRepository.acceptUser(userId, postId);
         if(application == null){
             throw new Error("application accept failed");
@@ -71,7 +71,7 @@ export class AppUseCase {
         
     }
 
-    async rejectUser(userId: string, postId: string): Promise<[ApplicationModel, PostModel]> {
+    async rejectUser(userId: string, postId: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
         const  application = await this.applicationRepository.rejectUser(userId, postId);
         if(application == null){
             throw new Error("application reject failed");

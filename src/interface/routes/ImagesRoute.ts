@@ -10,10 +10,10 @@ import crypto from "crypto";
 import path from "path";
 import fs from "fs";
 import { Env } from "../../config/env";
-import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 
 const route = Router();
-const imagesUseCase = new ImagesUseCase(new ImagesRepositoryImpl(), new PostRepositoryImpl());
+const imagesUseCase = new ImagesUseCase(new ImagesRepositoryImpl(), new RecruitmentPostRepositoryImpl());
 const imagesController = new ImagesController(imagesUseCase);
 
 const UPLOAD_URL = Env.UPLOAD_URL;

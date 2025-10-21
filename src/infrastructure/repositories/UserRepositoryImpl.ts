@@ -1,6 +1,5 @@
 import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { PostModel } from "../../domain/entities/PostModel";
 import { UserModel } from "../../domain/entities/UserModel";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
 import { UserEntity, UserRole, UserStatus, UserType } from "../entities/UserEntity";

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { PostEntity } from "./PostEntity";
+import { RecruitmentPostEntity } from "./RecruitmentPostEntity";
 import { UserEntity } from "./UserEntity";
 import { ReviewEntity } from "./ReviewEntiry";
 
@@ -39,9 +39,9 @@ export class ApplicationEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => PostEntity, post => post.applications, { onDelete: 'CASCADE' })
+    @ManyToOne(() => RecruitmentPostEntity, post => post.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'postId' })
-    post: PostEntity
+    post: RecruitmentPostEntity
 
     // 신청 유저의 승인 상테
     @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })

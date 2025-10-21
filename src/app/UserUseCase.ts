@@ -1,14 +1,13 @@
-import { PostModel } from "../domain/entities/PostModel";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
 import { TResUserAndReivews, UserModel } from "../domain/entities/UserModel";
-import { PostEntity } from "../infrastructure/entities/PostEntity";
 import { UserStatus } from "../infrastructure/entities/UserEntity";
-import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { ReviewRepositoryImpl } from "../infrastructure/repositories/ReviewRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 import bcrypt from "bcrypt";
 
 export class UserUseCase {
-    constructor(private userRepo: UserRepositoryImpl, private postRepo: PostRepositoryImpl, private reviewRepo: ReviewRepositoryImpl) { }
+    constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: ReviewRepositoryImpl) { }
 
     async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date): Promise<[UserModel , number]> {
         const findUser = await this.userRepo.findUserByEmail(email);
@@ -56,7 +55,7 @@ export class UserUseCase {
     async getUserByNickname(nickname: string): Promise<UserModel | null> {
         return this.userRepo.findUserByNickname(nickname);
     }
-    async getPostsByNickname(nickname: string): Promise<PostModel[]> {
+    async getPostsByNickname(nickname: string): Promise<RecruitmentPostModel[]> {
         // 1. 닉네임으로 사용자 정보를 조회하여 userId를 얻습니다.
         const user = await this.userRepo.findUserByNickname(nickname);
 

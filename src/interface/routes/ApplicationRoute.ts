@@ -3,12 +3,12 @@ import { Router } from "express";
 import { AppUseCase } from "../../app/AppUseCase";
 import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
 import { ApplicationController } from "../controllers/ApplicationController";
-import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
 
 const router = Router();
 
-const applicationUseCase = new AppUseCase(new ApplicationRepositoryImpl(), new PostRepositoryImpl());
+const applicationUseCase = new AppUseCase(new ApplicationRepositoryImpl(), new RecruitmentPostRepositoryImpl());
 const applicationController = new ApplicationController(applicationUseCase);
 
 // router.get("/findByPostId/:postId", applicationController.findApplicationsByPostId.bind(applicationController)); post에서 appilcations 가져오기

@@ -1,9 +1,9 @@
-import { PostUseCase } from "../../app/PostUseCase";
+import { RecruitmentPostUseCase } from "../../app/RecruitmentPostUseCase";
 import { Request, Response } from "express";
 import { getInitPostsQueue } from "../../config/RedisConfig";
 
-export class PostController {
-    constructor(private postUseCase: PostUseCase) { }
+export class RecruitmentPostController {
+    constructor(private postUseCase: RecruitmentPostUseCase) { }
 
     async createPost(req: Request, res: Response): Promise<void> {
         try {

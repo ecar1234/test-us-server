@@ -1,15 +1,15 @@
 import { Router } from "express";
-import { PostController } from "../controllers/PostController";
-import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
-import { PostUseCase } from "../../app/PostUseCase";
+import { RecruitmentPostController } from "../controllers/RecruitmentPostController";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { RecruitmentPostUseCase } from "../../app/RecruitmentPostUseCase";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
 import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
 
 const route = Router();
 
-const postUseCase: PostUseCase = new PostUseCase(new PostRepositoryImpl(), new UserRepositoryImpl(), new ApplicationRepositoryImpl());
-const postController = new PostController(postUseCase);
+const recruitmentPostUseCase: RecruitmentPostUseCase = new RecruitmentPostUseCase(new RecruitmentPostRepositoryImpl(), new UserRepositoryImpl(), new ApplicationRepositoryImpl());
+const postController = new RecruitmentPostController(recruitmentPostUseCase);
 
 route.post('/create', authMiddleware, postController.createPost.bind(postController));
 route.put('/update', authMiddleware, postController.updatePost.bind(postController));

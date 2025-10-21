@@ -1,38 +1,37 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn, JoinColumn, OneToMany } from "typeorm";
 import { UserEntity } from "./UserEntity";
-import { ApplicationEntity } from "./ApplicationEntity";
 import { ImagesEntity } from "./ImagesEntity";
 
-export enum PostStatusType {
+
+export enum PromotionPostStatusType {
     ACTIVE = 'active',
-    END = 'end',
+    // END = 'end',
     EXPIRED = 'expired',
     DELETE = 'delete'
-}
+}JoinColumn
 
-@Entity('Post')
-export class PostEntity {
+@Entity('PromotionPost')
+export class PromotionPostEntity {
     @PrimaryGeneratedColumn('uuid')
     postId: string
-
-    @ManyToOne(() => UserEntity, user => user.posts, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'authorId' })
-    author: UserEntity
 
     @Column('varchar', { length: 30 })
     title: string
 
-    @Column("varchar", { length: 100 })
+    @Column("varchar", { length: 30 })
     subtitle: string
-
-    @Column({ type: 'simple-array', nullable: false })
-    platform: string[]
 
     @Column('text')
     contents: string
 
-    @Column({ type: 'enum', enum: PostStatusType, default: 'active' })
-    status: PostStatusType
+    @Column({ type: 'simple-array', nullable: false })
+    platform: string[]
+
+    @Column({ type: 'enum', enum: PromotionPostStatusType, default: 'active' })
+    status: PromotionPostStatusType
+
+    @Column({ type: 'simple-array', nullable: false})
+    domain: string[]
 
     @Column('int', { default: 7 })
     period: number
@@ -42,13 +41,15 @@ export class PostEntity {
 
     @CreateDateColumn()
     createdAt: Date
-    
+
     @UpdateDateColumn()
     updatedAt: Date
-    
+
+    @ManyToOne(() => UserEntity, user => user.posts, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'authorId' })
+    author: UserEntity
+
     @OneToMany(() => ImagesEntity, image => image.post, { cascade: [ 'update', 'remove' ], eager: true, nullable: true })
     images: ImagesEntity[]
 
-    @OneToMany(() => ApplicationEntity, application => application.post)
-    applications: ApplicationEntity[]
 }

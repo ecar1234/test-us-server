@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { PostEntity } from "./PostEntity";
+import { RecruitmentPostEntity } from "./RecruitmentPostEntity";
 
 @Entity('Images')
 export class ImagesEntity {
@@ -27,7 +27,7 @@ export class ImagesEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @ManyToOne(() => PostEntity, post => post.images, { onDelete: 'CASCADE', nullable: true })
+    @ManyToOne(() => RecruitmentPostEntity, post => post.images, { onDelete: 'CASCADE', nullable: true })
     @JoinColumn({ name: 'postId' })
-    post: PostEntity;
+    post: RecruitmentPostEntity;
 }
