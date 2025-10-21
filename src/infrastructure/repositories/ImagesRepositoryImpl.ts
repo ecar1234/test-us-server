@@ -3,7 +3,7 @@ import { AppDataSource } from "../../config/DataSource";
 import { ImagesModel } from "../../domain/entities/ImagesModel";
 import { IImagesRepository } from "../../domain/interface_repositories/IImagesRepository";
 import { ImagesEntity } from "../entities/ImagesEntity";
-import { PostEntity } from "../entities/RecruitmentPostEntity";
+import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 
 
 export class ImagesRepositoryImpl implements IImagesRepository {
@@ -38,7 +38,7 @@ export class ImagesRepositoryImpl implements IImagesRepository {
         entity.mimetype = model.mimetype;
         entity.size = model.size;
         entity.url = model.url;
-        entity.post = { postId: model.postId } as PostEntity;
+        entity.post = { postId: model.postId } as RecruitmentPostEntity;
 
         return entity;
     }
