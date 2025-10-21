@@ -13,7 +13,7 @@ export class ImagesController {
             res.status(400).json({ message: 'No image files uploaded.' });
             return;
         }
-        const { postId } = req.body;
+        const { postId, postType } = req.body;
         const files = req.files as Express.Multer.File[];
         const images = files.map((file: Express.Multer.File) =>
         ({
@@ -24,7 +24,11 @@ export class ImagesController {
             url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
         })
         );
-        const result = await this.imagesUseCase.imagesRegister(images, postId);
+        if (!postType) {
+            res.status(400).json({ message: 'postType is required.' });
+            return;
+        }
+        const result = await this.imagesUseCase.imagesRegister(images, postId, postType);
         // console.log(result);
         res.status(200).json({ status: 200, post: result });
         return;
@@ -32,7 +36,7 @@ export class ImagesController {
     }
 
     async updateImages(req: Request, res: Response): Promise<void> {
-        const { postId } = req.body;
+        const { postId, postType } = req.body;
         let deleteImagesData = [];
 
         // deleteImages가 문자열로 오면 JSON 파싱을 시도합니다.
@@ -56,7 +60,11 @@ export class ImagesController {
                 url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
             }
         ));
-        const result = await this.imagesUseCase.imagesUpdate(deleteImagesData, images, postId);
+        if (!postType) {
+            res.status(400).json({ message: 'postType is required.' });
+            return;
+        }
+        const result = await this.imagesUseCase.imagesUpdate(deleteImagesData, images, postId, postType);
         // console.log('post', result);
         res.status(200).json({ status: 200, post: result });
         return;

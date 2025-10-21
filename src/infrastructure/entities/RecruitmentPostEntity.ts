@@ -15,7 +15,7 @@ export class RecruitmentPostEntity {
     @PrimaryGeneratedColumn('uuid')
     postId: string
 
-    @ManyToOne(() => UserEntity, user => user.posts, { onDelete: 'CASCADE' })
+    @ManyToOne(() => UserEntity, user => user.recruitmentPosts, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
     author: UserEntity
 
@@ -46,7 +46,10 @@ export class RecruitmentPostEntity {
     @UpdateDateColumn()
     updatedAt: Date
     
-    @OneToMany(() => ImagesEntity, image => image.post, { cascade: [ 'update', 'remove' ], eager: true, nullable: true })
+    @OneToMany(() => ImagesEntity, image => image.postId, { cascade: [ 'insert', 'update', 'remove' ], eager: true, nullable: true })
+    @JoinColumn([
+        { name: 'postId', referencedColumnName: 'postId' }
+    ])
     images: ImagesEntity[]
 
     @OneToMany(() => ApplicationEntity, application => application.post)

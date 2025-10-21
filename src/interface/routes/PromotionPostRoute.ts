@@ -14,7 +14,7 @@ const promotionPostController = new PromotionPostController(promotionPostUseCase
 // route.post('/create', authMiddleware, promotionPostController.createPost.bind(promotionPostController));
 // route.put('/update', authMiddleware, promotionPostController.updatePost.bind(promotionPostController));
 // route.post('/delete', authMiddleware, promotionPostController.deletePost.bind(promotionPostController));
-// route.get('/getPostById/:id', promotionPostController.getPostById.bind(promotionPostController));
+route.get('/getPostById/:id', promotionPostController.getPostById.bind(promotionPostController));
 // route.get('/getUserRecruitmentPosts/:userId', promotionPostController.getUserRecuritmentPosts.bind(promotionPostController));
 // route.get('/getPostByTitle/:title', promotionPostController.getPostByTitle.bind(promotionPostController));
 // route.get('/getAllPosts', promotionPostController.getAllPosts.bind(promotionPostController));

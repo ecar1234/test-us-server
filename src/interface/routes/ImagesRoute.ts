@@ -11,9 +11,10 @@ import path from "path";
 import fs from "fs";
 import { Env } from "../../config/env";
 import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl";
 
 const route = Router();
-const imagesUseCase = new ImagesUseCase(new ImagesRepositoryImpl(), new RecruitmentPostRepositoryImpl());
+const imagesUseCase = new ImagesUseCase(new ImagesRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new PromotionPostRepositoryImpl());
 const imagesController = new ImagesController(imagesUseCase);
 
 const UPLOAD_URL = Env.UPLOAD_URL;

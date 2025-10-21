@@ -6,6 +6,8 @@ import path from "path";
 import { URL } from "url";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
+import { PromotionPostModel } from "../domain/entities/PromotionPostModel";
+import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
 
 // 컨트롤러에서 전달되는 데이터의 타입을 명확하게 정의합니다.
 interface UploadedImageInfo {
@@ -21,24 +23,34 @@ interface ImageToDelete {
     url: string;
 }
 
+type AnyPostModel = RecruitmentPostModel | PromotionPostModel;
+
 
 export class ImagesUseCase {
     constructor(
         private imagesRepo: ImagesRepositoryImpl,
-        private postRepo: RecruitmentPostRepositoryImpl
+        private recruitmentRepo: RecruitmentPostRepositoryImpl,
+        private promotionRepo: PromotionPostRepositoryImpl
     ) { }
 
-    async imagesRegister(images: UploadedImageInfo[], postId: string): Promise<RecruitmentPostModel> {
+    async imagesRegister(images: UploadedImageInfo[], postId: string, postType: string): Promise<AnyPostModel> {
         const models: ImagesModel[] = images.map((image) => {
-            return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId);
+            return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId, postType);
         });
-        await this.imagesRepo.imagesRegister(models, postId);
+        
+        await this.imagesRepo.imagesRegister(models, postId, postType);
 
-        const post = await this.postRepo.getPostById(postId);
-        return post;
+        switch (postType) {
+            case 'recruitment':
+                return await this.recruitmentRepo.getPostById(postId);
+            case 'promotion':
+                return await this.promotionRepo.getPostById(postId);
+            default:
+                throw new Error(`Unsupported postType: ${postType}`);
+        }
     }
 
-    async imagesUpdate(deleteImages: ImageToDelete[], newImages: UploadedImageInfo[], postId: string): Promise<RecruitmentPostModel> {
+    async imagesUpdate(deleteImages: ImageToDelete[], newImages: UploadedImageInfo[], postId: string, postType: string): Promise<AnyPostModel> {
         // Repository에는 삭제할 이미지의 ID만 필요합니다.
 
         if (deleteImages && deleteImages.length > 0) {
@@ -66,14 +78,20 @@ export class ImagesUseCase {
         }
         if(newImages && newImages.length > 0){
             const modelsToSave: ImagesModel[] = newImages.map((image) => {
-                return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId);
+                return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId, postType);
             });
-            await this.imagesRepo.imagesUpdate(modelsToSave, postId);
+            await this.imagesRepo.imagesUpdate(modelsToSave, postId, postType);
 
         }
     
-        const post = await this.postRepo.getPostById(postId);
-        return post;
+        switch (postType) {
+            case 'recruitment':
+                return await this.recruitmentRepo.getPostById(postId);
+            case 'promotion':
+                return await this.promotionRepo.getPostById(postId);
+            default:
+                throw new Error(`Unsupported postType: ${postType}`);
+        }
     }
 
     async imagesDelete(deleteImages: ImageToDelete[]): Promise<boolean>{

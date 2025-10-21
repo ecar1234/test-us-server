@@ -8,6 +8,7 @@ export class ImagesModel{
         public size: number,
         public url: string,
         public postId: string,
+        public postType: string,
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null
     ){}

@@ -45,11 +45,14 @@ export class PromotionPostEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @ManyToOne(() => UserEntity, user => user.posts, { onDelete: 'CASCADE' })
+    @ManyToOne(() => UserEntity, user => user.promotionPosts, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
     author: UserEntity
 
-    @OneToMany(() => ImagesEntity, image => image.post, { cascade: [ 'update', 'remove' ], eager: true, nullable: true })
+    @OneToMany(() => ImagesEntity, image => image.postId, { cascade: [ 'insert', 'update', 'remove' ], eager: true, nullable: true })
+    @JoinColumn([
+        { name: 'postId', referencedColumnName: 'postId' }
+    ])
     images: ImagesEntity[]
 
 }

@@ -4,4 +4,8 @@ import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/Prom
 export class PromotionPostUseCase {
     constructor(private repository: PromotionPostRepositoryImpl) { }
 
+    async getPostById(id: string): Promise<any> {
+        return this.repository.getPostById(id);
+    }
+
 }
