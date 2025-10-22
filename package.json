@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev:server": "ts-node-dev --respawn --transpile-only src/index.ts",
-    "dev:workers": "ts-node-dev --respawn --transpile-only src/workers/workers.ts",
+    "dev:workers": "ts-node-dev --respawn --transpile-only src/workers/index.ts",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:workers\"",
     "build": "tsc",
     "start": "node dist/index.js",

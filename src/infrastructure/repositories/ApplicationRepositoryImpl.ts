@@ -18,7 +18,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
                     (applicationEntity.status === ApplicationStatus.REJECTED ? 'rejected' : 'cancel')),
             applicationEntity.appliedAt,
             applicationEntity.updatedAt,
-            applicationEntity.post && applicationEntity.post.postId,
+            applicationEntity.post?.postId,
             applicationEntity.applicant?.userId
         );
     }

@@ -6,15 +6,16 @@ import { RecruitmentPostEntity, RecruitmentPostStatusType } from "../entities/Re
 import { UserModel } from "../../domain/entities/UserModel";
 import { redisClient } from "../../config/RedisConfig";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
+import { BasePostEntity } from "../entities/BasePostEntity";
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
     private postRepository = AppDataSource.getRepository(RecruitmentPostEntity);
+
     private applicationRepository: ApplicationRepositoryImpl;
-    // private userRepository = AppDataSource.getRepository(UserEntity);
     constructor() {
         this.applicationRepository = new ApplicationRepositoryImpl();
     }
-    private toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
+    public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
         const authorInfo = postEntity.author
             ? { userId: postEntity.author.userId, nickname: postEntity.author.nickname }
@@ -84,7 +85,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async updatePost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: post.id },
-            relations: ["author", "applications", "applications.applicant", "applications.post", "images"],
+            relations: ["author", "applications", "applications.applicant", "images"],
         });
 
         if (!postEntity) {
@@ -130,27 +131,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         return true;
     }
 
-    async getFavoritePostsPaginations(page: number): Promise<RecruitmentPostModel[]> {
-        const cachedKey = `favoritePosts`;
-        const cachedData = await redisClient.get(cachedKey);
-        if (cachedData) {
-            const parseredData: RecruitmentPostEntity[] = JSON.parse(cachedData);
-            return parseredData.map(postEntity => this.toDomainPost(postEntity));
-        }
-
-        const favoritePosts = await this.postRepository.find({
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images'],
-            where: { views: MoreThan(50), status: RecruitmentPostStatusType.ACTIVE },
-            order: { views: 'DESC' },
-            take: 10
-        });
-
-        if(favoritePosts.length){
-            await redisClient.set(cachedKey, JSON.stringify(favoritePosts), 'EX', 60 * 10);
-        }
-        // console.log(favoritePosts);
-        return favoritePosts.map(postEntity => this.toDomainPost(postEntity));
-    }
     async getPostsPaginations(page: number): Promise<RecruitmentPostModel[]> {
         const cacheKey = `posts:page:${page}`;
         const cachedPosts = await redisClient.get(cacheKey);
@@ -162,7 +142,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         
         const posts = await this.postRepository.find({
             where: { status: RecruitmentPostStatusType.ACTIVE },
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images'],
+            relations: ['author', 'applications', 'applications.applicant', 'images'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
             take: 10
@@ -178,7 +158,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostById(id: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: id, status: RecruitmentPostStatusType.ACTIVE},
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
+            relations: ['author', 'applications', 'applications.applicant', 'images']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -199,7 +179,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         const postEntities = await this.postRepository.find({
             where: { author: { userId }, status: Not(RecruitmentPostStatusType.DELETE)},
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
+            relations: ['author', 'applications', 'applications.applicant', 'images']
         });
 
         if(postEntities.length > 0){
@@ -213,7 +193,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostByTitle(title: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { title },
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
+            relations: ['author', 'applications', 'applications.applicant', 'images']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -224,7 +204,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostsByAuthor(authorId: string): Promise<RecruitmentPostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { author: { userId: authorId } },
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'images']
+            relations: ['author', 'applications', 'applications.applicant', 'images']
         });
 
         return postEntities.map(entity => this.toDomainPost(entity));

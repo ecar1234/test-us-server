@@ -55,7 +55,7 @@ export class JobController {
 
                 const result = await job.returnvalue;
                 if (result && result['state'] === 'success') {
-                    res.status(200).json({ status: 200, favoritePosts: result['posts'][0], posts: result['posts'][1] });
+                    res.status(200).json({ status: 200, favoritePosts: result['favorite'], recruitPosts: result['recruit'], promotionPosts: result['promotion'] });
                     return;
                 } else {
                     // 작업은 완료되었지만, 내부 로직에서 실패한 경우

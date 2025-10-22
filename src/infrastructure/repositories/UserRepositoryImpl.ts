@@ -8,6 +8,7 @@ import { In } from "typeorm";
 
 export class UserRepositoryImpl implements IUserRepository {
     private userRepository = AppDataSource.getRepository(UserEntity);
+    
     private toDomainUser(userEntity: UserEntity): UserModel {
         // console.log(userEntity);
         return new UserModel(

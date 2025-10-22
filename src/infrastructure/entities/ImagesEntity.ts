@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BasePostEntity } from "./BasePostEntity";
 
 @Entity('Images')
 export class ImagesEntity {
@@ -26,11 +27,7 @@ export class ImagesEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    // 다형성 관계를 위한 컬럼
-    @Column({ nullable: true })
-    postId: string;
-
-    // 게시물의 종류를 식별하기 위한 컬럼 ('recruitment', 'promotion' 등)
-    @Column({ nullable: true })
-    postType: string;
+    @ManyToOne(() => BasePostEntity, post => post.images, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'postId' })
+    post: BasePostEntity;
 }

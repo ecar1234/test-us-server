@@ -1,9 +1,8 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { RecruitmentPostEntity } from "./RecruitmentPostEntity";
 import { ApplicationEntity } from "./ApplicationEntity";
 import { MessagesEntity } from "./MessageEntity";
 import { ReviewEntity } from "./ReviewEntiry";
-import { PromotionPostEntity } from "./PromotionPostEntity";
+import { BasePostEntity } from "./BasePostEntity";
 
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',
@@ -64,11 +63,8 @@ export class UserEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @OneToMany(() => RecruitmentPostEntity, recruitmentPost => recruitmentPost.author)
-    recruitmentPosts: RecruitmentPostEntity[]
-
-    @OneToMany(() => PromotionPostEntity, promotionPost => promotionPost.author)
-    promotionPosts: PromotionPostEntity[]
+    @OneToMany(() => BasePostEntity, post => post.author)
+    posts: BasePostEntity[];
 
     @OneToMany(() => ApplicationEntity, app => app.applicant)
     applications: ApplicationEntity[]

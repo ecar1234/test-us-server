@@ -17,6 +17,7 @@ import MessageRoute from './interface/routes/MessageRoute';
 import ImagesRoute from './interface/routes/ImagesRoute';
 import JobStateRoute from './interface/routes/JobStateRoute';
 import { Env } from './config/env';
+import PostRoute from './interface/routes/PostRoute';
 
 const app = express();
 const port = parseInt(process.env.SERVER_PORT);
@@ -35,7 +36,7 @@ AppDataSource.initialize()
             
             app.use('/api/v1/auth', AuthRoute);
             app.use('/api/v1/user', UserRoute);
-            app.use('/api/v1/recruitmentPost', RecruitmentPostRoute);
+            app.use('/api/v1/post', PostRoute);
             app.use('/api/v1/application', ApplicationRoute);
             app.use('/api/v1/review', ReviewRoute);
             app.use('/api/v1/message', MessageRoute);
