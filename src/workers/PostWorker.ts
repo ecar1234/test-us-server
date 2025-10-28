@@ -7,6 +7,7 @@ import { ApplicationRepositoryImpl } from "../infrastructure/repositories/Applic
 import { PostUseCase } from "../app/PostUseCase";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
 import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
+import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
 
 const getInitPostsWorker = new Worker(
     'getInitPostsQueue',
@@ -15,8 +16,9 @@ const getInitPostsWorker = new Worker(
         const postRepo = new PostRepositoryImpl();
         const recruitRepo = new RecruitmentPostRepositoryImpl();
         const promotionRepo = new PromotionPostRepositoryImpl();
+        const imageRepo = new ImagesRepositoryImpl();
 
-        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo);
+        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, imageRepo);
         
         const [favorite, recruit, promotion] = await postUseCase.getInitPosts();
         return { 'state': 'success', 'favorite': favorite, 'recruit': recruit, 'promotion': promotion};

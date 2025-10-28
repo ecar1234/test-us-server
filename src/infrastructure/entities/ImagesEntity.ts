@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { BasePostEntity } from "./BasePostEntity";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('Images')
 export class ImagesEntity {
@@ -27,7 +26,9 @@ export class ImagesEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @ManyToOne(() => BasePostEntity, post => post.images, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'postId' })
-    post: BasePostEntity;
+    @Column()
+    postId: string;
+
+    @Column()
+    postType: string;
 }

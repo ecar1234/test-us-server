@@ -1,15 +1,19 @@
 import { AppDataSource } from "../../config/DataSource";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel";
 import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository";
-import { PromotionPostEntity, PromotionPostStatusType } from "../entities/PromotionPostEntity";
+import { ImagesModel } from "../../domain/entities/ImagesModel";
+import { BasePostStateType } from "../entities/BasePostEntity";
+import { PromotionPostEntity } from "../entities/PromotionPostEntity";
+import { ImagesRepositoryImpl } from "./ImagesRepositoryImpl";
 
 
 export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
 
     private repository = AppDataSource.getRepository(PromotionPostEntity);
+    public imagesRepository = new ImagesRepositoryImpl();
 
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
-        const status = post.status === 'active' ? PromotionPostStatusType.ACTIVE : (post.status === 'delete' ? PromotionPostStatusType.DELETE : PromotionPostStatusType.EXPIRED)
+        const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)
 
         let authorRelation: { userId: string } | undefined = undefined;
         if (post.author) {
@@ -31,7 +35,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             period: post.period,
             views: post.views,
             domain: post.domain,
-            images: post.images,
             createdAt: post.createdAt ? post.createdAt : new Date(),
             updatedAt: post.updatedAt ? post.updatedAt : new Date(),
         });
@@ -41,8 +44,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         const authorInfo = post.author
             ? { userId: post.author.userId, nickname: post.author.nickname }
             : null;
-        const status = post.status === PromotionPostStatusType.ACTIVE ?
-            'active' : (post.status === PromotionPostStatusType.EXPIRED ? 'expired' : 'delete');
+        const status = post.status === BasePostStateType.ACTIVE ?
+            'active' : (post.status === BasePostStateType.EXPIRED ? 'expired' : 'delete');
         return new PromotionPostModel(
             post.postId,
             authorInfo,
@@ -53,7 +56,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             status,
             post.period,
             post.views,
-            post.images,
+            [], // 이미지는 별도로 로드하여 채웁니다.
             post.domain,
             post.createdAt,
             post.updatedAt
@@ -64,18 +67,23 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         try {
             const postEntity = this.toEntity(post);
             const savedPost = await this.repository.save(postEntity);
-
-            return this.toDomain(savedPost);
+            const domainPost = this.toDomain(savedPost);
+            if (post.images && post.images.length > 0) {
+                const savedImages = await this.imagesRepository.imagesRegister(post.images as ImagesModel[], savedPost.postId, 'promotion');
+                domainPost.images = savedImages;
+            }
+            return domainPost;
         } catch (error) {
             console.log(error);
             throw error;
         }
 
     }
+
     async updatePost(post: PromotionPostModel): Promise<PromotionPostModel> {
         const postEntity = await this.repository.findOne({
             where: { postId: post.id },
-            relations: ["author", "images"],
+            relations: ["author"],
         });
 
         if (!postEntity) {
@@ -86,67 +94,85 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
         postEntity.contents = post.contents;
-        postEntity.status = post.status === 'active' ? PromotionPostStatusType.ACTIVE : (post.status === 'delete' ? PromotionPostStatusType.DELETE : PromotionPostStatusType.EXPIRED);
+        postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED);
         if (post.period !== undefined) postEntity.period = post.period;
         postEntity.domain = post.domain;
 
-        const updatedPost = await this.repository.save(postEntity);
-        return this.toDomain(updatedPost);
+        const updatedPostEntity = await this.repository.save(postEntity);
+        const domainPost = this.toDomain(updatedPostEntity);
+        domainPost.images = await this.imagesRepository.getImagesByPostId(post.id);
+        return domainPost;
     }
     async deletePost(id: string): Promise<boolean> {
         const result = await this.repository.findOneBy({ postId: id });
         if (!result) {
             throw new Error("Promotion Post not found");
         }
-        result.status = PromotionPostStatusType.DELETE;
+        result.status = BasePostStateType.DELETE;
         await this.repository.save(result);
         return true;
     }
     async getPostById(id: string): Promise<PromotionPostModel> {
         const postEntity = await this.repository.findOne({
-            where: { postId: id, status: PromotionPostStatusType.ACTIVE },
-            relations: ['author', 'images']
+            where: { postId: id, status: BasePostStateType.ACTIVE },
+            relations: ['author']
         });
         if (!postEntity) {
             throw new Error("Promotion Post not found");
         }
         postEntity.views += 1;
         const newPost = await this.repository.save(postEntity);
-        return this.toDomain(newPost);
+        const domainPost = this.toDomain(newPost);
+        domainPost.images = await this.imagesRepository.getImagesByPostId(id);
+        return domainPost;
     }
     async getUserPromotionPosts(userId: string): Promise<PromotionPostModel[]> {
         const postEntities = await this.repository.find({
-            where: { author: { userId }, status: PromotionPostStatusType.ACTIVE },
-            relations: ['author', 'images']
+            where: { author: { userId }, status: BasePostStateType.ACTIVE },
+            relations: ['author']
         });
-        return postEntities.map(entity => this.toDomain(entity));
+        const domainPosts = postEntities.map(entity => this.toDomain(entity));
+        for (const post of domainPosts) {
+            post.images = await this.imagesRepository.getImagesByPostId(post.id);
+        }
+        return domainPosts;
     }
     async getPostByTitle(title: string): Promise<PromotionPostModel> {
         const postEntity = await this.repository.findOne({
             where: { title },
-            relations: ['author', 'images']
+            relations: ['author']
         });
         if (!postEntity) {
             throw new Error("Promotion Post not found");
         }
-        return this.toDomain(postEntity);
+        const domainPost = this.toDomain(postEntity);
+        domainPost.images = await this.imagesRepository.getImagesByPostId(postEntity.postId);
+        return domainPost;
     }
     async getPostsByAuthor(authorId: string): Promise<PromotionPostModel[]> {
         const postEntities = await this.repository.find({
             where: { author: { userId: authorId } },
-            relations: ['author', 'images']
+            relations: ['author']
         });
 
-        return postEntities.map(entity => this.toDomain(entity));
+        const domainPosts = postEntities.map(entity => this.toDomain(entity));
+        for (const post of domainPosts) {
+            post.images = await this.imagesRepository.getImagesByPostId(post.id);
+        }
+        return domainPosts;
     }
     async getPostsPaginations(page: number): Promise<PromotionPostModel[]> {
         const posts = await this.repository.find({
-            where: { status: PromotionPostStatusType.ACTIVE },
-            relations: ['author', 'images'],
+            where: { status: BasePostStateType.ACTIVE },
+            relations: ['author'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
             take: 10
         });
-        return posts.map(postEntity => this.toDomain(postEntity));
+        const domainPosts = posts.map(postEntity => this.toDomain(postEntity));
+        for (const post of domainPosts) {
+            post.images = await this.imagesRepository.getImagesByPostId(post.id);
+        }
+        return domainPosts;
     }
 }

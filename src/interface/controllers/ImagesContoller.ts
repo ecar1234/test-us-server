@@ -7,34 +7,6 @@ export class ImagesController {
         private imagesUseCase: ImagesUseCase
     ) { }
 
-    async uploadImages(req: Request, res: Response): Promise<void> {
-
-        if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
-            res.status(400).json({ message: 'No image files uploaded.' });
-            return;
-        }
-        const { postId, postType } = req.body;
-        const files = req.files as Express.Multer.File[];
-        const images = files.map((file: Express.Multer.File) =>
-        ({
-            filename: file.filename,
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            size: file.size,
-            url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
-        })
-        );
-        if (!postType) {
-            res.status(400).json({ message: 'postType is required.' });
-            return;
-        }
-        const result = await this.imagesUseCase.imagesRegister(images, postId, postType);
-        // console.log(result);
-        res.status(200).json({ status: 200, post: result });
-        return;
-
-    }
-
     async updateImages(req: Request, res: Response): Promise<void> {
         const { postId, postType } = req.body;
         let deleteImagesData = [];

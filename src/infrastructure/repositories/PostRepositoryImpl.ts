@@ -26,20 +26,27 @@ export class PostRepositoryImpl implements IPostRepository {
         }
 
         const favoritePostEntities = await this.baseRepo.find({
-            relations: ['author', 'images'],
+            relations: ['author'],
             where: { views: MoreThan(50),  },
             order: { views: 'DESC' },
             take: 10
         });
 
-        const favoritePosts = favoritePostEntities.map(post => {
+        const favoritePostsPromises = favoritePostEntities.map(async post => {
             if (post instanceof RecruitmentPostEntity) {
-                return this.recruitmentRepo.toDomainPost(post);
+                const domainPost = this.recruitmentRepo.toDomainPost(post);
+                domainPost.images = await this.recruitmentRepo.imagesRepository.getImagesByPostId(post.postId);
+                return domainPost;
             } else if (post instanceof PromotionPostEntity) {
-                return this.promotionRepo.toDomain(post);
+                const domainPost = this.promotionRepo.toDomain(post);
+                domainPost.images = await this.promotionRepo.imagesRepository.getImagesByPostId(post.postId);
+                return domainPost;
             }
             return null;
-        }).filter((p): p is RecruitmentPostModel | PromotionPostModel => p !== null);
+        });
+
+        const favoritePosts = (await Promise.all(favoritePostsPromises))
+            .filter((p): p is RecruitmentPostModel | PromotionPostModel => p !== null);
 
         await redisClient.set(cachedKey, JSON.stringify(favoritePosts), 'EX', 60 * 10);
         return favoritePosts;

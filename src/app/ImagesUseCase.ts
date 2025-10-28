@@ -33,21 +33,12 @@ export class ImagesUseCase {
         private promotionRepo: PromotionPostRepositoryImpl
     ) { }
 
-    async imagesRegister(images: UploadedImageInfo[], postId: string, postType: string): Promise<AnyPostModel> {
+    async imagesRegister(images: UploadedImageInfo[], postId: string, postType: string): Promise<ImagesModel[]> {
         const models: ImagesModel[] = images.map((image) => {
             return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId, postType);
         });
         
-        await this.imagesRepo.imagesRegister(models, postId, postType);
-
-        switch (postType) {
-            case 'recruitment':
-                return await this.recruitmentRepo.getPostById(postId);
-            case 'promotion':
-                return await this.promotionRepo.getPostById(postId);
-            default:
-                throw new Error(`Unsupported postType: ${postType}`);
-        }
+        return await this.imagesRepo.imagesRegister(models, postId, postType);
     }
 
     async imagesUpdate(deleteImages: ImageToDelete[], newImages: UploadedImageInfo[], postId: string, postType: string): Promise<AnyPostModel> {

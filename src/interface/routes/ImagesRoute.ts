@@ -36,8 +36,8 @@ const uploadWithFiles = multer({ storage: storage, limits: { fileSize: 1024 * 10
 const uploadOnlyText = multer({ limits: { fileSize: 1024 * 1024 * 5 } }); // 파일 저장을 위한 storage 설정이 없음
 
 
-route.post('/uploads', authMiddleware, uploadWithFiles.array('images', 4), imagesController.uploadImages.bind(imagesController));
-route.put('/update', authMiddleware, uploadWithFiles.array('images', 4), imagesController.updateImages.bind(imagesController));
+// route.post('/uploads', authMiddleware, uploadWithFiles.array('images', 4), imagesController.uploadImages.bind(imagesController)); // Removed as post creation now handles images
+// route.put('/update', authMiddleware, uploadWithFiles.array('images', 4), imagesController.updateImages.bind(imagesController)); // This is now handled by PostController
 // route.get('/download/', authMiddleware, imagesController.downloadImage.bind(imagesController));
 route.delete('/delete/', authMiddleware, uploadOnlyText.none(), imagesController.deleteImage.bind(imagesController));
 

@@ -5,17 +5,15 @@ import {
     UpdateDateColumn,
     ManyToOne,
     JoinColumn,
-    OneToMany,
     TableInheritance,
     Entity,
-    ChildEntity,
 } from "typeorm";
 import { UserEntity } from "./UserEntity";
-import { ImagesEntity } from "./ImagesEntity";
 
-export enum BasePostStatusType {
+export enum BasePostStateType {
     ACTIVE = 'active',
     EXPIRED = 'expired',
+    END = 'end',
     DELETE = 'delete'
 }
 
@@ -35,18 +33,24 @@ export abstract class BasePostEntity {
     @Column("varchar", { length: 100 })
     subtitle: string;
 
+    @Column({ type: 'simple-array', nullable: false })
+    platform: string[];
+
     @Column('text')
     contents: string;
 
     @Column({ type: 'int', default: 0 })
     views: number;
 
+    @Column({ type: 'enum', enum: BasePostStateType, default: 'active' })
+    status: BasePostStateType;
+
+    @Column('int', { default: 7 })
+    period: number
+
     @CreateDateColumn()
     createdAt: Date;
 
     @UpdateDateColumn()
     updatedAt: Date;
-
-    @OneToMany(() => ImagesEntity, image => image.post, { cascade: true, eager: true, nullable: true })
-    images: ImagesEntity[];
 }

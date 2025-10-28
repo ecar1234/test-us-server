@@ -14,7 +14,6 @@ import RecruitmentPostRoute from './interface/routes/RecruitmentPostRoute';
 import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
-import ImagesRoute from './interface/routes/ImagesRoute';
 import JobStateRoute from './interface/routes/JobStateRoute';
 import { Env } from './config/env';
 import PostRoute from './interface/routes/PostRoute';
@@ -40,7 +39,6 @@ AppDataSource.initialize()
             app.use('/api/v1/application', ApplicationRoute);
             app.use('/api/v1/review', ReviewRoute);
             app.use('/api/v1/message', MessageRoute);
-            app.use('/api/v1/images', ImagesRoute);
             app.use('/api/v1/jobState', JobStateRoute);
 
             // 중앙 에러 처리 미들웨어

@@ -1,27 +1,30 @@
-import { In, MoreThan, Not } from "typeorm";
+import { Not } from "typeorm";
 import { AppDataSource } from "../../config/DataSource";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
 import { IRecruitmentPostRepository } from "../../domain/interface_repositories/IRecruitmentPostRepository";
-import { RecruitmentPostEntity, RecruitmentPostStatusType } from "../entities/RecruitmentPostEntity";
-import { UserModel } from "../../domain/entities/UserModel";
+import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
-import { BasePostEntity } from "../entities/BasePostEntity";
+import { BasePostStateType } from "../entities/BasePostEntity";
+import { ImagesRepositoryImpl } from "./ImagesRepositoryImpl";
+import { ImagesModel } from "../../domain/entities/ImagesModel";
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
     private postRepository = AppDataSource.getRepository(RecruitmentPostEntity);
 
     private applicationRepository: ApplicationRepositoryImpl;
+    public imagesRepository: ImagesRepositoryImpl;
     constructor() {
         this.applicationRepository = new ApplicationRepositoryImpl();
+        this.imagesRepository = new ImagesRepositoryImpl();
     }
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
         const authorInfo = postEntity.author
             ? { userId: postEntity.author.userId, nickname: postEntity.author.nickname }
             : null;
-        const status = postEntity.status === RecruitmentPostStatusType.ACTIVE ? 
-        'active' : (postEntity.status === RecruitmentPostStatusType.END ? 'end' : (postEntity.status === RecruitmentPostStatusType.EXPIRED ? 'expired' : 'delete'));
+        const status = postEntity.status === BasePostStateType.ACTIVE ? 
+        'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
         return new RecruitmentPostModel(
             postEntity.postId,
             authorInfo,
@@ -32,7 +35,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             status,
             postEntity.period,
             postEntity.views,
-            postEntity.images,
+            [], // 이미지는 별도로 로드하여 채웁니다.
             postEntity.createdAt,
             postEntity.updatedAt,
             postEntity.applications ? postEntity.applications.map(app => this.applicationRepository.toDomainApplication(app)) : []
@@ -40,7 +43,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     }
     private toEntityPost(post: RecruitmentPostModel): RecruitmentPostEntity {
         // console.log("post model : ", post);
-        const postStatus = post.status === 'active' ? RecruitmentPostStatusType.ACTIVE : (post.status === 'end' ? RecruitmentPostStatusType.END : RecruitmentPostStatusType.EXPIRED);
+        const postStatus = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'end' ? BasePostStateType.END : BasePostStateType.EXPIRED);
 
         let authorRelation: { userId: string } | undefined = undefined;
         if (post.author) {
@@ -64,7 +67,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             status: postStatus,
             period: post.period,
             views: post.views,
-            images: post.images,
             createdAt: post.createdAt ? post.createdAt : new Date(),
             updatedAt: post.updatedAt ? post.updatedAt : new Date(),
             ...(post.applications && { applications: post.applications.map(appId => ({ appId })) })
@@ -74,18 +76,25 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
     async createPost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = this.toEntityPost(post);
+        console.log(postEntity);
         const savedPost = await this.postRepository.save(postEntity);
-
+        
+        const domainPost = this.toDomainPost(savedPost);
+        if (post.images && post.images.length > 0) {
+            const savedImages = await this.imagesRepository.imagesRegister(post.images as ImagesModel[], savedPost.postId, 'recruitment');
+            domainPost.images = savedImages;
+        }
+        
         // 새 게시물 추가 시, 첫 페이지 캐시를 삭제합니다.
         await redisClient.del('posts:page:1');
 
-        return this.toDomainPost(savedPost);
+        return domainPost;
     }
 
     async updatePost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: post.id },
-            relations: ["author", "applications", "applications.applicant", "images"],
+            relations: ["author", "applications", "applications.applicant"],
         });
 
         if (!postEntity) {
@@ -97,12 +106,11 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
         postEntity.contents = post.contents;
-        postEntity.status = post.status === 'active' ? RecruitmentPostStatusType.ACTIVE : (post.status === 'end' ? RecruitmentPostStatusType.END : RecruitmentPostStatusType.EXPIRED);
+        postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'end' ? BasePostStateType.END : BasePostStateType.EXPIRED);
         if (post.period !== undefined) postEntity.period = post.period;
 
         const updatedPost = await this.postRepository.save(postEntity);
-
-        // 게시물 업데이트 시, 관련 캐시를 모두 삭제합니다.
+        const domainPost = this.toDomainPost(updatedPost); // 이미지는 UseCase에서 처리 후 별도로 조회됩니다.
         // 더 정교한 전략을 사용할 수도 있지만, 모든 페이지 캐시를 지우는 것이 가장 간단하고 확실합니다.
         const keys = await redisClient.keys('posts:page:*');
         if (keys.length > 0) {
@@ -110,7 +118,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         }
         await redisClient.del('favoritePosts');
 
-        return this.toDomainPost(updatedPost);
+        return domainPost;
     }
 
     async deletePost(id: string): Promise<boolean> {
@@ -118,7 +126,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         if (!result) {
             throw new Error("Post not found");
         }
-        result.status = RecruitmentPostStatusType.DELETE;
+        result.status = BasePostStateType.DELETE;
         await this.postRepository.save(result);
 
         // 게시물 삭제 시, 관련 캐시를 모두 삭제합니다.
@@ -137,28 +145,38 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         if (cachedPosts) {
             const parsedPosts: RecruitmentPostEntity[] = JSON.parse(cachedPosts);
-            return parsedPosts.map(postEntity => this.toDomainPost(postEntity));
+            const domainPosts = parsedPosts.map(postEntity => this.toDomainPost(postEntity));
+            // 캐시된 데이터에 이미지 정보를 추가합니다.
+            for (const post of domainPosts) {
+                post.images = await this.imagesRepository.getImagesByPostId(post.id);
+            }
+            return domainPosts;
         }
         
         const posts = await this.postRepository.find({
-            where: { status: RecruitmentPostStatusType.ACTIVE },
-            relations: ['author', 'applications', 'applications.applicant', 'images'],
+            where: { status: BasePostStateType.ACTIVE },
+            relations: ['author', 'applications', 'applications.applicant'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
             take: 10
         });
 
+        const domainPosts = posts.map(postEntity => this.toDomainPost(postEntity));
+        for (const post of domainPosts) {
+            post.images = await this.imagesRepository.getImagesByPostId(post.id);
+        }
+
         if (posts.length > 0) {
             await redisClient.set(cacheKey, JSON.stringify(posts), 'EX', 60 * 10); // 10분 동안 캐시
         }
 
-        return posts.map(postEntity => this.toDomainPost(postEntity));
+        return domainPosts;
     }
 
     async getPostById(id: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
-            where: { postId: id, status: RecruitmentPostStatusType.ACTIVE},
-            relations: ['author', 'applications', 'applications.applicant', 'images']
+            where: { postId: id, status: BasePostStateType.ACTIVE},
+            relations: ['author', 'applications', 'applications.applicant']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -166,7 +184,10 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         postEntity.views += 1;
         const newPost = await this.postRepository.save(postEntity);
         // console.log(newPost);
-        return this.toDomainPost(newPost);
+        const domainPost = this.toDomainPost(newPost);
+        domainPost.images = await this.imagesRepository.getImagesByPostId(id);
+
+        return domainPost;
     }
 
     async getUserRecuritmentPosts(userId: string): Promise<RecruitmentPostModel[]> {
@@ -174,26 +195,35 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         const cachedData = await redisClient.get(redisKey);
         if (cachedData) {
             const parsedData: RecruitmentPostEntity[] = JSON.parse(cachedData);
-            return parsedData.map(postEntity => this.toDomainPost(postEntity));
+            const domainPosts = parsedData.map(postEntity => this.toDomainPost(postEntity));
+            for (const post of domainPosts) {
+                post.images = await this.imagesRepository.getImagesByPostId(post.id);
+            }
+            return domainPosts;
         }
 
         const postEntities = await this.postRepository.find({
-            where: { author: { userId }, status: Not(RecruitmentPostStatusType.DELETE)},
-            relations: ['author', 'applications', 'applications.applicant', 'images']
+            where: { author: { userId }, status: Not(BasePostStateType.DELETE)},
+            relations: ['author', 'applications', 'applications.applicant']
         });
+
+        const domainPosts = postEntities.map(postEntity => this.toDomainPost(postEntity));
+        for (const post of domainPosts) {
+            post.images = await this.imagesRepository.getImagesByPostId(post.id);
+        }
 
         if(postEntities.length > 0){
             await redisClient.set(redisKey, JSON.stringify(postEntities), 'EX', 60 * 10);
         }
 
-        return postEntities.map(postEntity => this.toDomainPost(postEntity));
+        return domainPosts;
 
     }
 
     async getPostByTitle(title: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { title },
-            relations: ['author', 'applications', 'applications.applicant', 'images']
+            relations: ['author', 'applications', 'applications.applicant']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -204,10 +234,14 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostsByAuthor(authorId: string): Promise<RecruitmentPostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { author: { userId: authorId } },
-            relations: ['author', 'applications', 'applications.applicant', 'images']
+            relations: ['author', 'applications', 'applications.applicant']
         });
 
-        return postEntities.map(entity => this.toDomainPost(entity));
+        const domainPosts = postEntities.map(entity => this.toDomainPost(entity));
+        for (const post of domainPosts) {
+            post.images = await this.imagesRepository.getImagesByPostId(post.id);
+        }
+        return domainPosts;
     }
 
     // async getPostsByNickname(nickname: string): Promise<PostModel[]> {

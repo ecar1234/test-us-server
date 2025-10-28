@@ -4,12 +4,32 @@ import { UserEntity } from "../infrastructure/entities/UserEntity";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
 import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
+import { ImagesModel } from "../domain/entities/ImagesModel";
+import fs from "fs";
+import path from "path";
+import { URL } from "url";
+import { Env } from "../config/env";
+
+interface UploadedImageInfo {
+    filename: string;
+    originalname: string;
+    mimetype: string;
+    size: number;
+    url: string;
+}
+
+interface ImageToDelete {
+    id: number;
+    url: string;
+}
 
 export class PostUseCase {
     constructor(
         private postRepo: PostRepositoryImpl,
         private recruitRepo: RecruitmentPostRepositoryImpl,
-        private promotionRepo: PromotionPostRepositoryImpl
+        private promotionRepo: PromotionPostRepositoryImpl,
+        private imagesRepo: ImagesRepositoryImpl
     ) { }
 
     async getInitPosts(): Promise<[ (RecruitmentPostModel | PromotionPostModel | PromotionPostModel)[], RecruitmentPostModel[], PromotionPostModel[] ]> {
@@ -22,12 +42,44 @@ export class PostUseCase {
     }
    // Recruitment
         async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, images: object[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
+        console.log(author.userId);
         const post = new RecruitmentPostModel(null, author.userId, title, subtitle, platform, contents, status, period, 0, images);
         return this.recruitRepo.createPost(post);
     }
-    async updateRecruitPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, status: string = 'active'): Promise<RecruitmentPostModel> {
-        const post = new RecruitmentPostModel(id, author.userId, title, subtitle, platform, contents, status);
-        return this.recruitRepo.updatePost(post);
+    async updateRecruitPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, status: string = 'active', deleteImages: ImageToDelete[] = [], newImages: UploadedImageInfo[] = []): Promise<RecruitmentPostModel> {
+        // 1. 텍스트 정보로 게시물 업데이트
+        const postModel = new RecruitmentPostModel(id, author.userId, title, subtitle, platform, contents, status);
+        const updatedPost = await this.recruitRepo.updatePost(postModel);
+
+        // 2. 이미지 삭제 처리 (DB + File System)
+        if (deleteImages && deleteImages.length > 0) {
+            const imageIdsToDelete = deleteImages.map(img => img.id);
+            const deleteResult = await this.imagesRepo.imagesDelete(imageIdsToDelete);
+
+            if (deleteResult) {
+                const deletePromises = deleteImages.map(async (image) => {
+                    try {
+                        const filename = path.basename(new URL(image.url).pathname);
+                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        await fs.promises.unlink(imagePath);
+                    } catch (error) {
+                        if (error.code !== 'ENOENT') {
+                            console.error(`Failed to delete image file: ${error.message}`);
+                        }
+                    }
+                });
+                await Promise.all(deletePromises);
+            }
+        }
+
+        // 3. 새 이미지 추가
+        if (newImages && newImages.length > 0) {
+            const modelsToSave: ImagesModel[] = newImages.map(image => new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, id, 'recruitment'));
+            await this.imagesRepo.imagesRegister(modelsToSave, id, 'recruitment');
+        }
+
+        // 4. 최종 게시물 정보(이미지 포함) 반환
+        return this.recruitRepo.getPostById(id);
     }
     async deleteRecruitPost(id: string): Promise<boolean> {
         return this.recruitRepo.deletePost(id);
@@ -60,9 +112,40 @@ export class PostUseCase {
         const post = new PromotionPostModel(null, author.userId, title, subtitle, platform, contents, status, period, 0, images, domain);
         return this.promotionRepo.createPost(post);
     }
-    async updatePromotionPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, domain: string[], status: string = 'active'): Promise<PromotionPostModel> {
-        const post = new PromotionPostModel(id, author.userId, title, subtitle, platform, contents, status, undefined, undefined, undefined, domain);
-        return this.promotionRepo.updatePost(post);
+    async updatePromotionPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, domain: string[], status: string = 'active', deleteImages: ImageToDelete[] = [], newImages: UploadedImageInfo[] = []): Promise<PromotionPostModel> {
+        // 1. 텍스트 정보로 게시물 업데이트
+        const postModel = new PromotionPostModel(id, author.userId, title, subtitle, platform, contents, status, undefined, undefined, undefined, domain);
+        await this.promotionRepo.updatePost(postModel);
+
+        // 2. 이미지 삭제 처리 (DB + File System)
+        if (deleteImages && deleteImages.length > 0) {
+            const imageIdsToDelete = deleteImages.map(img => img.id);
+            const deleteResult = await this.imagesRepo.imagesDelete(imageIdsToDelete);
+
+            if (deleteResult) {
+                const deletePromises = deleteImages.map(async (image) => {
+                    try {
+                        const filename = path.basename(new URL(image.url).pathname);
+                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        await fs.promises.unlink(imagePath);
+                    } catch (error) {
+                        if (error.code !== 'ENOENT') {
+                            console.error(`Failed to delete image file: ${error.message}`);
+                        }
+                    }
+                });
+                await Promise.all(deletePromises);
+            }
+        }
+
+        // 3. 새 이미지 추가
+        if (newImages && newImages.length > 0) {
+            const modelsToSave: ImagesModel[] = newImages.map(image => new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, id, 'promotion'));
+            await this.imagesRepo.imagesRegister(modelsToSave, id, 'promotion');
+        }
+
+        // 4. 최종 게시물 정보(이미지 포함) 반환
+        return this.promotionRepo.getPostById(id);
     }
     async deletePromotionPost(id: string): Promise<boolean> {
         return this.promotionRepo.deletePost(id);
