@@ -29,6 +29,16 @@ export class PostController {
         }
     }
 
+    async getInitUserPosts(req: Request, res: Response): Promise<void> {
+        try {
+            const job = await getInitPostsQueue.add('getInitUserPosts', { userId: req.params.userId });
+            res.status(202).json({ status: 202, state: 'pending', jobId: job.id });
+            return;
+        }catch (error) {
+            res.status(501).json({ error: error.message });
+        }
+    }
+
     // Recruitment
     async createRecruitPost(req: Request, res: Response): Promise<void> {
         try {

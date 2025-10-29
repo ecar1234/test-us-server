@@ -26,6 +26,24 @@ const getInitPostsWorker = new Worker(
     { connection: redisClient }
 );
 
+const getInitUserPostsWorker = new Worker(
+    'getInitUserPosts',
+    async (job) => {
+        const postRepo = new PostRepositoryImpl();
+        const recruitRepo = new RecruitmentPostRepositoryImpl();
+        const promotionRepo = new PromotionPostRepositoryImpl();
+
+        const imageRepo = new ImagesRepositoryImpl();
+
+        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, imageRepo);
+        const { userId } = job.data;
+        const [ recruit, promotion ] = await postUseCase.getInitUserPosts(userId);
+        return { 'state': 'success', 'recruit': recruit, 'promotion': promotion };
+    },
+    { connection: redisClient }
+);
+
+
 getInitPostsWorker.on('completed', (job) => {
     console.log(`PostWorker: Job ${job.id} has completed.`);
 });

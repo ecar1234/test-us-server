@@ -45,6 +45,7 @@ const uploadWithFiles = multer({ storage: storage, limits: { fileSize: 1024 * 10
 
 
 route.get('/getInitPosts', postController.getInitPosts.bind(postController));
+route.get('/getUserInitPosts/:userId', postController.getInitUserPosts.bind(postController));
 // Recruitment
 route.post('/createRecruitPost', authMiddleware, uploadWithFiles.array('images', 4), postController.createRecruitPost.bind(postController));
 route.put('/updateRecruitPost', authMiddleware, uploadWithFiles.array('images', 4), postController.updateRecruitPost.bind(postController));
