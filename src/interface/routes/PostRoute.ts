@@ -53,7 +53,7 @@ route.post('/deleteRecruitPost', authMiddleware, postController.deleteRecruitPos
 route.get('/getRecruitPostById/:id', postController.getRecruitPostById.bind(postController));
 route.get('/getUserRecruitPosts/:userId', postController.getUserRecuritmentPosts.bind(postController));
 route.get('/getRecruitPostByTitle/:title', postController.getRecruitPostByTitle.bind(postController));;
-route.get('/getRecruitPostPagination', postController.getRecruitPostPagination.bind(postController));
+route.post('/getRecruitPostPagination', postController.getRecruitPostPagination.bind(postController));
 route.get('/getRecruitPostsByAuthor/:authorId', authMiddleware, postController.getRecruitPostsByAuthor.bind(postController));
 // route.get('/getPostByNickname/:nickname', postController.getPostsByNickname.bind(postController));
 

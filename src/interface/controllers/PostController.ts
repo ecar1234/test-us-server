@@ -155,9 +155,14 @@ export class PostController {
 
     async getRecruitPostPagination(req: Request, res: Response): Promise<void> {
         try {
-            const page = parseInt(req.query.page as string) || 1;
+            const {page, size} = req.body;
 
-            const posts = await this.postUseCase.getRecruitPostPagination(page);
+            if (!page || !size) {
+                res.status(400).json({ status: 400, message: 'page and size are required.' });
+                return;
+            }
+
+            const posts = await this.postUseCase.getRecruitPostPagination(parseInt(page as string), parseInt(size as string));
             // console.log(posts);
 
             res.status(200).json({ status: 200, posts: posts });

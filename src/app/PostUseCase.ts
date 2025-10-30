@@ -88,7 +88,31 @@ export class PostUseCase {
         return this.recruitRepo.getPostById(id);
     }
     async deleteRecruitPost(id: string): Promise<boolean> {
-        return this.recruitRepo.deletePost(id);
+        const post = await this.recruitRepo.getPostById(id);
+        if (!post) {
+            return false; // Or throw an error
+        }
+
+        if (post.images && post.images.length > 0) {
+            const imageIdsToDelete = post.images.map((img : {id: number, url: string}) => img.id);
+            const deleteDbResult = await this.imagesRepo.imagesDelete(imageIdsToDelete);
+
+            if (deleteDbResult) {
+                const deleteFilePromises = post.images.map(async (image: {id: number, url: string}) => {
+                    try {
+                        const filename = path.basename(new URL(image.url).pathname);
+                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        await fs.promises.unlink(imagePath);
+                    } catch (error) {
+                        if (error.code !== 'ENOENT') {
+                            console.error(`Failed to delete image file: ${error.message}`);
+                        }
+                    }
+                });
+                await Promise.all(deleteFilePromises);
+            }
+        }
+        return await this.recruitRepo.deletePost(id);
     }
     async getRecruitPostById(id: string): Promise<RecruitmentPostModel> {
         return this.recruitRepo.getPostById(id);
@@ -100,9 +124,9 @@ export class PostUseCase {
     async getRecruitPostByTitle(title: string): Promise<RecruitmentPostModel> {
         return this.recruitRepo.getPostByTitle(title);
     }
-    async getRecruitPostPagination(page: number): Promise<RecruitmentPostModel[]> {
+    async getRecruitPostPagination(page: number, size: number): Promise<RecruitmentPostModel[]> {
 
-        const posts = await this.recruitRepo.getPostsPaginations(page);
+        const posts = await this.recruitRepo.getPostsPaginations(page, size);
         // console.log(posts);
         return posts;
     }
@@ -154,7 +178,31 @@ export class PostUseCase {
         return this.promotionRepo.getPostById(id);
     }
     async deletePromotionPost(id: string): Promise<boolean> {
-        return this.promotionRepo.deletePost(id);
+        const post = await this.promotionRepo.getPostById(id);
+        if (!post) {
+            return false;
+        }
+
+        if (post.images && post.images.length > 0) {
+            const imageIdsToDelete = post.images.map((img : {id: number, url: string}) => img.id);
+            const deleteDbResult = await this.imagesRepo.imagesDelete(imageIdsToDelete);
+
+            if (deleteDbResult) {
+                const deleteFilePromises = post.images.map(async (image: {id: number, url: string}) => {
+                    try {
+                        const filename = path.basename(new URL(image.url).pathname);
+                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        await fs.promises.unlink(imagePath);
+                    } catch (error) {
+                        if (error.code !== 'ENOENT') {
+                            console.error(`Failed to delete image file: ${error.message}`);
+                        }
+                    }
+                });
+                await Promise.all(deleteFilePromises);
+            }
+        }
+        return await this.promotionRepo.deletePost(id);
     }
     async getPromotionPostById(id: string): Promise<PromotionPostModel> {
         return this.promotionRepo.getPostById(id);

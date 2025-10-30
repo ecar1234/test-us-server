@@ -23,8 +23,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         const authorInfo = postEntity.author
             ? { userId: postEntity.author.userId, nickname: postEntity.author.nickname }
             : null;
-        const status = postEntity.status === BasePostStateType.ACTIVE ? 
-        'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
+        const status = postEntity.status === BasePostStateType.ACTIVE ?
+            'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
         return new RecruitmentPostModel(
             postEntity.postId,
             authorInfo,
@@ -78,13 +78,13 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         const postEntity = this.toEntityPost(post);
         console.log(postEntity);
         const savedPost = await this.postRepository.save(postEntity);
-        
+
         const domainPost = this.toDomainPost(savedPost);
         if (post.images && post.images.length > 0) {
             const savedImages = await this.imagesRepository.imagesRegister(post.images as ImagesModel[], savedPost.postId, 'recruitment');
             domainPost.images = savedImages;
         }
-        
+
         // 새 게시물 추가 시, 첫 페이지 캐시를 삭제합니다.
         await redisClient.del('posts:page:1');
 
@@ -139,8 +139,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         return true;
     }
 
-    async getPostsPaginations(page: number): Promise<RecruitmentPostModel[]> {
-        const cacheKey = `posts:page:${page}`;
+    async getPostsPaginations(page: number, size: number = 20): Promise<RecruitmentPostModel[]> {
+        const cacheKey = `recruitPosts:page:${page}`;
         const cachedPosts = await redisClient.get(cacheKey);
 
         if (cachedPosts) {
@@ -152,13 +152,13 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             }
             return domainPosts;
         }
-        
+
         const posts = await this.postRepository.find({
             where: { status: BasePostStateType.ACTIVE },
             relations: ['author', 'applications', 'applications.applicant'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
-            take: 10
+            take: size
         });
 
         const domainPosts = posts.map(postEntity => this.toDomainPost(postEntity));
@@ -175,7 +175,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
     async getPostById(id: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
-            where: { postId: id, status: BasePostStateType.ACTIVE},
+            where: { postId: id, status: BasePostStateType.ACTIVE },
             relations: ['author', 'applications', 'applications.applicant']
         });
         if (!postEntity) {
@@ -203,7 +203,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         }
 
         const postEntities = await this.postRepository.find({
-            where: { author: { userId }, status: Not(BasePostStateType.DELETE)},
+            where: { author: { userId }, status: Not(BasePostStateType.DELETE) },
             relations: ['author', 'applications', 'applications.applicant']
         });
 
@@ -212,7 +212,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             post.images = await this.imagesRepository.getImagesByPostId(post.id);
         }
 
-        if(postEntities.length > 0){
+        if (postEntities.length > 0) {
             await redisClient.set(redisKey, JSON.stringify(postEntities), 'EX', 60 * 10);
         }
 

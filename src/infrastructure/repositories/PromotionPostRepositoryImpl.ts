@@ -5,6 +5,7 @@ import { ImagesModel } from "../../domain/entities/ImagesModel";
 import { BasePostStateType } from "../entities/BasePostEntity";
 import { PromotionPostEntity } from "../entities/PromotionPostEntity";
 import { ImagesRepositoryImpl } from "./ImagesRepositoryImpl";
+import { redisClient } from "../../config/RedisConfig";
 
 
 export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
@@ -161,13 +162,26 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         }
         return domainPosts;
     }
-    async getPostsPaginations(page: number): Promise<PromotionPostModel[]> {
+    async getPostsPaginations(page: number, size: number = 20): Promise<PromotionPostModel[]> {
+        const cacheKey = `promotionPosts:page:${page}`;
+        const cachedPosts = await redisClient.get(cacheKey);
+
+        if (cachedPosts) {
+            const parsedPosts: PromotionPostEntity[] = JSON.parse(cachedPosts);
+            const domainPosts = parsedPosts.map(postEntity => this.toDomain(postEntity));
+            // 캐시된 데이터에 이미지 정보를 추가합니다.
+            for (const post of domainPosts) {
+                post.images = await this.imagesRepository.getImagesByPostId(post.id);
+            }
+            return domainPosts;
+        }
+
         const posts = await this.repository.find({
             where: { status: BasePostStateType.ACTIVE },
             relations: ['author'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
-            take: 10
+            take: size
         });
         const domainPosts = posts.map(postEntity => this.toDomain(postEntity));
         for (const post of domainPosts) {
