@@ -9,47 +9,40 @@ import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositor
 import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
 import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
 
-const getInitPostsWorker = new Worker(
+const postWorker = new Worker(
     'getInitPostsQueue',
     async (job) => {
-        const { page } = job.data;
         const postRepo = new PostRepositoryImpl();
         const recruitRepo = new RecruitmentPostRepositoryImpl();
         const promotionRepo = new PromotionPostRepositoryImpl();
         const imageRepo = new ImagesRepositoryImpl();
-
         const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, imageRepo);
-        
-        const [favorite, recruit, promotion] = await postUseCase.getInitPosts();
-        return { 'state': 'success', 'favorite': favorite, 'recruit': recruit, 'promotion': promotion};
-    },
-    { connection: redisClient }
-);
-
-const getInitUserPostsWorker = new Worker(
-    'getInitUserPosts',
-    async (job) => {
-        const postRepo = new PostRepositoryImpl();
-        const recruitRepo = new RecruitmentPostRepositoryImpl();
-        const promotionRepo = new PromotionPostRepositoryImpl();
-
-        const imageRepo = new ImagesRepositoryImpl();
-
-        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, imageRepo);
-        const { userId } = job.data;
-        const [ recruit, promotion ] = await postUseCase.getInitUserPosts(userId);
-        return { 'state': 'success', 'recruit': recruit, 'promotion': promotion };
+ 
+        switch (job.name) {
+            case 'getInitPosts':
+                const [favorite, recruit, promotion] = await postUseCase.getInitPosts();
+                return { 'state': 'success', 'favorite': favorite, 'recruit': recruit, 'promotion': promotion };
+            
+            case 'getInitUserPosts':
+                const { userId } = job.data;
+                const [userRecruit, userPromotion] = await postUseCase.getInitUserPosts(userId);
+                return { 'state': 'success', 'recruit': userRecruit, 'promotion': userPromotion };
+            
+            default:
+                throw new Error(`Unknown job name: ${job.name}`);
+        }
     },
     { connection: redisClient }
 );
 
 
-getInitPostsWorker.on('completed', (job) => {
-    console.log(`PostWorker: Job ${job.id} has completed.`);
+postWorker.on('completed', (job) => {
+    console.log(`PostWorker: Job ${job.id} (${job.name}) has completed.`);
+    console.log(job.returnvalue);
 });
 
-getInitPostsWorker.on('failed', (job, err) => {
-    console.error(`PostWorker: Job ${job.id} has failed with error:`, err.message);
+postWorker.on('failed', (job, err) => {
+    console.error(`PostWorker: Job ${job.id} (${job.name}) has failed with error:`, err.message);
 });
 
 console.log("Post worker is running.");

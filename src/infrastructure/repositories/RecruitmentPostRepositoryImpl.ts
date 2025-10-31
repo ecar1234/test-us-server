@@ -76,17 +76,11 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
     async createPost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = this.toEntityPost(post);
-        console.log(postEntity);
         const savedPost = await this.postRepository.save(postEntity);
-
         const domainPost = this.toDomainPost(savedPost);
-        if (post.images && post.images.length > 0) {
-            const savedImages = await this.imagesRepository.imagesRegister(post.images as ImagesModel[], savedPost.postId, 'recruitment');
-            domainPost.images = savedImages;
-        }
 
         // 새 게시물 추가 시, 첫 페이지 캐시를 삭제합니다.
-        await redisClient.del('posts:page:1');
+        await redisClient.del('recruitPosts:page:1');
 
         return domainPost;
     }
@@ -111,12 +105,12 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         const updatedPost = await this.postRepository.save(postEntity);
         const domainPost = this.toDomainPost(updatedPost); // 이미지는 UseCase에서 처리 후 별도로 조회됩니다.
-        // 더 정교한 전략을 사용할 수도 있지만, 모든 페이지 캐시를 지우는 것이 가장 간단하고 확실합니다.
-        const keys = await redisClient.keys('posts:page:*');
+        
+        const keys = await redisClient.keys('recruitPosts:page:*');
         if (keys.length > 0) {
             await redisClient.del(keys);
         }
-        await redisClient.del('favoritePosts');
+        await redisClient.del(`userPosts:${post.author['userId']}`);
 
         return domainPost;
     }
@@ -192,14 +186,10 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
     async getUserRecuritmentPosts(userId: string): Promise<RecruitmentPostModel[]> {
         const redisKey = `userPosts:${userId}`;
-        const cachedData = await redisClient.get(redisKey);
-        if (cachedData) {
-            const parsedData: RecruitmentPostEntity[] = JSON.parse(cachedData);
-            const domainPosts = parsedData.map(postEntity => this.toDomainPost(postEntity));
-            for (const post of domainPosts) {
-                post.images = await this.imagesRepository.getImagesByPostId(post.id);
-            }
-            return domainPosts;
+        const cachedPosts = await redisClient.get(redisKey);
+        if (cachedPosts) {
+            // 캐시된 데이터는 이미 RecruitmentPostModel[] 형태이므로 바로 파싱하여 반환합니다.
+            return JSON.parse(cachedPosts) as RecruitmentPostModel[];
         }
 
         const postEntities = await this.postRepository.find({
@@ -207,16 +197,17 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             relations: ['author', 'applications', 'applications.applicant']
         });
 
-        const domainPosts = postEntities.map(postEntity => this.toDomainPost(postEntity));
-        for (const post of domainPosts) {
-            post.images = await this.imagesRepository.getImagesByPostId(post.id);
-        }
+        const domainPostsPromises = postEntities.map(async (postEntity) => {
+            const domainPost = this.toDomainPost(postEntity);
+            domainPost.images = await this.imagesRepository.getImagesByPostId(postEntity.postId);
+            return domainPost;
+        });
 
-        if (postEntities.length > 0) {
-            await redisClient.set(redisKey, JSON.stringify(postEntities), 'EX', 60 * 10);
-        }
+        const domainPostsWithImages = await Promise.all(domainPostsPromises);
 
-        return domainPosts;
+        await redisClient.set(redisKey, JSON.stringify(domainPostsWithImages), 'EX', 60 * 10);
+
+        return domainPostsWithImages;
 
     }
 

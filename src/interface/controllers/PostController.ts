@@ -185,7 +185,7 @@ export class PostController {
     // Promotion
     async createPromotionPost(req: Request, res: Response): Promise<void> {
         try {
-            const { title, subtitle, platform, contents, author, domain } = req.body.post;
+            const { title, subtitle, platform, contents, author, domain } = JSON.parse(req.body.post);
 
             const files = req.files as Express.Multer.File[];
             const images = files.map((file: Express.Multer.File) =>
@@ -247,9 +247,37 @@ export class PostController {
         }
     }
 
-    async getPromotionPostById(req: Request, res: Response): Promise<void> { }
+    async getPromotionPostById(req: Request, res: Response): Promise<void> { 
+        try {
+            const { id } = req.params;
+            const post = await this.postUseCase.getPromotionPostById(id);
+            if(!post) {
+                res.status(404).json({ status: 404, error: "Post not found" });
+                return;
+            }
+            res.status(200).json({ status: 200, post: post });
 
-    async getUserPromotionPosts(req: Request, res: Response): Promise<void> { }
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+
+    }
+
+    async getUserPromotionPosts(req: Request, res: Response): Promise<void> {
+        try {
+            const { userId } = req.params;
+            const posts = await this.postUseCase.getUserPromotionPosts(userId);
+            if(!posts) {
+                res.status(404).json({ status: 404, error: "Post not found" });
+                return;
+            }
+            res.status(200).json({ status: 200, posts: posts });
+
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+
+     }
 
     async getPromotionPostByTitle(req: Request, res: Response): Promise<void> { }
 

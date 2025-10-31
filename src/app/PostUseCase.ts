@@ -44,6 +44,7 @@ export class PostUseCase {
     async getInitUserPosts(userId: string): Promise<[RecruitmentPostModel[], PromotionPostModel[]]> {
         const recruitPosts = await this.recruitRepo.getUserRecuritmentPosts(userId);
         const promotionPosts = await this.promotionRepo.getUserPromotionPosts(userId);
+        console.log(recruitPosts);
         return [recruitPosts, promotionPosts];
     }
    // Recruitment
