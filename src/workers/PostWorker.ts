@@ -38,7 +38,7 @@ const postWorker = new Worker(
 
 postWorker.on('completed', (job) => {
     console.log(`PostWorker: Job ${job.id} (${job.name}) has completed.`);
-    console.log(job.returnvalue);
+    // console.log(job.returnvalue);
 });
 
 postWorker.on('failed', (job, err) => {

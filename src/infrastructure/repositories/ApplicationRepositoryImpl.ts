@@ -110,7 +110,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
 
     public async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
         const applicationEntities = await this.applicationRepository.find({
-            where: { applicant: { userId } },
+            where: { applicant: { userId: userId} },
             relations: ['applicant', 'post', 'reviews']
         });
         if(!applicationEntities){

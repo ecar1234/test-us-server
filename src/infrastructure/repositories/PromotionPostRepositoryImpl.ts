@@ -129,7 +129,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
     }
     async getUserPromotionPosts(userId: string): Promise<PromotionPostModel[]> {
         const postEntities = await this.repository.find({
-            where: { author: { userId }, status: BasePostStateType.ACTIVE },
+            where: { author: { userId: userId }, status: BasePostStateType.ACTIVE },
             relations: ['author']
         });
         const domainPosts = postEntities.map(entity => this.toDomain(entity));

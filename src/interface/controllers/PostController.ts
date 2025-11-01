@@ -281,7 +281,16 @@ export class PostController {
 
     async getPromotionPostByTitle(req: Request, res: Response): Promise<void> { }
 
-    async getPromotionPostPagination(req: Request, res: Response): Promise<void> { }
+    async getPromotionPostPagination(req: Request, res: Response): Promise<void> {
+        try {
+            const {page, size} = req.body;
+            const posts = await this.postUseCase.getPromotionPostPagination(parseInt(page as string), parseInt(size as string));
+            res.status(200).json({ status: 200, posts: posts });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+
+     }
 
     async getPromotionPostsByAuthor(req: Request, res: Response): Promise<void> { }
 

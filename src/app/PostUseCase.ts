@@ -214,8 +214,12 @@ export class PostUseCase {
     async getPromotionPostByTitle(title: string): Promise<PromotionPostModel> {
         return this.promotionRepo.getPostByTitle(title);
     }
-    async getPromotionPostPagination(page: number): Promise<PromotionPostModel[]> {
-        return this.promotionRepo.getPostsPaginations(page);
+    async getPromotionPostPagination(page: number, size: number): Promise<PromotionPostModel[]> {
+        const posts = await this.promotionRepo.getPostsPaginations(page, size);
+        if(!posts){
+            return [];
+        }
+        return this.promotionRepo.getPostsPaginations(page, size);
     }
     async getPromotionPostsByAuthor(authorId: string): Promise<PromotionPostModel[]> {
         return this.promotionRepo.getPostsByAuthor(authorId);

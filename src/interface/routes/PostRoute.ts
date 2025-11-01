@@ -64,7 +64,7 @@ route.post('/deletePromotionPost', authMiddleware, postController.deletePromotio
 route.get('/getPromotionPostById/:id', postController.getPromotionPostById.bind(postController));
 route.get('/getUserPromotionPosts/:userId', postController.getUserPromotionPosts.bind(postController));
 route.get('/getPromotionPostByTitle/:title', postController.getPromotionPostByTitle.bind(postController));;
-route.get('/getPromotionPostPagination', postController.getPromotionPostPagination.bind(postController));
+route.post('/getPromotionPostPagination', postController.getPromotionPostPagination.bind(postController));
 route.get('/getPromotionPostsByAuthor/:authorId', authMiddleware, postController.getPromotionPostsByAuthor.bind(postController));
 
 export default route;
