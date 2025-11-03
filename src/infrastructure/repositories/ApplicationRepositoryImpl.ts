@@ -73,22 +73,24 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         return this.toDomainApplication(findApp);
     }
     public async acceptUser(userId: string, postId: string): Promise<ApplicationModel> {
-        return this.applicationRepository.findOne({
+        const application = await this.applicationRepository.findOne({
             where: {
                 applicant: { userId },
                 post: { postId },
-                status: ApplicationStatus.PENDING
             },
             relations: ['applicant', 'post', 'reviews']
-        }).then(applicationEntity => {
-            if (!applicationEntity) {
-                throw new Error(`Application not found for user ${userId} and post ${postId}`);
-            }
-            applicationEntity.status = ApplicationStatus.ACCEPTED;
-            return this.applicationRepository.save(applicationEntity).then(savedEntity => {
-                return this.toDomainApplication(savedEntity);
-            });
         });
+
+        if(!application){
+            throw new Error('Application not found');
+        }
+        if(application.status === ApplicationStatus.ACCEPTED){
+            return this.toDomainApplication(application);
+            // throw new Error('Application already accepted');
+        }
+        application.status = ApplicationStatus.ACCEPTED;
+        await this.applicationRepository.save(application);
+        return this.toDomainApplication(application);
     }
     public async rejectUser(userId: string, postId: string): Promise<ApplicationModel> {
         const application = await this.applicationRepository.findOne({

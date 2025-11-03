@@ -3,6 +3,7 @@ import { ApplicationModel } from "../domain/entities/ApplicationModel";
 import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { redisClient } from "../config/RedisConfig";
 
 export class AppUseCase {
     constructor(private applicationRepository: ApplicationRepositoryImpl, private postRepository: RecruitmentPostRepositoryImpl) {}
@@ -53,6 +54,12 @@ export class AppUseCase {
         if(post != null){
             result[0] = application;
             result[1] = post;
+
+            // 캐시 무효화: 게시물 작성자의 게시물 목록 캐시를 삭제합니다.
+            if (typeof post.author === 'object' && post.author !== null && 'userId' in post.author) {
+                const authorId = post.author.userId;
+                await redisClient.del(`userPosts:${authorId}`);
+            }
         }
         // console.log(result);
         return result
@@ -67,6 +74,12 @@ export class AppUseCase {
         if(post == null){
             throw new Error("post not found");
         }
+
+        // 캐시 무효화: 게시물 작성자의 게시물 목록 캐시를 삭제합니다.
+        if (typeof post.author === 'object' && post.author !== null && 'userId' in post.author) {
+            const authorId = post.author.userId;
+            await redisClient.del(`userPosts:${authorId}`);
+        }
         return [application, post];
         
     }
@@ -79,6 +92,12 @@ export class AppUseCase {
         const post = await this.postRepository.getPostById(application.postId);
         if(post == null){
             throw new Error("post not found");
+        }
+
+        // 캐시 무효화: 게시물 작성자의 게시물 목록 캐시를 삭제합니다.
+        if (typeof post.author === 'object' && post.author !== null && 'userId' in post.author) {
+            const authorId = post.author.userId;
+            await redisClient.del(`userPosts:${authorId}`);
         }
         return [application, post];
     }
