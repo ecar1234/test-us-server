@@ -5,18 +5,14 @@ import { IRecruitmentPostRepository } from "../../domain/interface_repositories/
 import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
-import { BasePostStateType } from "../entities/BasePostEntity";
-import { ImagesRepositoryImpl } from "./ImagesRepositoryImpl";
-import { ImagesModel } from "../../domain/entities/ImagesModel";
+import { BasePostStateType, BasePostEntity } from "../entities/BasePostEntity";
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
     private postRepository = AppDataSource.getRepository(RecruitmentPostEntity);
 
     private applicationRepository: ApplicationRepositoryImpl;
-    public imagesRepository: ImagesRepositoryImpl;
     constructor() {
         this.applicationRepository = new ApplicationRepositoryImpl();
-        this.imagesRepository = new ImagesRepositoryImpl();
     }
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
@@ -35,7 +31,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             status,
             postEntity.period,
             postEntity.views,
-            [], // 이미지는 별도로 로드하여 채웁니다.
+            postEntity.images || [],
             postEntity.createdAt,
             postEntity.updatedAt,
             postEntity.applications ? postEntity.applications.map(app => this.applicationRepository.toDomainApplication(app)) : []
@@ -64,6 +60,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             subtitle: post.subtitle,
             platform: post.platform,
             contents: post.contents,
+            images: post.images as BasePostEntity['images'],
             status: postStatus,
             period: post.period,
             views: post.views,
@@ -88,7 +85,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async updatePost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: post.id },
-            relations: ["author", "applications", "applications.applicant"],
+            relations: ["author"],
         });
 
         if (!postEntity) {
@@ -100,11 +97,12 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
         postEntity.contents = post.contents;
+        postEntity.images = post.images as BasePostEntity['images'];
         postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'end' ? BasePostStateType.END : BasePostStateType.EXPIRED);
         if (post.period !== undefined) postEntity.period = post.period;
 
         const updatedPost = await this.postRepository.save(postEntity);
-        const domainPost = this.toDomainPost(updatedPost); // 이미지는 UseCase에서 처리 후 별도로 조회됩니다.
+        const domainPost = this.toDomainPost(updatedPost);
         
         const keys = await redisClient.keys('recruitPosts:page:*');
         if (keys.length > 0) {
@@ -140,25 +138,18 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         if (cachedPosts) {
             const parsedPosts: RecruitmentPostEntity[] = JSON.parse(cachedPosts);
             const domainPosts = parsedPosts.map(postEntity => this.toDomainPost(postEntity));
-            // 캐시된 데이터에 이미지 정보를 추가합니다.
-            for (const post of domainPosts) {
-                post.images = await this.imagesRepository.getImagesByPostId(post.id);
-            }
             return domainPosts;
         }
 
         const posts = await this.postRepository.find({
             where: { status: BasePostStateType.ACTIVE },
-            relations: ['author', 'applications', 'applications.applicant'],
+            relations: ['author'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
             take: size
         });
 
         const domainPosts = posts.map(postEntity => this.toDomainPost(postEntity));
-        for (const post of domainPosts) {
-            post.images = await this.imagesRepository.getImagesByPostId(post.id);
-        }
 
         if (posts.length > 0) {
             await redisClient.set(cacheKey, JSON.stringify(posts), 'EX', 60 * 10); // 10분 동안 캐시
@@ -179,7 +170,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         const newPost = await this.postRepository.save(postEntity);
         // console.log(newPost);
         const domainPost = this.toDomainPost(newPost);
-        domainPost.images = await this.imagesRepository.getImagesByPostId(id);
 
         return domainPost;
     }
@@ -198,9 +188,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         });
 
         const domainPostsPromises = postEntities.map(async (postEntity) => {
-            const domainPost = this.toDomainPost(postEntity);
-            domainPost.images = await this.imagesRepository.getImagesByPostId(postEntity.postId);
-            return domainPost;
+            return this.toDomainPost(postEntity);
         });
 
         const domainPostsWithImages = await Promise.all(domainPostsPromises);
@@ -229,9 +217,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         });
 
         const domainPosts = postEntities.map(entity => this.toDomainPost(entity));
-        for (const post of domainPosts) {
-            post.images = await this.imagesRepository.getImagesByPostId(post.id);
-        }
         return domainPosts;
     }
 

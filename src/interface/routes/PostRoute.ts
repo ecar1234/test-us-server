@@ -6,7 +6,6 @@ import { PostRepositoryImpl } from "../../infrastructure/repositories/PostReposi
 import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl";
 import multer from "multer";
-import { ImagesRepositoryImpl } from "../../infrastructure/repositories/ImagesRepositoryImpl";
 import crypto from "crypto";
 import path from "path";
 import fs from "fs";
@@ -19,12 +18,11 @@ const route = Router();
 const postRepo = new PostRepositoryImpl();
 const recruitRepo = new RecruitmentPostRepositoryImpl();
 const promotionRepo = new PromotionPostRepositoryImpl();
-const imagesRepo = new ImagesRepositoryImpl();
 
 // const appRepo = new ApplicationRepositoryImpl();
 // const recruitmentPostUseCase = new RecruitmentPostUseCase(recruitRepo);
 
-const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, imagesRepo);
+const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo);
 const postController = new PostController(postUseCase);
 
 const UPLOAD_URL = Env.UPLOAD_URL;

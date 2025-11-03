@@ -39,6 +39,9 @@ export abstract class BasePostEntity {
     @Column('text')
     contents: string;
 
+    @Column({ type: 'simple-json', nullable: true })
+    images: { url: string; filename: string; originalname: string; mimetype: string; size: number; }[] | null;
+
     @Column({ type: 'int', default: 0 })
     views: number;
 

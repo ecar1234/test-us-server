@@ -42,9 +42,6 @@ export class PostController {
     // Recruitment
     async createRecruitPost(req: Request, res: Response): Promise<void> {
         try {
-            // 클라이언트가 'post' 필드에 모든 데이터를 JSON 문자열로 보내므로, req.body.post를 파싱합니다.
-            // req.body.post는 이미 객체이므로 JSON.parse를 제거합니다.
-
             const { author, title, subtitle, platform, contents } = JSON.parse(req.body.post);
 
             const files = req.files as Express.Multer.File[];
@@ -62,6 +59,7 @@ export class PostController {
                 res.status(400).json({ status: 400, message: 'Author information is missing.' });
                 return;
             }
+            console.log("post controller", images);
 
             const newPost = await this.postUseCase.createRecruitPost(author, title, subtitle, platform, contents, images);
             res.status(200).json({ status: 200, post: newPost });
@@ -73,7 +71,7 @@ export class PostController {
     async updateRecruitPost(req: Request, res: Response): Promise<void> {
         try {
             const { author, id, title, subtitle, platform, contents, status } = JSON.parse(req.body.post);;
-            const deleteImages = JSON.parse(req.body.deleteImages);
+            const deleteImages = req.body.deleteImages ? JSON.parse(req.body.deleteImages) : [];
 
 
             // deleteImagesJson은 post 객체 안에 문자열화 되어 있을 수 있습니다.

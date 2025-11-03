@@ -1,17 +1,14 @@
 import { AppDataSource } from "../../config/DataSource";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel";
 import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository";
-import { ImagesModel } from "../../domain/entities/ImagesModel";
-import { BasePostStateType } from "../entities/BasePostEntity";
+import { BasePostStateType, BasePostEntity } from "../entities/BasePostEntity";
 import { PromotionPostEntity } from "../entities/PromotionPostEntity";
-import { ImagesRepositoryImpl } from "./ImagesRepositoryImpl";
 import { redisClient } from "../../config/RedisConfig";
 
 
 export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
 
     private repository = AppDataSource.getRepository(PromotionPostEntity);
-    public imagesRepository = new ImagesRepositoryImpl();
 
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
         const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)
@@ -32,6 +29,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             subtitle: post.subtitle,
             platform: post.platform,
             contents: post.contents,
+            images: post.images as BasePostEntity['images'],
             status: status,
             period: post.period,
             views: post.views,
@@ -57,7 +55,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             status,
             post.period,
             post.views,
-            [], // 이미지는 별도로 로드하여 채웁니다.
+            post.images || [],
             post.domain,
             post.createdAt,
             post.updatedAt
@@ -69,10 +67,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             const postEntity = this.toEntity(post);
             const savedPost = await this.repository.save(postEntity);
             const domainPost = this.toDomain(savedPost);
-            if (post.images && post.images.length > 0) {
-                const savedImages = await this.imagesRepository.imagesRegister(post.images as ImagesModel[], savedPost.postId, 'promotion');
-                domainPost.images = savedImages;
-            }
             return domainPost;
         } catch (error) {
             console.log(error);
@@ -95,14 +89,13 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
         postEntity.contents = post.contents;
+        postEntity.images = post.images as BasePostEntity['images'];
         postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED);
         if (post.period !== undefined) postEntity.period = post.period;
         postEntity.domain = post.domain;
 
         const updatedPostEntity = await this.repository.save(postEntity);
-        const domainPost = this.toDomain(updatedPostEntity);
-        domainPost.images = await this.imagesRepository.getImagesByPostId(post.id);
-        return domainPost;
+        return this.toDomain(updatedPostEntity);
     }
     async deletePost(id: string): Promise<boolean> {
         const result = await this.repository.findOneBy({ postId: id });
@@ -124,7 +117,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         postEntity.views += 1;
         const newPost = await this.repository.save(postEntity);
         const domainPost = this.toDomain(newPost);
-        domainPost.images = await this.imagesRepository.getImagesByPostId(id);
         return domainPost;
     }
     async getUserPromotionPosts(userId: string): Promise<PromotionPostModel[]> {
@@ -133,9 +125,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             relations: ['author']
         });
         const domainPosts = postEntities.map(entity => this.toDomain(entity));
-        for (const post of domainPosts) {
-            post.images = await this.imagesRepository.getImagesByPostId(post.id);
-        }
         return domainPosts;
     }
     async getPostByTitle(title: string): Promise<PromotionPostModel> {
@@ -147,7 +136,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             throw new Error("Promotion Post not found");
         }
         const domainPost = this.toDomain(postEntity);
-        domainPost.images = await this.imagesRepository.getImagesByPostId(postEntity.postId);
         return domainPost;
     }
     async getPostsByAuthor(authorId: string): Promise<PromotionPostModel[]> {
@@ -157,9 +145,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         });
 
         const domainPosts = postEntities.map(entity => this.toDomain(entity));
-        for (const post of domainPosts) {
-            post.images = await this.imagesRepository.getImagesByPostId(post.id);
-        }
         return domainPosts;
     }
     async getPostsPaginations(page: number, size: number = 20): Promise<PromotionPostModel[]> {
@@ -169,10 +154,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         if (cachedPosts) {
             const parsedPosts: PromotionPostEntity[] = JSON.parse(cachedPosts);
             const domainPosts = parsedPosts.map(postEntity => this.toDomain(postEntity));
-            // 캐시된 데이터에 이미지 정보를 추가합니다.
-            for (const post of domainPosts) {
-                post.images = await this.imagesRepository.getImagesByPostId(post.id);
-            }
             return domainPosts;
         }
 
@@ -184,9 +165,6 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             take: size
         });
         const domainPosts = posts.map(postEntity => this.toDomain(postEntity));
-        for (const post of domainPosts) {
-            post.images = await this.imagesRepository.getImagesByPostId(post.id);
-        }
         return domainPosts;
     }
 }
