@@ -39,7 +39,7 @@ export class PostController {
         }
     }
 
-    // Recruitment
+    // CHECK: Recruit post
     async createRecruitPost(req: Request, res: Response): Promise<void> {
         try {
             const { author, title, subtitle, platform, contents } = JSON.parse(req.body.post);
@@ -180,7 +180,18 @@ export class PostController {
         }
     }
 
-    // Promotion
+    async getAppRecruitPosts(req: Request, res: Response): Promise<void> {
+        try {
+            const { ids } = req.body;
+            const posts = await this.postUseCase.getAppRecruitPosts(ids);
+            res.status(200).json({ status: 200, posts: posts });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    
+    }
+
+    // CHECK: Promotion post
     async createPromotionPost(req: Request, res: Response): Promise<void> {
         try {
             const { title, subtitle, platform, contents, author, domain } = JSON.parse(req.body.post);

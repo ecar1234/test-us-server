@@ -1,4 +1,4 @@
-import { Not } from "typeorm";
+import { In, Not } from "typeorm";
 import { AppDataSource } from "../../config/DataSource";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
 import { IRecruitmentPostRepository } from "../../domain/interface_repositories/IRecruitmentPostRepository";
@@ -218,6 +218,14 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         const domainPosts = postEntities.map(entity => this.toDomainPost(entity));
         return domainPosts;
+    }
+
+    async getAppRecruitPosts(ids: string[]): Promise<RecruitmentPostModel[]> {
+        const postEntities = await this.postRepository.find({
+            where: { postId: In(ids) },
+            relations: ['author', 'applications', 'applications.applicant']
+        });
+        return postEntities.map(entity => this.toDomainPost(entity));
     }
 
     // async getPostsByNickname(nickname: string): Promise<PostModel[]> {

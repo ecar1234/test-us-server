@@ -124,6 +124,10 @@ export class PostUseCase {
     async getRecruitPostsByAuthor(authorId: string): Promise<RecruitmentPostModel[]> {
         return this.recruitRepo.getPostsByAuthor(authorId);
     }
+
+    async getAppRecruitPosts(ids: string[]): Promise<RecruitmentPostModel[]> {
+        return this.recruitRepo.getAppRecruitPosts(ids);
+    }
     // async getPostsByNickname(nickname: string): Promise<PostModel[]> {
     //    return this.postRepository.getPostsByNickname(nickname);
     // }

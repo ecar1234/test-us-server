@@ -53,6 +53,7 @@ route.get('/getUserRecruitPosts/:userId', postController.getUserRecuritmentPosts
 route.get('/getRecruitPostByTitle/:title', postController.getRecruitPostByTitle.bind(postController));;
 route.post('/getRecruitPostPagination', postController.getRecruitPostPagination.bind(postController));
 route.get('/getRecruitPostsByAuthor/:authorId', authMiddleware, postController.getRecruitPostsByAuthor.bind(postController));
+route.post('/getAppRecruitPosts', postController.getAppRecruitPosts.bind(postController));
 // route.get('/getPostByNickname/:nickname', postController.getPostsByNickname.bind(postController));
 
 // PromotionDELETE /api/v1/post/deleteImage 라우트를 만들 수 있습니다. update에 통합하는 것이 더 효율적입니다.
