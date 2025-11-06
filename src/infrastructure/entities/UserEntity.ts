@@ -57,6 +57,9 @@ export class UserEntity {
     @Column({ type: 'enum', enum: UserStatus, default: UserStatus.ACTIVE })
     status: UserStatus
 
+    @Column({ type: 'simple-json', nullable: true })
+    image: { url: string; filename: string; originalname: string; mimetype: string; size: number; } | null;
+
     @CreateDateColumn()
     createdAt: Date
 

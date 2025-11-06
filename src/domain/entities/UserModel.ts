@@ -11,6 +11,7 @@ export class UserModel {
         public role: string,
         public userName: string,
         public birth: Date,
+        public profileImg: object | null = null,
         public readonly createdAt: Date | null = null,
         public updatedAt: Date | null = null,
         public posts: string[] = [],

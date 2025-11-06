@@ -65,19 +65,37 @@ export class UserController {
 
             res.status(200).json({
                 status: 200,
-                user:
-                {
-                    userId: updatedUser.userId,
-                    email: updatedUser.email,
-                    nickname: updatedUser.nickname,
-                    userType: updatedUser.userType,
-                    userName: updatedUser.userName,
-                    birth: updatedUser.birth,
-                    status: updatedUser.status,
-                    updatedAt: updatedUser.updatedAt
-                }
+                user: updatedUser
             });
         } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    async updateUserInfoWithImg(req: Request, res: Response): Promise<void> {
+        try {
+            const { userId, nickname, userType, role, userName, birth } = JSON.parse(req.body.user);
+            // const { filename, originalname, mimetype, size, url } = JSON.parse(req.body.newImage);
+            const oldImage = JSON.parse(req.body.oldImage);
+           
+            const file = req.file;
+            if (!file) {
+                res.status(400).json({ status: 400, message: 'Image is required.' });
+                return;
+            }
+            
+            const image = {
+                filename: file.filename,
+                originalname: file.originalname,
+                mimetype: file.mimetype,
+                size: file.size,
+                url: `${req.protocol}://${req.get('host')}/profile/${file.filename}`,
+            }
+
+            const user = await this.userUseCase.updateUserInfoWithImg(userId, nickname, userType, role, userName, birth, image, oldImage);
+            res.status(200).json({ status: 200, user: user });
+            
+        }catch(error){
             res.status(500).json({ error: error.message });
         }
     }

@@ -21,6 +21,7 @@ export class UserRepositoryImpl implements IUserRepository {
             this.getUserRoleString(userEntity.role),
             userEntity.userName,
             userEntity.birth,
+            userEntity.image,
             userEntity.createdAt,
             userEntity.updatedAt,
             userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
@@ -45,6 +46,7 @@ export class UserRepositoryImpl implements IUserRepository {
             birth: user.birth,
             ...(user.posts && { posts: user.posts.map(post => ({ postId: post })) }),
             ...(user.applications && { applications: user.applications.map(application => ({ appId: application.id })) }),
+            ...(user.profileImg && { image: user.profileImg as { url: string; filename: string; originalname: string; mimetype: string; size: number } }),
             // ...(user.sentMessages && { sentMessages: user.sentMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.receiveMessages && { receiveMessages: user.receiveMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.givenReviews && { givenReviews: user.givenReviews.map(review => ({ reviewId: review.id })) }),
@@ -127,21 +129,26 @@ export class UserRepositoryImpl implements IUserRepository {
         return true;
     }
     async updateUserInfo(user: UserModel): Promise<UserModel> {
-        // console.log("Impl : ", user);
-        const userEntity = await this.userRepository.findOne({ where: { userId: user.userId } });
-        if (!userEntity) {
+        const newUserEntity  = this.toEntityUser(user);
+
+        const findUser = await this.userRepository.findOne({ where: { userId: newUserEntity.userId } });
+        if (!findUser) {
             throw new Error("User not found");
         }
 
         // DB에서 조회한 엔티티의 속성을 직접 수정합니다.
-        userEntity.nickname = user.nickname;
-        userEntity.type = user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS : UserType.COMPANIES;
-        userEntity.userName = user.userName;
-        userEntity.birth = user.birth;
+        findUser.nickname = newUserEntity.nickname;
+        findUser.type = newUserEntity.type,
+        findUser.role = newUserEntity.role;
+        findUser.userName = newUserEntity.userName;
+        findUser.birth = newUserEntity.birth;
+        if(newUserEntity.image){
+            findUser.image = newUserEntity.image;
+        }
 
         // 수정된 엔티티를 저장합니다.
 
-        const savedUser = await this.userRepository.save(userEntity);
+        const savedUser = await this.userRepository.save(findUser);
         return this.toDomainUser(savedUser);
     }
     findUserById(userId: string): Promise<UserModel | null> {

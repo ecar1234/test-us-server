@@ -151,10 +151,18 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         const cacheKey = `promotionPosts:page:${page}`;
         const cachedPosts = await redisClient.get(cacheKey);
 
-        if (cachedPosts) {
-            const parsedPosts: PromotionPostEntity[] = JSON.parse(cachedPosts);
-            const domainPosts = parsedPosts.map(postEntity => this.toDomain(postEntity));
-            return domainPosts;
+        if (cachedPosts && cachedPosts.length > 0) {
+            try {
+                const parsedPosts = JSON.parse(cachedPosts);
+                if (Array.isArray(parsedPosts)) {
+                    const domainPosts = parsedPosts.map(postEntity => this.toDomain(postEntity));
+                    return domainPosts;
+                }
+            } catch (error) {
+                // JSON 파싱 실패 시, 캐시를 삭제하여 다음 요청 시 DB에서 새로 가져오도록 합니다.
+                console.error('Failed to parse cached promotion posts, deleting cache key:', cacheKey, error);
+                await redisClient.del(cacheKey);
+            }
         }
 
         const posts = await this.repository.find({

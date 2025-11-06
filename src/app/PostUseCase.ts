@@ -41,11 +41,11 @@ export class PostUseCase {
     async getInitUserPosts(userId: string): Promise<[RecruitmentPostModel[], PromotionPostModel[]]> {
         const recruitPosts = await this.recruitRepo.getUserRecuritmentPosts(userId);
         const promotionPosts = await this.promotionRepo.getUserPromotionPosts(userId);
-        console.log(recruitPosts);
+        // console.log(recruitPosts);
         return [recruitPosts, promotionPosts];
     }
    // Recruitment
-        async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, images: object[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
+        async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string[], contents: string, images: UploadedImageInfo[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
         const post = new RecruitmentPostModel(null, author.userId, title, subtitle, platform, contents, status, period, 0, images);
         return this.recruitRepo.createPost(post);
     }

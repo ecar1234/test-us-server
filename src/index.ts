@@ -24,7 +24,8 @@ const port = parseInt(process.env.SERVER_PORT);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(Env.UPLOAD_URL));
+app.use('/posts', express.static(Env.UPLOAD_URL));
+app.use('/profile', express.static(Env.UPLOAD_USER_URL));
 
 AppDataSource.initialize()
     .then(() => {

@@ -51,7 +51,7 @@ export class PostController {
                 originalname: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
+                url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             })
             );
             if (!author) {
@@ -71,21 +71,14 @@ export class PostController {
     async updateRecruitPost(req: Request, res: Response): Promise<void> {
         try {
             const { author, id, title, subtitle, platform, contents, status } = JSON.parse(req.body.post);;
-            const deleteImages = req.body.deleteImages ? JSON.parse(req.body.deleteImages) : [];
-
-
-            // deleteImagesJson은 post 객체 안에 문자열화 되어 있을 수 있습니다.
-            if (deleteImages === null || deleteImages === undefined) { // deleteImagesJson이 단일 값일 경우를 대비
-                res.status(400).json({ status: 400, message: 'Invalid format for deleteImages.' });
-                return;
-            }
+            const deleteImages = req.body.deleteImages ? JSON.parse(req.body.deleteImages) : []; // deleteImages가 없으면 빈 배열로 초기화
 
             const newImageFiles = (req.files as Express.Multer.File[] || []).map(file => ({
                 filename: file.filename,
                 originalname: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
+                url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             }));
 
             const updatedPost = await this.postUseCase.updateRecruitPost(id, author, title, subtitle, platform, contents, status, deleteImages, newImageFiles);
@@ -203,7 +196,7 @@ export class PostController {
                 originalname: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
+                url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             })
             );
             const post = await this.postUseCase.createPromotionPost(author, title, subtitle, platform, contents, images, domain);
@@ -216,25 +209,17 @@ export class PostController {
     async updatePromotionPost(req: Request, res: Response): Promise<void> {
         try {
             // 업데이트 시에도 클라이언트가 'post' 필드에 모든 데이터를 JSON 문자열로 보내므로, req.body.post를 파싱합니다.
-            const postData = req.body.post;
-            const { author, id, title, subtitle, platform, contents, domain, status, deleteImages: deleteImagesJson } = postData;
+            const { author, id, title, subtitle, platform, contents, domain, status } = JSON.parse(req.body.post);
+            const deleteImages = req.body.deleteImages ? JSON.parse(req.body.deleteImages) : [];
 
-            let deleteImages = [];
-            if (deleteImagesJson && typeof deleteImagesJson === 'string') {
-                try {
-                    deleteImages = JSON.parse(deleteImagesJson);
-                } catch (e) {
-                    res.status(400).json({ status: 400, message: 'Invalid format for deleteImages.' });
-                    return;
-                }
-            }
             const newImageFiles = (req.files as Express.Multer.File[] || []).map(file => ({
                 filename: file.filename,
                 originalname: file.originalname,
                 mimetype: file.mimetype,
                 size: file.size,
-                url: `${req.protocol}://${req.get('host')}/uploads/${file.filename}`,
+                url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             }));
+
             const updatedPost = await this.postUseCase.updatePromotionPost(id, author, title, subtitle, platform, contents, domain, status, deleteImages, newImageFiles);
             res.status(200).json({ status: 200, post: updatedPost });
         } catch (error) {

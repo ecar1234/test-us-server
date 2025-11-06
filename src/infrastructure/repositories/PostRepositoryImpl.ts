@@ -20,9 +20,12 @@ export class PostRepositoryImpl implements IPostRepository {
     async getFavoritePosts(): Promise<(RecruitmentPostModel | PromotionPostModel)[]> {
         const cachedKey = `favoritePosts`;
         const cachedData = await redisClient.get(cachedKey);
-        if (cachedData) {
-            // 캐시된 데이터는 이미 도메인 모델이므로 바로 파싱하여 반환
-            return JSON.parse(cachedData);
+        if (cachedData && cachedData.length > 0) {
+            try {
+                return JSON.parse(cachedData);
+            } catch (error) {
+                await redisClient.del(cachedKey);
+            }
         }
 
         const favoritePostEntities = await this.baseRepo.find({
@@ -34,13 +37,9 @@ export class PostRepositoryImpl implements IPostRepository {
 
         const favoritePostsPromises = favoritePostEntities.map(async post => {
             if (post instanceof RecruitmentPostEntity) {
-                const domainPost = this.recruitmentRepo.toDomainPost(post);
-                domainPost.images = await this.recruitmentRepo.imagesRepository.getImagesByPostId(post.postId);
-                return domainPost;
+                return this.recruitmentRepo.toDomainPost(post);
             } else if (post instanceof PromotionPostEntity) {
-                const domainPost = this.promotionRepo.toDomain(post);
-                domainPost.images = await this.promotionRepo.imagesRepository.getImagesByPostId(post.postId);
-                return domainPost;
+                return this.promotionRepo.toDomain(post);
             }
             return null;
         });

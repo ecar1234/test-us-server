@@ -15,8 +15,7 @@ const postWorker = new Worker(
         const postRepo = new PostRepositoryImpl();
         const recruitRepo = new RecruitmentPostRepositoryImpl();
         const promotionRepo = new PromotionPostRepositoryImpl();
-        const imageRepo = new ImagesRepositoryImpl();
-        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, imageRepo);
+        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo);
  
         switch (job.name) {
             case 'getInitPosts':
