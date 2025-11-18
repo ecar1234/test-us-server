@@ -8,6 +8,8 @@ import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 import { Env } from "../config/env";
+import { ImagesModel } from "../domain/entities/ImagesModel"
+import uuid from 'uuid';
 
 
 
@@ -28,14 +30,30 @@ interface ImageToDelete {
 export class UserUseCase {
     constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: ReviewRepositoryImpl) { }
 
-    async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date): Promise<[UserModel , number]> {
+    async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date, profileImg?: UploadedImageInfo, method: string = 'EMAIL'): Promise<[UserModel, number]> {
         const findUser = await this.userRepo.findUserByEmail(email);
         if (findUser) {
             return [findUser, 409];
         }
         const passwordHash = await bcrypt.hash(password, 10);
-        const user = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth);
+        const user = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth, profileImg, method);
         return [await this.userRepo.registerUser(user), 200];
+    }
+    async authUserRegister(email: string, nickname: string, profileUrl: string, userType: string, role: string, method: string): Promise<UserModel> {
+        const user = new UserModel(
+            null,
+            email,
+            nickname?? `User${uuid.v4}`,
+            'authUserRegister',
+            userType,
+            UserStatus.ACTIVE,
+            role, 
+            null,
+            null, 
+            { url: profileUrl, filename: null, originalname: null, mimetype: null, size: null },
+            method
+        );
+        return await this.userRepo.registerUser(user);
     }
     async deleteUser(userId: string): Promise<[boolean, string]> {
         // console.log(userId);
@@ -50,14 +68,14 @@ export class UserUseCase {
         }
         return [true, "User deleted successfully"];
     }
-    async updateUserInfo(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date): Promise<UserModel> {
+    async updateUserInfo(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date,method: string = 'EMAIL'): Promise<UserModel> {
         // console.log("use case : ", birth);
-        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth);
+        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, null, method);
         return this.userRepo.updateUserInfo(user);
     }
-    async updateUserInfoWithImg(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date, image: UploadedImageInfo, oldImage?: UploadedImageInfo): Promise<UserModel> {
-        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, image);
-        if(oldImage && oldImage.url){
+    async updateUserInfoWithImg(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date, image: UploadedImageInfo, oldImage?: UploadedImageInfo, method: string = "EMAIL"): Promise<UserModel> {
+        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, image, method);
+        if (oldImage && oldImage.url) {
             try {
                 // 이전 이미지의 URL에서 파일명을 추출하여 삭제합니다.
                 const filename = path.basename(new URL(oldImage.url).pathname);

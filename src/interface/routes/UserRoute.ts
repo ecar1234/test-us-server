@@ -34,9 +34,9 @@ const uploadWithFile = multer({ storage: storage, limits: { fileSize: 1024 * 102
 route.post('/update', authMiddleware, userController.update.bind(userController));
 route.get('/getUserById/:id', authMiddleware, userController.getUserById.bind(userController));
 route.post('/getUsersByIds', authMiddleware, userController.getUsersByIds.bind(userController));
-route.get('/getUserByEmail/:email', authMiddleware, userController.getUserByEmail.bind(userController));
-route.get('/getUserByNickname/:nickname', authMiddleware, userController.getUserByNickname.bind(userController));
-route.get('/getPostsByNickname/:nickname', authMiddleware, userController.getPostsByNickname.bind(userController));
+route.get('/getUserByEmail/:email', userController.getUserByEmail.bind(userController));
+route.get('/getUserByNickname/:nickname', userController.getUserByNickname.bind(userController));
+route.get('/getPostsByNickname/:nickname', userController.getPostsByNickname.bind(userController));
 route.put('/changePassword', authMiddleware, userController.changePassword.bind(userController));
 route.get('/getAllUsers', authMiddleware, userController.getAllUsers.bind(userController));
 route.get('/isNicknameAvailable/:nickname', userController.isNicknameAvailable.bind(userController));

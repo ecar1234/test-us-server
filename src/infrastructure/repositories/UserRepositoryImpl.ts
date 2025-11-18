@@ -2,7 +2,7 @@ import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import { UserModel } from "../../domain/entities/UserModel";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
-import { UserEntity, UserRole, UserStatus, UserType } from "../entities/UserEntity";
+import { UserEntity, UserMethod, UserRole, UserStatus, UserType } from "../entities/UserEntity";
 import { In } from "typeorm";
 
 
@@ -22,6 +22,7 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.userName,
             userEntity.birth,
             userEntity.image,
+            userEntity.method,
             userEntity.createdAt,
             userEntity.updatedAt,
             userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
@@ -47,6 +48,7 @@ export class UserRepositoryImpl implements IUserRepository {
             ...(user.posts && { posts: user.posts.map(post => ({ postId: post })) }),
             ...(user.applications && { applications: user.applications.map(application => ({ appId: application.id })) }),
             ...(user.profileImg && { image: user.profileImg as { url: string; filename: string; originalname: string; mimetype: string; size: number } }),
+            method: user.method === 'EMAIL' ? UserMethod.EMAIL : (  user.method === 'GOOGLE' ? UserMethod.GOOGLE : UserMethod.NAVER),
             // ...(user.sentMessages && { sentMessages: user.sentMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.receiveMessages && { receiveMessages: user.receiveMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.givenReviews && { givenReviews: user.givenReviews.map(review => ({ reviewId: review.id })) }),

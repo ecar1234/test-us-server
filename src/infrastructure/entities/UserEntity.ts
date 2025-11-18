@@ -24,7 +24,13 @@ export enum UserRole {
     OPERATER='OPERATER',
     PM='PM',
     QA='QA',
-    CS='CS'
+    CS='CS',
+    NORMAL='NORMAL',
+}
+export enum UserMethod {
+    GOOGLE='GOOGLE',
+    NAVER='NAVER',
+    EMAIL='EMAIL',
 }
 
 @Entity('User')
@@ -59,6 +65,9 @@ export class UserEntity {
 
     @Column({ type: 'simple-json', nullable: true })
     image: { url: string; filename: string; originalname: string; mimetype: string; size: number; } | null;
+
+    @Column({ type: 'enum', enum: UserMethod, default: UserMethod.EMAIL })
+    method: UserMethod
 
     @CreateDateColumn()
     createdAt: Date

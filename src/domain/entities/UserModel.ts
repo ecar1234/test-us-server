@@ -12,6 +12,7 @@ export class UserModel {
         public userName: string,
         public birth: Date,
         public profileImg: object | null = null,
+        public method: string,
         public readonly createdAt: Date | null = null,
         public updatedAt: Date | null = null,
         public posts: string[] = [],

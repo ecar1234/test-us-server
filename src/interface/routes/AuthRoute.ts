@@ -13,6 +13,8 @@ const userController: UserController = new UserController(userUseCase);
 
 route.post('/register', userController.register.bind(userController));
 route.post('/login', userController.login.bind(userController));
+route.post('/authLogin', userController.authLogin.bind(userController));
+route.post('/authSignup', userController.authRegister.bind(userController));
 route.post('/delete', userController.delete.bind(userController));
 
 export default route;

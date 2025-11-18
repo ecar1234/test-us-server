@@ -21,6 +21,18 @@ export class UserController {
         }
     }
 
+    async authRegister (req: Request, res: Response):Promise<void> {
+        try {
+            const { email, nickname, profileImg, userType, role, method } = req.body;
+            const user = await this.userUseCase.authUserRegister(email, nickname, profileImg.url, userType, role, method);
+            const token = generateToken(user);
+
+            res.status(200).json({status: 200, user: user, token: token});
+        } catch (error) {
+            res.status(500).json({status: 500, error: error.message});
+        }
+    }
+
     async delete(req: Request, res: Response): Promise<void> {
         try {
             const { userId } = req.body;
@@ -56,6 +68,18 @@ export class UserController {
         }
     }
 
+    async authLogin(req: Request, res: Response): Promise<void> {
+        try {
+            const { email } = req.body;
+            const user = await this.userUseCase.getUserByEmail(email);
+            const token = generateToken(user);
+            res.status(200).json({status: 200, user: user, token: token});
+
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+
     async update(req: Request, res: Response): Promise<void> {
         try {
             const { userId, nickname, userType, role, userName, birth } = req.body;
@@ -74,7 +98,7 @@ export class UserController {
 
     async updateUserInfoWithImg(req: Request, res: Response): Promise<void> {
         try {
-            const { userId, nickname, userType, role, userName, birth } = JSON.parse(req.body.user);
+            const { userId, nickname, userType, role, userName, birth, method } = JSON.parse(req.body.user);
             // const { filename, originalname, mimetype, size, url } = JSON.parse(req.body.newImage);
             const oldImage = JSON.parse(req.body.oldImage);
            
@@ -92,7 +116,7 @@ export class UserController {
                 url: `${req.protocol}://${req.get('host')}/profile/${file.filename}`,
             }
 
-            const user = await this.userUseCase.updateUserInfoWithImg(userId, nickname, userType, role, userName, birth, image, oldImage);
+            const user = await this.userUseCase.updateUserInfoWithImg(userId, nickname, userType, role, userName, birth, image, oldImage, method);
             res.status(200).json({ status: 200, user: user });
             
         }catch(error){
