@@ -16,8 +16,12 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     }
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
-        const authorInfo = postEntity.author
-            ? { userId: postEntity.author.userId, nickname: postEntity.author.nickname }
+        const authorInfo = postEntity.author 
+            ? {
+                userId: postEntity.author.userId,
+                nickname: postEntity.author.nickname,
+                profileImg: postEntity.author.image
+              }
             : null;
         const status = postEntity.status === BasePostStateType.ACTIVE ?
             'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
@@ -74,12 +78,15 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async createPost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = this.toEntityPost(post);
         const savedPost = await this.postRepository.save(postEntity);
-        const domainPost = this.toDomainPost(savedPost);
+        const newPost = await this.postRepository.findOne({
+            where: { postId: savedPost.postId },
+            relations: ['author']
+        });
 
         // 새 게시물 추가 시, 첫 페이지 캐시를 삭제합니다.
         await redisClient.del('recruitPosts:page:1');
 
-        return domainPost;
+        return this.toDomainPost(newPost!);
     }
 
     async updatePost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {

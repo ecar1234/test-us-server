@@ -9,7 +9,7 @@ import { redisClient } from "../../config/RedisConfig";
 export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
 
     private repository = AppDataSource.getRepository(PromotionPostEntity);
-
+    
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
         const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)
 
@@ -41,7 +41,11 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
     }
     public toDomain(post: PromotionPostEntity): PromotionPostModel {
         const authorInfo = post.author
-            ? { userId: post.author.userId, nickname: post.author.nickname }
+            ? {
+                userId: post.author.userId,
+                nickname: post.author.nickname,
+                profileImg: post.author.image
+              }
             : null;
         const status = post.status === BasePostStateType.ACTIVE ?
             'active' : (post.status === BasePostStateType.EXPIRED ? 'expired' : 'delete');
@@ -66,8 +70,11 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         try {
             const postEntity = this.toEntity(post);
             const savedPost = await this.repository.save(postEntity);
-            const domainPost = this.toDomain(savedPost);
-            return domainPost;
+            const newPost = await this.repository.findOne({
+                where: { postId: savedPost.postId },
+                relations: ['author']
+            });
+            return this.toDomain(newPost!);
         } catch (error) {
             console.log(error);
             throw error;
