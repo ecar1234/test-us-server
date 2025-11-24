@@ -36,6 +36,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             postEntity.period,
             postEntity.views,
             postEntity.images || [],
+            postEntity.postType,
             postEntity.createdAt,
             postEntity.updatedAt,
             postEntity.applications ? postEntity.applications.map(app => this.applicationRepository.toDomainApplication(app)) : []
@@ -183,9 +184,9 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             throw new Error("Post not found");
         }
         postEntity.views += 1;
-        const newPost = await this.postRepository.save(postEntity);
-        // console.log(newPost);
-        const domainPost = this.toDomainPost(newPost);
+        await this.postRepository.save(postEntity); // 조회수 업데이트만 수행
+        console.log(postEntity);
+        const domainPost = this.toDomainPost(postEntity); // save의 반환값이 아닌, relations가 포함된 원래 객체를 사용
 
         return domainPost;
     }

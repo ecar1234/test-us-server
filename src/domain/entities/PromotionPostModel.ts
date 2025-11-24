@@ -13,6 +13,7 @@ export class PromotionPostModel {
         public views: number = 0,
         public images: object[] = [],
         public domain: string[],
+        public postType: string = 'PromotionPostEntity',
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null
     ){}

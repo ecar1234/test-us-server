@@ -61,6 +61,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             post.views,
             post.images || [],
             post.domain,
+            post.postType,
             post.createdAt,
             post.updatedAt
         );

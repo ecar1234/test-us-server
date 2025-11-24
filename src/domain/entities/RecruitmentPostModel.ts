@@ -12,6 +12,7 @@ export class RecruitmentPostModel {
         public period: number = 7,
         public views: number = 0,
         public images: object[] = [],
+        public postType: string = 'RecruitmentPostEntity',
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null,
         public applications: ApplicationModel[] | number[] = []

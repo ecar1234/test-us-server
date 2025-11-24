@@ -23,6 +23,9 @@ export abstract class BasePostEntity {
     @PrimaryGeneratedColumn('uuid')
     postId: string;
 
+    @Column()
+    postType: string;
+
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
     author: UserEntity;

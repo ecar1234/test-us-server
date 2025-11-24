@@ -70,7 +70,7 @@ export class AppUseCase {
         if(application == null){
             throw new Error("application accept failed");
         }
-        const post = await this.postRepository.getPostById(application.postId);
+        const post = await this.postRepository.getPostById(postId);
         if(post == null){
             throw new Error("post not found");
         }
