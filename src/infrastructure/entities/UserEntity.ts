@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { ApplicationEntity } from "./ApplicationEntity";
 import { MessagesEntity } from "./MessageEntity";
-import { ReviewEntity } from "./ReviewEntiry";
+import { UserReviewEntity } from "./UserReviewEntiry";
 import { BasePostEntity } from "./BasePostEntity";
 
 export enum UserType {
@@ -33,7 +33,7 @@ export enum UserMethod {
     EMAIL='EMAIL',
 }
 
-@Entity('User')
+@Entity('users')
 @Unique(['email', 'nickname'])
 export class UserEntity {
     @PrimaryGeneratedColumn("uuid")
@@ -87,9 +87,9 @@ export class UserEntity {
     @OneToMany(() => MessagesEntity, message => message.receiver)
     receiveMessages: MessagesEntity[]
 
-    @OneToMany(() => ReviewEntity, review => review.reviewer)
-    givenReviews: ReviewEntity[]
+    @OneToMany(() => UserReviewEntity, review => review.reviewer)
+    givenReviews: UserReviewEntity[]
 
-    @OneToMany(() => ReviewEntity, review => review.reviewed)
-    receivedReviews: ReviewEntity[]
+    @OneToMany(() => UserReviewEntity, review => review.reviewed)
+    receivedReviews: UserReviewEntity[]
 }

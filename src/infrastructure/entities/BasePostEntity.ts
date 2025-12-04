@@ -7,8 +7,12 @@ import {
     JoinColumn,
     TableInheritance,
     Entity,
+    OneToMany,
 } from "typeorm";
 import { UserEntity } from "./UserEntity";
+import { PostReviewEntity } from "./PostReviewEntity";
+
+
 
 export enum BasePostStateType {
     ACTIVE = 'active',
@@ -59,4 +63,7 @@ export abstract class BasePostEntity {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    @OneToMany(() => PostReviewEntity, review => review.post)
+    receivedReviews: PostReviewEntity[]
 }

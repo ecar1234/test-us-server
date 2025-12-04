@@ -2,9 +2,9 @@ import { UserUseCase } from "../../app/UserUseCase";
 import { Router } from 'express';
 import { UserController } from "../controllers/UserController";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
+import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
-import { ReviewRepositoryImpl } from "../../infrastructure/repositories/ReviewRepositoryImpl";
 import { Env } from "../../config/env";
 import fs from "fs";
 import multer from "multer";
@@ -12,7 +12,7 @@ import path from "path";
 import crypto from "crypto";
 
 const route = Router();
-const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new ReviewRepositoryImpl());
+const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new UserReviewRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
 const UPLOAD_USER_URL = Env.UPLOAD_USER_URL;

@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { UserEntity } from "./UserEntity";
 
-@Entity('Messages')
+@Entity('messages')
 @Unique(['messageId'])
 export class MessagesEntity {
     @PrimaryGeneratedColumn('uuid')

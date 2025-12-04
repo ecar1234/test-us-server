@@ -6,14 +6,19 @@ import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
 import { BasePostStateType, BasePostEntity } from "../entities/BasePostEntity";
+import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
+
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
     private postRepository = AppDataSource.getRepository(RecruitmentPostEntity);
 
     private applicationRepository: ApplicationRepositoryImpl;
+    private reviewRepository: PostReviewRepositoryImpl;
     constructor() {
         this.applicationRepository = new ApplicationRepositoryImpl();
+        this.reviewRepository = new PostReviewRepositoryImpl();
     }
+    
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
         const authorInfo = postEntity.author 
@@ -37,6 +42,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             postEntity.views,
             postEntity.images || [],
             postEntity.postType,
+            postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
             postEntity.createdAt,
             postEntity.updatedAt,
             postEntity.applications ? postEntity.applications.map(app => this.applicationRepository.toDomainApplication(app)) : []
@@ -90,6 +96,19 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         return this.toDomainPost(newPost!);
     }
 
+    async findPostAndStatus(id: string, status: string): Promise<RecruitmentPostModel | null> {
+        const postEntity = await this.postRepository.findOne({
+            where: { postId: id },
+            relations: ['author']
+        });
+        if (!postEntity) {
+            throw new Error("Post not found");
+        }
+        postEntity.status = status === 'active' ? BasePostStateType.ACTIVE : (status === 'end' ? BasePostStateType.END : BasePostStateType.DELETE);
+        await this.postRepository.save(postEntity);
+
+        return this.toDomainPost(postEntity);
+    }
     async updatePost(post: RecruitmentPostModel): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: post.id },
@@ -178,7 +197,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostById(id: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { postId: id, status: BasePostStateType.ACTIVE },
-            relations: ['author', 'applications', 'applications.applicant']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -204,7 +223,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         const postEntities = await this.postRepository.find({
             where: { author: { userId }, status: Not(BasePostStateType.DELETE) },
-            relations: ['author', 'applications', 'applications.applicant']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
 
         const domainPostsPromises = postEntities.map(async (postEntity) => {
@@ -222,7 +241,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostByTitle(title: string): Promise<RecruitmentPostModel> {
         const postEntity = await this.postRepository.findOne({
             where: { title },
-            relations: ['author', 'applications', 'applications.applicant']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
         if (!postEntity) {
             throw new Error("Post not found");
@@ -233,7 +252,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getPostsByAuthor(authorId: string): Promise<RecruitmentPostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { author: { userId: authorId } },
-            relations: ['author', 'applications', 'applications.applicant']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
 
         const domainPosts = postEntities.map(entity => this.toDomainPost(entity));
@@ -243,7 +262,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getAppRecruitPosts(ids: string[]): Promise<RecruitmentPostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { postId: In(ids) },
-            relations: ['author', 'applications', 'applications.applicant']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
         return postEntities.map(entity => this.toDomainPost(entity));
     }

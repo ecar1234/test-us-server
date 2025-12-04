@@ -1,93 +1,93 @@
 import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { ReviewModel } from "../../domain/entities/ReviewModel";
 import { UserModel } from "../../domain/entities/UserModel";
-import { IReviewRepository } from "../../domain/interface_repositories/IReview_repository";
+import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository";
 import { ApplicationEntity } from "../entities/ApplicationEntity";
 import { UserEntity } from "../entities/UserEntity";
-import { ReviewEntity, ReviewType } from "../entities/ReviewEntiry";
+import { UserReviewEntity, ReviewType } from "../entities/UserReviewEntiry";
 import { In } from "typeorm";
+import { BasePostEntity } from "../entities/BasePostEntity";
+import { UserReviewModel } from "../../domain/entities/UserReviewModel";
 
 
-export class ReviewRepositoryImpl implements IReviewRepository {
-    private reviewDataSource = AppDataSource.getRepository(ReviewEntity);
-    private toDomainReview(reviewEntity: ReviewEntity): ReviewModel {
-        // ReviewModel constructor expects IDs, not full model objects.
-        // Ensure relations are loaded when calling this method.
-        return new ReviewModel(
-            reviewEntity.reviewId,
-            reviewEntity.rating,
-            reviewEntity.comment,
-            reviewEntity.reviewType,
-            reviewEntity.createdAt,
-            reviewEntity.application?.appId, // Pass appId
-            reviewEntity.reviewer?.userId,   // Pass userId
-            reviewEntity.reviewed?.userId    // Pass userId
-        );
-    }
-    private toEntityReview(reviewModel: ReviewModel): ReviewEntity {
-        const reviewType = reviewModel.reviewType === 'PRODUCT_RATING' ? ReviewType.PRODUCT_RATING : ReviewType.PARTICIPANT_ATTITUDE_RATING;
-        const reviewEntity = new ReviewEntity();
-        reviewEntity.reviewId = reviewModel.reviewId;
-        reviewEntity.rating = reviewModel.rating;
-        reviewEntity.comment = reviewModel.comment;
-        reviewEntity.reviewType = reviewType;
-        reviewEntity.createdAt = reviewModel.createdAt || new Date(); // Ensure createdAt is set
-        reviewEntity.application = { appId: reviewModel.applicationId } as ApplicationEntity; // No change needed here
-        reviewEntity.reviewer = { userId: reviewModel.reviewerUserId } as UserEntity; // No change needed here
-        reviewEntity.reviewed = { userId: reviewModel.reviewedUserId } as UserEntity; // No change needed here
-        return reviewEntity;
-    }
-    async createReview(review: ReviewModel): Promise<ReviewModel> {
-        const reviewEntity = this.toEntityReview(review);
-        const savedEntity = await this.reviewDataSource.save(reviewEntity);
-        // Fetch the saved entity with relations to convert it to domain model
-        const fullSavedEntity = await this.reviewDataSource.findOne({
-            where: { reviewId: savedEntity.reviewId },
-            relations: ['application', 'reviewer', 'reviewed']
-        });
-        return this.toDomainReview(fullSavedEntity);
-    }
-    async getReviewById(reviewId: string): Promise<ReviewModel | null> {
-        // post 정보까지 함께 로드하기 위해 relations를 추가합니다.
-        return this.reviewDataSource.findOne({
-            where: { reviewId },
-            relations: ['application', 'application.post', 'reviewer', 'reviewed']
-        })
-            .then(reviewEntity => reviewEntity ? this.toDomainReview(reviewEntity) : null);
-    }
-    async getUserReviewAverage(userIds: string[]): Promise<ReviewModel[]> {
-        
-       const reviews = await this.reviewDataSource.find({
-            where: { reviewed: { userId: In(userIds) }, reviewType: ReviewType.PARTICIPANT_ATTITUDE_RATING },
-            relations : ['application', 'application.post', 'reviewer', 'reviewed']
-        });
+// export class UserReviewRepositoryImpl implements IUserReviewRepository {
+//     private reviewDataSource = AppDataSource.getRepository(UserReviewEntity);
+//     public toDomainReview(reviewEntity: UserReviewEntity): UserReviewModel {
+//         // UserReviewModel constructor expects IDs, not full model objects.
+//         // Ensure relations are loaded when calling this method.
+//         return new UserReviewModel({
+//             reviewId: reviewEntity.reviewId,
+//             rating: reviewEntity.rating,
+//             comment: reviewEntity.comment,
+//             reviewType: reviewEntity.reviewType,
+//             createdAt: reviewEntity.createdAt,
+//             applicationId: reviewEntity.application.appId,
+//             reviewerUserId: reviewEntity.reviewer.userId,
+//             reviewedUserId: reviewEntity.reviewed.userId,
+//             // postId: reviewEntity.application.post.postId // postId는 Application을 통해 접근
+//         });
+//     }
+//     public toEntityReview(reviewModel: UserReviewModel): UserReviewEntity {
+//         const reviewType = reviewModel.reviewType === 'PRODUCT_RATING' ? ReviewType.PRODUCT_RATING : ReviewType.PARTICIPANT_ATTITUDE_RATING;
+//         const reviewEntity: UserReviewEntity = this.reviewDataSource.create({
+//             ...(reviewModel.reviewId && { reviewId: reviewModel.reviewId }),
+//             rating: reviewModel.rating,
+//             comment: reviewModel.comment,
+//             reviewType: reviewType,
+//             createdAt: reviewModel.createdAt || new Date(),
+//             application: { appId: reviewModel.applicationId },
+//             reviewer: { userId: reviewModel.reviewerUserId },
+//             reviewed: { userId: reviewModel.reviewedUserId },
+//         });
+//         return reviewEntity;
+//     }
 
-       return reviews.map(review => this.toDomainReview(review));
-    }
-    // async getReviewsByApplicationId(applicationId: number): Promise<ReviewModel[]> {
-    //     return this.reviewDataSource.find({
-    //         where: { application: { appId: applicationId } },
-    //         relations: ['application', 'application.post', 'reviewer', 'reviewed']
-    //     })
-    //         .then(reviewEntities => reviewEntities.map(this.toDomainReview.bind(this)));
-    // }
-    // async getReviewsByReviewerUserId(reviewerUserId: string): Promise<ReviewModel[]> {
-    //     return this.reviewDataSource.find({
-    //         where: { reviewer: { userId: reviewerUserId } },
-    //         relations: ['application', 'application.post', 'reviewer', 'reviewed']
-    //     })
-    //         .then(reviewEntities => reviewEntities.map(this.toDomainReview.bind(this)));
-    // }
-    // async getReviewsByReviewedUserId(reviewedUserId: string): Promise<ReviewModel[]> {
-    //     return this.reviewDataSource.find({
-    //         where: { reviewed: { userId: reviewedUserId } },
-    //         relations: ['application', 'application.post', 'reviewer', 'reviewed']
-    //     }).then(reviewEntities => reviewEntities.map(this.toDomainReview.bind(this)));
-    // }
-    // async deleteReview(reviewId: string): Promise<boolean> {
-    //     const result = await this.reviewDataSource.delete({ reviewId : reviewId});
-    //     return result.affected !== 0;
-    // }
-    
-}
+//     // async addPromotionReview(review: UserReviewModel): Promise<UserReviewModel> {
+//     //     const entity = this.toEntityReview(review);
+//     //     const result = await this.reviewDataSource.save(entity);
+//     //     return this.toDomainReview(result);
+//     // }
+//     // async addRecruitReview(review: UserReviewModel): Promise<UserReviewModel> {
+//     //     const entity = this.toEntityReview(review);
+//     //     const result = await this.reviewDataSource.save(entity);
+//     //     return this.toDomainReview(result);
+//     // }
+//     async addUserReview(review: UserReviewModel): Promise<UserReviewModel> {
+//         const entity = this.toEntityReview(review);
+//         const result = await this.reviewDataSource.save(entity);
+//         return this.toDomainReview(result);
+//     }
+//     // async getReviewByPostId(postId: string): Promise<UserReviewModel> {
+//     //     const review = await this.reviewDataSource.findOne({
+//     //         where: {application: {post: {postId: postId}}}, 
+//     //         relations: ['application', 'application.post', 'reviewer', 'reviewed']
+//     //     });
+
+//     //     if(review){
+//     //         return this.toDomainReview(review);
+//     //     }
+//     //     throw new Error("Review not found");
+//     // }
+//     async getReviewByUserId(userId: string): Promise<UserReviewModel> {
+//         const review = await this.reviewDataSource.findOne({
+//             where: {reviewer: {userId: userId}},
+//             relations: ['application', 'application.post', 'reviewer', 'reviewed']
+//         });
+
+//         if(review){
+//             return this.toDomainReview(review);
+//         }
+//         throw new Error("Review not found");
+//     }
+//     async getReviewByTesterIds(ids: string[], postId: string): Promise<UserReviewModel[]> {
+//         const reviews = await this.reviewDataSource.find({
+//             where: {reviewed: {userId: In(ids)}, application: {post: {postId: postId}}}, 
+//             relations: ['application', 'application.post', 'reviewer', 'reviewed']
+//         });
+
+//         if(reviews){
+//             return reviews.map(review => this.toDomainReview(review));
+//         }
+//         throw new Error("Review not found");
+//     }    
+// }

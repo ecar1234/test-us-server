@@ -52,15 +52,19 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     }
 
     public async update(application: ApplicationModel): Promise<ApplicationModel> {
-        const entity = this.toEntityApplication(application);
-        const savedResult = await this.applicationRepository.save(entity);
-
-        // 업데이트 후 관계가 포함된 완전한 엔티티를 다시 조회합니다.
+        const status = application.status === 'pending' ? ApplicationStatus.PENDING :
+            (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
+                (application.status === 'rejected' ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL));
+        
+        await this.applicationRepository.update(application.id, {
+            status: status
+        });
+    
         const result = await this.applicationRepository.findOne({
-            where: { appId: savedResult.appId },
+            where: { appId: application.id },
             relations: ['post', 'applicant']
         });
-        return this.toDomainApplication(result);
+        return this.toDomainApplication(result!);
     }
 
     public async cancel(id: number): Promise<ApplicationModel> {

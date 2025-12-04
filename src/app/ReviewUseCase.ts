@@ -1,27 +1,68 @@
-import { ReviewModel } from "../domain/entities/ReviewModel";
-import { ReviewRepositoryImpl } from "../infrastructure/repositories/ReviewRepositoryImpl";
+import { PostReviewModel } from "../domain/entities/PostReviewModel";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
+import { PostReviewRepositoryImpl } from "../infrastructure/repositories/PostReviewRepositoryImpl";
+import { UserReviewModel } from "../domain/entities/UserReviewModel";
 
 
 export class ReviewUseCase {
-    constructor(private reviewRepo: ReviewRepositoryImpl){}
+    constructor(
+        private userReviewRepo: UserReviewRepositoryImpl,
+        private postReviewRepo: PostReviewRepositoryImpl
+    ){}
 
-    async createReview(review: ReviewModel): Promise<ReviewModel>{
-        return this.reviewRepo.createReview(review);
+    async addPromotionReview(rating: number, comments: string, type: string, reviewer: string, postId: string):Promise<PostReviewModel> {
+        const postReviewModel = new PostReviewModel({
+            reviewId: null,
+            rating: rating,
+            comment: comments,
+            reviewType: type,
+            reviewerUserId: reviewer,
+            postId: postId
+        });
+        const review = await this.postReviewRepo.addPostReview(postReviewModel); // PostReviewRepo 사용
+        return review;   
     }
-    async getReviewById(reviewId: string):Promise<ReviewModel | null>{
-        return this.reviewRepo.getReviewById(reviewId);
+
+    async addRecruitReview(rating: number, comments: string, type: string, reviewer: string, postId: string):Promise<PostReviewModel> {
+        const postReviewModel = new PostReviewModel({
+            reviewId: null,
+            rating: rating,
+            comment: comments,
+            reviewType: type,
+            reviewerUserId: reviewer,
+            postId: postId
+        });
+        const review = await this.postReviewRepo.addPostReview(postReviewModel); // PostReviewRepo 사용
+        return review; 
     }
-    
-    // async getReviewsByApplicationId(applicationId: number): Promise<ReviewModel[]>{
-    //     return this.reviewRepo.getReviewsByApplicationId(applicationId);
-    // }
-    // async getReviewsByReviewerUserId(reviewerUserId: string): Promise<ReviewModel[]>{
-    //     return this.reviewRepo.getReviewsByReviewedUserId(reviewerUserId);
-    // }
-    // async getReviewsByReviewedUserId(reviewedUserId: string): Promise<ReviewModel[]>{
-    //     return this.reviewRepo.getReviewsByReviewedUserId(reviewedUserId);
-    // }
-    // async deleteReview(reviewId: string): Promise<boolean>{
-    //     return this.reviewRepo.deleteReview(reviewId);
-    // }
+
+    async addUserReview(rating: number, comments: string, reviewer: string, reviewed: string, applicationId: number, postId: string):Promise<UserReviewModel> {
+        const userReviewModel = new UserReviewModel({
+            reviewId: null,
+            rating: rating,
+            comment: comments,
+            reviewerUserId: reviewer,
+            reviewedUserId: reviewed,
+            applicationId: applicationId,
+        });
+        const review = await this.userReviewRepo.addUserReview(userReviewModel); // UserReviewRepo 사용
+        // console.log(review);
+        return review; 
+    }
+
+    // 게시물 ID로 리뷰를 조회하는 것은 이제 PostReviewRepository에서 담당
+    async getPostReviewByPostId(postId: string): Promise<PostReviewModel>{
+        const reviews = await this.postReviewRepo.getPostReviewByPostId(postId);
+        return reviews;
+    }
+
+    async getUserReviewByUserId(userId: string): Promise<UserReviewModel>{ // 메서드 이름 변경
+        const reviews = await this.userReviewRepo.getReviewByUserId(userId); // UserReviewRepo 사용
+        return reviews;
+    }
+
+    async getUserReviewByTesterIds(ids: string[], postId: string): Promise<UserReviewModel[]>{ // 메서드 이름 변경
+        const reviews = await this.userReviewRepo.getReviewByTesterIds(ids, postId); // UserReviewRepo 사용
+        return reviews;
+    }
 }

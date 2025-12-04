@@ -4,11 +4,17 @@ import { IPromotionPostRepository } from "../../domain/interface_repositories/IP
 import { BasePostStateType, BasePostEntity } from "../entities/BasePostEntity";
 import { PromotionPostEntity } from "../entities/PromotionPostEntity";
 import { redisClient } from "../../config/RedisConfig";
+import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
+
 
 
 export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
 
     private repository = AppDataSource.getRepository(PromotionPostEntity);
+    private reviewRepository: PostReviewRepositoryImpl;
+    constructor() {
+        this.reviewRepository = new PostReviewRepositoryImpl();
+    }
     
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
         const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)
@@ -62,6 +68,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             post.images || [],
             post.domain,
             post.postType,
+            post.receivedReviews ? post.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
             post.createdAt,
             post.updatedAt
         );

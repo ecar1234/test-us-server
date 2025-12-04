@@ -83,6 +83,15 @@ export class PostUseCase {
 
         return updatedPost;
     }
+    async endRecruitPost(id: string): Promise<RecruitmentPostModel> {
+        // Use a method that fetches the post regardless of its current status.
+        const post = await this.recruitRepo.findPostAndStatus(id, 'end');
+        if (!post) {
+            throw new Error("Post not found");
+        }
+        
+        return this.recruitRepo.updatePost(post);
+    }
     async deleteRecruitPost(id: string): Promise<boolean> {
         const post = await this.recruitRepo.getPostById(id);
         if (!post) {

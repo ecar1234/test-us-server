@@ -2,14 +2,14 @@ import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
 import { TResUserAndReivews, UserModel } from "../domain/entities/UserModel";
 import { UserStatus } from "../infrastructure/entities/UserEntity";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { ReviewRepositoryImpl } from "../infrastructure/repositories/ReviewRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 import { Env } from "../config/env";
-import { ImagesModel } from "../domain/entities/ImagesModel"
+// import { ImagesModel } from "../domain/entities/ImagesModel"
 import uuid from 'uuid';
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
 
 
 
@@ -28,7 +28,7 @@ interface ImageToDelete {
 
 
 export class UserUseCase {
-    constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: ReviewRepositoryImpl) { }
+    constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: UserReviewRepositoryImpl) { }
 
     async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date, profileImg?: UploadedImageInfo, method: string = 'EMAIL'): Promise<[UserModel, number]> {
         const findUser = await this.userRepo.findUserByEmail(email);
@@ -93,15 +93,11 @@ export class UserUseCase {
     async getUserById(userId: string): Promise<UserModel | null> {
         return this.userRepo.findUserById(userId);
     }
-    async getUsersByIds(userIds: string[]): Promise<TResUserAndReivews[]> {
+    async getUsersByIds(userIds: string[]): Promise<UserModel[]> {
         const users = await this.userRepo.findUsersByIds(userIds);
-        const reviews = await this.reviewRepo.getUserReviewAverage(userIds);
+        // const reviews = await this.reviewRepo.getReviewByTesterIds(userIds, postId);
         // console.log('use case : ', users);
-        return users.map(user => {
-            const userReviews = reviews.filter(review => review.reviewerUserId === user.userId);
-            const averageRating = userReviews.length > 0 ? userReviews.reduce((sum, review) => sum + review.rating, 0) / userReviews.length : 0;
-            return { user, averageRating, reviewCount: userReviews.length };
-        });
+       return users;
     }
     async getUserByEmail(email: string): Promise<UserModel | null> {
         return this.userRepo.findUserByEmail(email);

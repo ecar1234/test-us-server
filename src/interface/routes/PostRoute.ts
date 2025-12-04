@@ -48,6 +48,7 @@ route.get('/getUserInitPosts/:userId', postController.getInitUserPosts.bind(post
 route.post('/createRecruitPost', authMiddleware, uploadWithFiles.array('images', 4), postController.createRecruitPost.bind(postController));
 route.put('/updateRecruitPost', authMiddleware, uploadWithFiles.array('images', 4), postController.updateRecruitPost.bind(postController));
 route.post('/deleteRecruitPost', authMiddleware, postController.deleteRecruitPost.bind(postController));
+route.put('/endRecruitPost', authMiddleware, postController.endRecruitPost.bind(postController));
 route.get('/getRecruitPostById/:id', postController.getRecruitPostById.bind(postController));
 route.get('/getUserRecruitPosts/:userId', postController.getUserRecuritmentPosts.bind(postController));
 route.get('/getRecruitPostByTitle/:title', postController.getRecruitPostByTitle.bind(postController));;

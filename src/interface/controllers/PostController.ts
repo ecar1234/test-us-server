@@ -92,6 +92,17 @@ export class PostController {
         }
     }
 
+    async endRecruitPost(req: Request, res: Response): Promise<void> {
+        try {
+            const { id } = req.body;
+            const updatedPost = await this.postUseCase.endRecruitPost(id);
+            console.log("updatedPost : ", updatedPost);
+            res.status(200).json({status: 200, post: updatedPost});
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+
     async deleteRecruitPost(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.body;

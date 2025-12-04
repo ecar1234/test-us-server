@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { RecruitmentPostEntity } from "./RecruitmentPostEntity";
 import { UserEntity } from "./UserEntity";
-import { ReviewEntity } from "./ReviewEntiry";
+import { UserReviewEntity } from "./UserReviewEntiry";
 
 // 신청 상태를 정의하는 Enum
 export enum ApplicationStatus {
@@ -14,10 +14,9 @@ export enum ApplicationsPlatform {
     WEB = 'web',
     IOS = 'ios',
     ANDROID = 'android',
-    GAME = 'game'
 }
 
-@Entity('Application')
+@Entity('applications')
 @Unique(['post', 'applicant'])
 export class ApplicationEntity {
     @PrimaryGeneratedColumn('increment')
@@ -48,6 +47,6 @@ export class ApplicationEntity {
     @JoinColumn({ name: 'appUserId' })
     applicant: UserEntity
 
-    @OneToMany(() => ReviewEntity, review => review.application)
-    reviews: ReviewEntity[];
+    @OneToMany(() => UserReviewEntity, review => review.application)
+    reviews: UserReviewEntity[];
 }

@@ -1,31 +1,32 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { ApplicationEntity } from "./ApplicationEntity";
 import { UserEntity } from "./UserEntity";
+import { BasePostEntity } from "./BasePostEntity";
 
 
-// 리뷰 유형을 정의하는 Enum
-export enum ReviewType {
-    PRODUCT_RATING = 'PRODUCT_RATING',             // 참여 유저 -> 작성자 제품 평가
-    PARTICIPANT_ATTITUDE_RATING = 'PARTICIPANT_ATTITUDE_RATING', // 작성자 유저 -> 참여자 태도 평가
-}
+// // 리뷰 유형을 정의하는 Enum
+// export enum ReviewType {
+//     PRODUCT_RATING = 'PRODUCT_RATING',             // 참여 유저 -> 작성자 제품 평가
+//     PARTICIPANT_ATTITUDE_RATING = 'PARTICIPANT_ATTITUDE_RATING', // 작성자 유저 -> 참여자 태도 평가
+// }
 
-@Entity('Review')
+@Entity('user_reviews')
 @Unique(['application', 'reviewer', 'reviewed'])
-export class ReviewEntity {
+export class UserReviewEntity {
     @PrimaryGeneratedColumn('uuid')
     reviewId: string
 
-    @Column({ type: 'int' })
+    @Column({ type: 'float' })
     rating: number; // 1-5점 등
 
     @Column({ type: 'text', nullable: true })
     comment: string | null; // 평가 내용 (선택 사항)
 
-    @Column({
-        type: 'enum',
-        enum: ReviewType,
-    })
-    reviewType: ReviewType;
+    // @Column({
+    //     type: 'enum',
+    //     enum: ReviewType,
+    // })
+    // reviewType: ReviewType;
 
     @CreateDateColumn()
     createdAt: Date;

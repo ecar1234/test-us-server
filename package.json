@@ -11,7 +11,7 @@
     "start": "node dist/index.js",
     "migration:run": "dotenv -e .env -- ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
     "migration:generate": "dotenv -e .env -- ts-node ./node_modules/typeorm/cli.js migration:generate -d src/config/DataSource.ts src/migration/AutoGen",
-    "migration:revert": "ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/DataSource.ts"
+    "migration:revert": "dotenv -e .env -- ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/DataSource.ts"
   },
   "keywords": [],
   "author": "",
