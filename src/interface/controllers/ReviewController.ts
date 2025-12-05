@@ -32,8 +32,8 @@ export class ReviewController {
         res.status(200).json({ status: 200, review: review });
     }
     async getReviewByTesterIds(req: Request, res: Response): Promise<void> {
-        const { ids, postId } = req.body;
-        const reviews = await this.reviewUseCase.getUserReviewByTesterIds(ids, postId);
-        res.status(200).json({ status: 200, review: reviews });
+        const { ids, appId } = req.body;
+        const reviews = await this.reviewUseCase.getUserReviewByTesterIds(ids, appId);
+        res.status(200).json({ status: 200, reviews: reviews });
     }
 }

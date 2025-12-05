@@ -1,5 +1,5 @@
 import { AppDataSource } from "../../config/DataSource";
-import { In } from "typeorm";
+import { In, IsNull } from "typeorm";
 import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository";
 import { UserReviewModel } from "../../domain/entities/UserReviewModel";
 import { UserReviewEntity } from "../entities/UserReviewEntiry";
@@ -54,9 +54,9 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
         if (!review) throw new Error("Review not found");
         return this.toDomainUserReview(review);
     }
-    async getReviewByTesterIds(ids: string[], postId: string): Promise<UserReviewModel[]> { // 타입 변경
+    async getReviewByTesterIds(ids: string[], appId: number): Promise<UserReviewModel[]> { // 타입 변경
         const reviews = await this.userReviewDataSource.find({ // DataSource 변경
-            where: {reviewed: {userId: In(ids)}, application: {post: {postId: postId}}},
+            where: {reviewed: {userId: In(ids)}, application: {appId: appId}},
             relations: ['application', 'application.post', 'reviewer', 'reviewed'] // application.post 관계 유지
         });
 

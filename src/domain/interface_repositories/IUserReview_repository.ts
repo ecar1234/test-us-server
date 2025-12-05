@@ -6,5 +6,5 @@ export interface IUserReviewRepository {
     addUserReview(review: UserReviewModel):Promise<UserReviewModel> 
     // getReviewByPostId(postId: string): Promise<ReviewModel>
     getReviewByUserId(userId: string): Promise<UserReviewModel>
-    getReviewByTesterIds(ids: string[], postId: string): Promise<UserReviewModel[]>
+    getReviewByTesterIds(ids: string[], appId: number): Promise<UserReviewModel[]>
 }

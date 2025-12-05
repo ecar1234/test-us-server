@@ -61,8 +61,8 @@ export class ReviewUseCase {
         return reviews;
     }
 
-    async getUserReviewByTesterIds(ids: string[], postId: string): Promise<UserReviewModel[]>{ // 메서드 이름 변경
-        const reviews = await this.userReviewRepo.getReviewByTesterIds(ids, postId); // UserReviewRepo 사용
+    async getUserReviewByTesterIds(ids: string[], appId: number): Promise<UserReviewModel[]>{ // 메서드 이름 변경
+        const reviews = await this.userReviewRepo.getReviewByTesterIds(ids, appId); // UserReviewRepo 사용
         return reviews;
     }
 }
