@@ -20,7 +20,7 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
             postId: reviewEntity.application.post?.postId
         });
     }
-    public toEntityUserReview(userReviewModel: UserReviewModel): UserReviewEntity { 
+    public toEntityUserReview(userReviewModel: UserReviewModel): UserReviewEntity {
         const reviewEntity: UserReviewEntity = this.userReviewDataSource.create({
             ...(userReviewModel.reviewId && { reviewId: userReviewModel.reviewId }),
             rating: userReviewModel.rating,
@@ -45,10 +45,20 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
         // console.log(newReview);
         return this.toDomainUserReview(newReview);
     }
+    async getUserReviewsByUserId(userId: string): Promise<UserReviewModel[]> {
+        const reviews = await this.userReviewDataSource.find({
+            where: {reviewed: {userId: userId}},
+            relations: ['application', 'application.post', 'reviewer', 'reviewed']
+        });
+        
+        if(!reviews) return [];
 
-    async getReviewByUserId(userId: string): Promise<UserReviewModel> { // 타입 변경
-        const review = await this.userReviewDataSource.findOne({ // DataSource 변경
-            where: {reviewer: {userId: userId}},
+        return reviews.map(review => this.toDomainUserReview(review));
+    }
+
+    async getReviewByUserId(userId: string): Promise<UserReviewModel> {
+        const review = await this.userReviewDataSource.findOne({
+            where: { reviewer: { userId: userId } },
             relations: ['application', 'application.post', 'reviewer', 'reviewed']
         });
         if (!review) throw new Error("Review not found");
@@ -56,12 +66,12 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
     }
     async getReviewByTesterIds(ids: string[], appId: number): Promise<UserReviewModel[]> { // 타입 변경
         const reviews = await this.userReviewDataSource.find({ // DataSource 변경
-            where: {reviewed: {userId: In(ids)}, application: {appId: appId}},
+            where: { reviewed: { userId: In(ids) }, application: { appId: appId } },
             relations: ['application', 'application.post', 'reviewer', 'reviewed'] // application.post 관계 유지
         });
 
         if (!reviews.length) return [];
-        
+
         return reviews.map(review => this.toDomainUserReview(review));
     }
 }

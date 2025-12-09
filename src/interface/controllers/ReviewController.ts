@@ -6,14 +6,14 @@ export class ReviewController {
     constructor(private reviewUseCase: ReviewUseCase) { }
 
     async addPromotionReview(req: Request, res: Response): Promise<void> {
-        const { rating, comment, reviewType, reviewerId, reviewedId } = req.body;
-        const review = await this.reviewUseCase.addPromotionReview(rating, comment, reviewType, reviewerId, reviewedId);
+        const { rating, comment, reviewType, reviewerUserId, postId } = req.body;
+        const review = await this.reviewUseCase.addPromotionReview(rating, comment, reviewType, reviewerUserId, postId);
         res.status(200).json({ status: 200, review: review });
 
     }
     async addRecruitReview(req: Request, res: Response): Promise<void> {
-        const { rating, comment, reviewType, reviewerId, reviewedId } = req.body;
-        const review = await this.reviewUseCase.addRecruitReview(rating, comment, reviewType, reviewerId, reviewedId);
+        const { rating, comment, reviewType, reviewerUserId, postId } = req.body;
+        const review = await this.reviewUseCase.addRecruitReview(rating, comment, reviewType, reviewerUserId, postId);
         res.status(200).json({ status: 200, review: review });
     }
     async addUserReview(req: Request, res: Response): Promise<void> {
@@ -27,9 +27,14 @@ export class ReviewController {
         res.status(200).json({ status: 200, review: review });
     }
     async getReviewByUserId(req: Request, res: Response): Promise<void> {
-        const { userId } = req.body;
+        const userId = req.params.userId;
         const review = await this.reviewUseCase.getUserReviewByUserId(userId);
         res.status(200).json({ status: 200, review: review });
+    }
+    async getReviewsByUserId(req: Request, res: Response): Promise<void> {
+        const userId = req.params.userId;
+        const reviews = await this.reviewUseCase.getReviewsByUserId(userId);
+        res.status(200).json({ status: 200, reviews: reviews });
     }
     async getReviewByTesterIds(req: Request, res: Response): Promise<void> {
         const { ids, appId } = req.body;

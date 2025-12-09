@@ -3,11 +3,15 @@ import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserRev
 import { PostReviewRepositoryImpl } from "../infrastructure/repositories/PostReviewRepositoryImpl";
 import { UserReviewModel } from "../domain/entities/UserReviewModel";
 
+import { redisClient } from "../config/RedisConfig";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+
 
 export class ReviewUseCase {
     constructor(
         private userReviewRepo: UserReviewRepositoryImpl,
-        private postReviewRepo: PostReviewRepositoryImpl
+        private postReviewRepo: PostReviewRepositoryImpl,
+        private recruitRepo: RecruitmentPostRepositoryImpl
     ){}
 
     async addPromotionReview(rating: number, comments: string, type: string, reviewer: string, postId: string):Promise<PostReviewModel> {
@@ -20,6 +24,12 @@ export class ReviewUseCase {
             postId: postId
         });
         const review = await this.postReviewRepo.addPostReview(postReviewModel); // PostReviewRepo 사용
+
+        // 리뷰가 추가된 게시물의 작성자 정보를 가져옵니다.
+        const authorId = await this.recruitRepo.getPostAuthorId(postId);
+        if (authorId) {
+            await redisClient.del(`userPosts:${authorId}`);
+        }
         return review;   
     }
 
@@ -33,6 +43,12 @@ export class ReviewUseCase {
             postId: postId
         });
         const review = await this.postReviewRepo.addPostReview(postReviewModel); // PostReviewRepo 사용
+
+        // 리뷰가 추가된 게시물의 작성자 정보를 가져옵니다.
+        const authorId = await this.recruitRepo.getPostAuthorId(postId);
+        if (authorId) {
+            await redisClient.del(`userPosts:${authorId}`);
+        }
         return review; 
     }
 
@@ -58,6 +74,10 @@ export class ReviewUseCase {
 
     async getUserReviewByUserId(userId: string): Promise<UserReviewModel>{ // 메서드 이름 변경
         const reviews = await this.userReviewRepo.getReviewByUserId(userId); // UserReviewRepo 사용
+        return reviews;
+    }
+    async getReviewsByUserId(userId: string): Promise<UserReviewModel[]>{
+        const reviews = await this.userReviewRepo.getUserReviewsByUserId(userId);
         return reviews;
     }
 

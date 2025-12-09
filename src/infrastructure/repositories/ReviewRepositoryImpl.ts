@@ -1,13 +1,13 @@
-import { AppDataSource } from "../../config/DataSource";
-import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { UserModel } from "../../domain/entities/UserModel";
-import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository";
-import { ApplicationEntity } from "../entities/ApplicationEntity";
-import { UserEntity } from "../entities/UserEntity";
-import { UserReviewEntity, ReviewType } from "../entities/UserReviewEntiry";
-import { In } from "typeorm";
-import { BasePostEntity } from "../entities/BasePostEntity";
-import { UserReviewModel } from "../../domain/entities/UserReviewModel";
+// import { AppDataSource } from "../../config/DataSource";
+// import { ApplicationModel } from "../../domain/entities/ApplicationModel";
+// import { UserModel } from "../../domain/entities/UserModel";
+// import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository";
+// import { ApplicationEntity } from "../entities/ApplicationEntity";
+// import { UserEntity } from "../entities/UserEntity";
+// import { UserReviewEntity, ReviewType } from "../entities/UserReviewEntiry";
+// import { In } from "typeorm";
+// import { BasePostEntity } from "../entities/BasePostEntity";
+// import { UserReviewModel } from "../../domain/entities/UserReviewModel";
 
 
 // export class UserReviewRepositoryImpl implements IUserReviewRepository {
