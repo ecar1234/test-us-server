@@ -41,7 +41,6 @@ export class JobController {
             res.status(500).json({ status: 500, error: error.message });
         }
     }
-
     async getInitPosts(req: Request, res: Response): Promise<void> {
         try {
             const { jobId } = req.params;

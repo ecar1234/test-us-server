@@ -7,7 +7,8 @@ export const Env = {
     SERVER_PORT: process.env.SERVER_PORT,
     JWT_SECRET: process.env.JWT_SECRET,
     UPLOAD_URL: process.env.UPLOAD_URL,
-    UPLOAD_USER_URL: process.env.UPLOAD_USER_URL
+    UPLOAD_USER_URL: process.env.UPLOAD_USER_URL,
+    BACKUP_DB: process.env.BACKUP_DB
 };
 export const RedisEnv = {
     REDIS_HOST: process.env.REDIS_HOST,

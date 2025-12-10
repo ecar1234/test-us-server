@@ -17,6 +17,7 @@ import MessageRoute from './interface/routes/MessageRoute';
 import JobStateRoute from './interface/routes/JobStateRoute';
 import { Env } from './config/env';
 import PostRoute from './interface/routes/PostRoute';
+import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
 
 const app = express();
 const port = parseInt(process.env.SERVER_PORT);
@@ -26,11 +27,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/posts', express.static(Env.UPLOAD_URL));
 app.use('/profile', express.static(Env.UPLOAD_USER_URL));
+app.use('/backup', express.static(Env.BACKUP_DB));
 
 AppDataSource.initialize()
     .then(() => {
         console.log("DB 연결 성공!!");
-
+        // Daliy Task
+        PostUpdateScheduledJob();
+        DbBackupScheduledJob();
+        
+        // routes
         app.listen(port, '0.0.0.0',() => {
             console.log(`서버 실행 중: 0.0.0.0:${port}`);
             
