@@ -10,14 +10,15 @@ import express, { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from './config/DataSource';
 import AuthRoute from './interface/routes/AuthRoute';
 import UserRoute from './interface/routes/UserRoute';
-import RecruitmentPostRoute from './interface/routes/RecruitmentPostRoute';
 import ApplicationRoute from './interface/routes/ApplicationRoute';
 import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
 import JobStateRoute from './interface/routes/JobStateRoute';
+import FirebaseRoute from './interface/routes/FirebaseRoute';
 import { Env } from './config/env';
 import PostRoute from './interface/routes/PostRoute';
 import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
+import './service/firebase/Firebase'; // Firebase Admin SDK 초기화
 
 const app = express();
 const port = parseInt(process.env.SERVER_PORT);
@@ -35,7 +36,7 @@ AppDataSource.initialize()
         // Daliy Task
         PostUpdateScheduledJob();
         DbBackupScheduledJob();
-        
+
         // routes
         app.listen(port, '0.0.0.0',() => {
             console.log(`서버 실행 중: 0.0.0.0:${port}`);
@@ -47,6 +48,7 @@ AppDataSource.initialize()
             app.use('/api/v1/review', ReviewRoute);
             app.use('/api/v1/message', MessageRoute);
             app.use('/api/v1/jobState', JobStateRoute);
+            app.use('/api/v1/firebase', FirebaseRoute);
 
             // 중앙 에러 처리 미들웨어
             app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

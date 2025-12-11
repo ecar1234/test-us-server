@@ -15,3 +15,7 @@ export const RedisEnv = {
     REDIS_PASSWORD: process.env.REDIS_PASSWORD,
     REDIS_PORT: process.env.REDIS_PORT
 }
+
+export const FirebaseEnv = {
+    FIREBASE_ADMIN_ACCOUNT: process.env.FIREBASE_ADMIN_ACCOUNT,
+}

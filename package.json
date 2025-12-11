@@ -26,6 +26,7 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "firebase-admin": "^13.6.0",
     "ioredis": "^5.8.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",

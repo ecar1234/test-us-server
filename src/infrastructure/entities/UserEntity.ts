@@ -3,6 +3,7 @@ import { ApplicationEntity } from "./ApplicationEntity";
 import { MessagesEntity } from "./MessageEntity";
 import { UserReviewEntity } from "./UserReviewEntiry";
 import { BasePostEntity } from "./BasePostEntity";
+import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity";
 
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',
@@ -92,4 +93,7 @@ export class UserEntity {
 
     @OneToMany(() => UserReviewEntity, review => review.reviewed)
     receivedReviews: UserReviewEntity[]
+
+    @OneToMany(() => FirebaseDeviceTokenEntity, token => token.user)
+    deviceTokens: FirebaseDeviceTokenEntity[];
 }

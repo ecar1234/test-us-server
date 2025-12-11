@@ -1,7 +1,7 @@
-import { AppDataSource } from "../config/DataSource";
-import { BasePostStateType } from "../infrastructure/entities/BasePostEntity";
-import { PromotionPostEntity } from "../infrastructure/entities/PromotionPostEntity";
-import { RecruitmentPostEntity } from "../infrastructure/entities/RecruitmentPostEntity";
+import { AppDataSource } from "../../config/DataSource";
+import { BasePostStateType } from "../../infrastructure/entities/BasePostEntity";
+import { PromotionPostEntity } from "../../infrastructure/entities/PromotionPostEntity";
+import { RecruitmentPostEntity } from "../../infrastructure/entities/RecruitmentPostEntity";
 
 
 export class DailyTaskService {
