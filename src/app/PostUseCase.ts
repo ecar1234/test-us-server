@@ -97,8 +97,8 @@ export class PostUseCase {
         const message: FCMPayload = {
             tokens: await this.fireRepository.getMessingTokens(post.applications.map(app => app.user.id)),
             notification: {
-                title: '테스트 종료',
-                body:'테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.'
+                title: 'TESTUS',
+                body:`${post.title}의 테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.`
             },
             data: {
                 postId: post.id,

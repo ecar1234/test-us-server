@@ -110,7 +110,7 @@ export class AppUseCase {
             token: await this.fireRepository.getMessingToken(application.applicantId),
             notification: {
                 title: 'TESTS',
-                body: '테스터 신청이 수락 됐습니다. 함께 성장하는 테스트가 됐으면 좋겠네요.'
+                body: `${post.title}의 테스터 신청이 수락 됐습니다. 함께 성장하는 테스트가 됐으면 좋겠네요.`
             },
             data: {
                 postId: post.id,
@@ -141,7 +141,7 @@ export class AppUseCase {
             token: await this.fireRepository.getMessingToken(application.applicantId),
             notification: {
                 title: 'TESTUS',
-                body: '아쉽게도 테스터 신청이 거절 됐습니다. 다른 프로덕트에 다시 신청해 보세요.'
+                body: `아쉽게도 ${post.title}의 테스터 신청이 거절 됐습니다. 다른 프로덕트에 다시 신청해 보세요.`
             },
             data: {
                 postId: post.id,
