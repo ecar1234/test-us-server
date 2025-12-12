@@ -10,6 +10,7 @@ import crypto from "crypto";
 import path from "path";
 import fs from "fs";
 import { Env } from "../../config/env";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
 
 
 const route = Router();
@@ -18,11 +19,12 @@ const route = Router();
 const postRepo = new PostRepositoryImpl();
 const recruitRepo = new RecruitmentPostRepositoryImpl();
 const promotionRepo = new PromotionPostRepositoryImpl();
+const firebaseRepo = new FirebaseRepositoryImpl();
 
 // const appRepo = new ApplicationRepositoryImpl();
 // const recruitmentPostUseCase = new RecruitmentPostUseCase(recruitRepo);
 
-const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo);
+const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, firebaseRepo);
 const postController = new PostController(postUseCase);
 
 const UPLOAD_URL = Env.UPLOAD_URL;

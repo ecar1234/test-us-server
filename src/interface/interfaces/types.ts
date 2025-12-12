@@ -5,7 +5,8 @@ export interface FCMPayload {
         body: string;
     };
     data?: {
-        postId: string;
+        postId?: string;
+        userId?: string;
     }
     token?: string;
     tokens?: string[];

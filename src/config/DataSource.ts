@@ -5,8 +5,8 @@ import * as path from "path";
 
 const env = Env;
 
-console.log('--- Diagnostics from DataSource.ts ---');
-console.log('Env object being used:', env);
+// console.log('--- Diagnostics from DataSource.ts ---');
+// console.log('Env object being used:', env);
 
 export const AppDataSource = new DataSource({
     type: "mysql",

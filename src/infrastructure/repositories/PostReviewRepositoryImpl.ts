@@ -16,7 +16,7 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
             reviewType: reviewEntity.reviewType,
             createdAt: reviewEntity.createdAt,
             reviewerUserId: reviewEntity.reviewer.userId,
-            postId: reviewEntity.post.postId
+            // postId: reviewEntity.post.postId
         });
     }
 
@@ -41,7 +41,10 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
             post: { postId: review.postId },
             reviewer: { userId: review.reviewerUserId }
         });
-        const newReview = await this.postReviewDataSource.findOne({ where: { reviewId: savedEntity.reviewId }, relations: ['reviewer', 'post'] });
+        const newReview = await this.postReviewDataSource.findOne({
+                where: { reviewId: savedEntity.reviewId },
+                relations: ['reviewer', 'post']
+            });
         return this.toDomainPostReview(newReview);
     }
 

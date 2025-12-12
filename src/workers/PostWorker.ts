@@ -8,6 +8,7 @@ import { PostUseCase } from "../app/PostUseCase";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
 import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
 import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 
 const postWorker = new Worker(
     'getInitPostsQueue',
@@ -15,7 +16,8 @@ const postWorker = new Worker(
         const postRepo = new PostRepositoryImpl();
         const recruitRepo = new RecruitmentPostRepositoryImpl();
         const promotionRepo = new PromotionPostRepositoryImpl();
-        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo);
+        const firebaseRepo = new FirebaseRepositoryImpl();
+        const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, firebaseRepo);
  
         switch (job.name) {
             case 'getInitPosts':

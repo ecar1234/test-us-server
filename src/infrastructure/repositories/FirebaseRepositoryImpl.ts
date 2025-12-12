@@ -1,3 +1,4 @@
+import { In } from "typeorm";
 import { AppDataSource } from "../../config/DataSource";
 import { FirebaseRepository } from "../../domain/interface_repositories/IFirebaseRepository";
 import { FirebaseDeviceTokenEntity } from "../entities/FirebaseDeviceTokenEntity";
@@ -46,5 +47,36 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
         }
         return;
     }
+    async revmoeMessingTokens(fcmTokens: string[]): Promise<void> {
+        const findToken = await this.tokenRepo.delete({
+            token: In(fcmTokens)
+        });
+        if (findToken.affected === 0) {
+            throw new Error('Token not found');
+        }
+        return;
+    }
+    async getMessingToken(userId: string): Promise<string> {
+        const findToken = await this.tokenRepo.findOne({
+            where: {
+                user: { userId }
+            }
+        });
+        if (!findToken) {
+            throw new Error('Token not found');
+        }
+        return findToken.token;
+    }
 
+    async getMessingTokens(ids: string[]): Promise<string[]> {
+        const findTokens = await this.tokenRepo.find({
+            where: {
+                user: { userId: In(ids) }
+            }
+        });
+        if (!findTokens) {
+            throw new Error('Token not found');
+        }
+        return findTokens.map(token => token.token);
+    }
 }

@@ -6,17 +6,17 @@ export class FirebaseController {
 
     async createMessingToken(req: Request, res: Response) {
         try {
-            const [userId, fcmToken, deviceType] = req.body;
+            const { userId, fcmToken, deviceType } = req.body;
             await this.firebaseUseCase.createMessingToken(userId, fcmToken, deviceType);
             res.status(200).json({ status: 200, result: true });
         } catch (error) {
             console.log(error);
-            res.status(200).json({ status: 500, result: false, message: error.message});
+            res.status(500).json({ status: 500, result: false, message: error.message});
         }
     }
     async updateMessingToken(req: Request, res: Response) {
         try {
-            const [userId, fcmToken, deviceType] = req.body;
+            const { userId, fcmToken, deviceType } = req.body;
             await this.firebaseUseCase.updateMessingToken(userId, fcmToken, deviceType);
             res.status(200).json({ status: 200, result: true });
         } catch (error) {
@@ -26,7 +26,7 @@ export class FirebaseController {
     }
     async revmoeMessingToken(req: Request, res: Response) {
         try {
-            const [userId, fcmToken] = req.body;
+            const { userId, fcmToken } = req.body;
             await this.firebaseUseCase.revmoeMessingToken(userId, fcmToken);
             res.status(200).json({ status: 200, result: true });
         } catch (error) {

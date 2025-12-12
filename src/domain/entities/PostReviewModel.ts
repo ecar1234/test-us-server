@@ -5,7 +5,7 @@ export class PostReviewModel {
     public reviewType: string;
     public createdAt: Date | null;
     public reviewerUserId: string;
-    public postId: string;
+    public postId?: string;
 
     constructor(props:{
         reviewId: string | null,
@@ -13,7 +13,7 @@ export class PostReviewModel {
         comment: string | null,
         reviewType: string,
         reviewerUserId: string,
-        postId: string,
+        postId?: string,
         createdAt?: Date
     }) {
         this.reviewId = props.reviewId;

@@ -204,7 +204,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         }
         postEntity.views += 1;
         await this.postRepository.save(postEntity); // 조회수 업데이트만 수행
-        console.log(postEntity);
+        // console.log(postEntity);
         const domainPost = this.toDomainPost(postEntity); // save의 반환값이 아닌, relations가 포함된 원래 객체를 사용
 
         return domainPost;
@@ -239,7 +239,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         const postEntities = await this.postRepository.find({
             where: { author: { userId }, status: Not(BasePostStateType.DELETE) },
-            relations: ['author', 'applications', 'applications.applicant', 'receivedReviews', 'receivedReviews.reviewer'],
+            relations: ['author', 'applications', 'applications.applicant', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post'],
         });
 
         const domainPosts = postEntities.map(postEntity => this.toDomainPost(postEntity));

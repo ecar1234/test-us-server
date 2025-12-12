@@ -8,6 +8,9 @@ import fs from "fs";
 import path from "path";
 import { URL } from "url";
 import { Env } from "../config/env";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
+import { FCMPayload } from "../interface/interfaces/types";
+import { sendNotificationToMultiUser } from "../service/firebase/FcmService";
 
 interface UploadedImageInfo {
     filename: string;
@@ -27,6 +30,7 @@ export class PostUseCase {
         private postRepo: PostRepositoryImpl,
         private recruitRepo: RecruitmentPostRepositoryImpl,
         private promotionRepo: PromotionPostRepositoryImpl,
+        private fireRepository: FirebaseRepositoryImpl
     ) { }
 
     async getInitPosts(): Promise<[ (RecruitmentPostModel | PromotionPostModel | PromotionPostModel)[], RecruitmentPostModel[], PromotionPostModel[] ]> {
@@ -88,6 +92,21 @@ export class PostUseCase {
         const post = await this.recruitRepo.findPostAndStatus(id, 'end');
         if (!post) {
             throw new Error("Post not found");
+        }
+
+        const message: FCMPayload = {
+            tokens: await this.fireRepository.getMessingTokens(post.applications.map(app => app.user.id)),
+            notification: {
+                title: '테스트 종료',
+                body:'테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.'
+            },
+            data: {
+                postId: post.id,
+            }
+        }
+        const result = await sendNotificationToMultiUser(message);
+        if(result.length > 0){
+            await this.fireRepository.revmoeMessingTokens(result);
         }
         
         return this.recruitRepo.updatePost(post);

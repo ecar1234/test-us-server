@@ -5,10 +5,11 @@ import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/App
 import { ApplicationController } from "../controllers/ApplicationController";
 import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
 
 const router = Router();
 
-const applicationUseCase = new AppUseCase(new ApplicationRepositoryImpl(), new RecruitmentPostRepositoryImpl());
+const applicationUseCase = new AppUseCase(new ApplicationRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new FirebaseRepositoryImpl());
 const applicationController = new ApplicationController(applicationUseCase);
 
 // router.get("/findByPostId/:postId", applicationController.findApplicationsByPostId.bind(applicationController)); post에서 appilcations 가져오기

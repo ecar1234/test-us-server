@@ -18,7 +18,7 @@ import FirebaseRoute from './interface/routes/FirebaseRoute';
 import { Env } from './config/env';
 import PostRoute from './interface/routes/PostRoute';
 import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
-import './service/firebase/Firebase'; // Firebase Admin SDK 초기화
+// import './service/firebase/Firebase'; 
 
 const app = express();
 const port = parseInt(process.env.SERVER_PORT);

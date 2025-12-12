@@ -55,11 +55,11 @@ export class PostController {
             })
             );
             if (!author) {
-                console.log(author);
+                // console.log(author);
                 res.status(400).json({ status: 400, message: 'Author information is missing.' });
                 return;
             }
-            console.log("post controller", images);
+            // console.log("post controller", images);
 
             const newPost = await this.postUseCase.createRecruitPost(author, title, subtitle, platform, contents, images);
             res.status(200).json({ status: 200, post: newPost });
@@ -96,7 +96,7 @@ export class PostController {
         try {
             const { id } = req.body;
             const updatedPost = await this.postUseCase.endRecruitPost(id);
-            console.log("updatedPost : ", updatedPost);
+            // console.log("updatedPost : ", updatedPost);
             res.status(200).json({status: 200, post: updatedPost});
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });

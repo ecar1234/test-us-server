@@ -3,6 +3,7 @@ import { redisClient } from "../config/RedisConfig";
 import { AppUseCase } from "../app/AppUseCase";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 
 const applicationWorker = new Worker(
     'getApplicationsByIdQueue',
@@ -10,7 +11,8 @@ const applicationWorker = new Worker(
         const { userId } = job.data;
         const appRepository = new ApplicationRepositoryImpl();
         const postRepository = new RecruitmentPostRepositoryImpl();
-        const useCase = new AppUseCase(appRepository, postRepository);
+        const firebaseRepository = new FirebaseRepositoryImpl();
+        const useCase = new AppUseCase(appRepository, postRepository, firebaseRepository);
         const applications = await useCase.findApplicationsByUserId(userId);
         if (!applications) {
             return { 'state': 'failed', 'applications': [] };
