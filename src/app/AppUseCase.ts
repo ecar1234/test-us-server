@@ -5,7 +5,7 @@ import { ApplicationRepositoryImpl } from "../infrastructure/repositories/Applic
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { redisClient } from "../config/RedisConfig";
 import { sendNotificationToUser } from "../service/firebase/FcmService";
-import { FCMPayload } from "../interface/interfaces/types";
+import { APNs, FCMPayload } from "../interface/interfaces/types";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 
 export class AppUseCase {
@@ -22,7 +22,7 @@ export class AppUseCase {
         const post = await this.postRepository.getPostById(appResult.postId);
         const token = await this.fireRepository.getMessingToken(userId);
         const message: FCMPayload = {
-            token: token,
+            token: token.token,
             notification: {
                 title: '테스터 신청',
                 body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
@@ -32,6 +32,23 @@ export class AppUseCase {
                 userId: userId
             },
         };
+        if (token.deviceType === 'ios') {
+            const apns: APNs = {
+                headers: {
+                    'apns-priority': '10'
+                },
+                payload: {
+                    aps: {
+                        alert: {
+                            title: 'TESTUS',
+                            body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                        },
+                        sound: 'default'
+                    }
+                }
+            };
+            message['apns'] = apns;
+        }
         await sendNotificationToUser(message);
         if (post != null) {
             result[0] = appResult;
@@ -53,8 +70,9 @@ export class AppUseCase {
         if (appResult.status === 'pending') {
             const post = await this.postRepository.getPostById(appResult.postId);
             const token = await this.fireRepository.getMessingToken(post.author['userId']);
+
             const message: FCMPayload = {
-                token: token,
+                token: token.token,
                 notification: {
                     title: 'TESTUS',
                     body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
@@ -64,6 +82,23 @@ export class AppUseCase {
                     userId: userId
                 },
             };
+            if (token.deviceType === 'ios') {
+                const apns: APNs = {
+                    headers: {
+                        'apns-priority': '10'
+                    },
+                    payload: {
+                        aps: {
+                            alert: {
+                                title: 'TESTUS',
+                                body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                            },
+                            sound: 'default'
+                        }
+                    }
+                };
+                message['apns'] = apns;
+            }
             await sendNotificationToUser(message);
         }
         const post = await this.postRepository.getPostById(appResult.postId);
@@ -105,9 +140,10 @@ export class AppUseCase {
         if (post == null) {
             throw new Error("post not found");
         }
+        const token = await this.fireRepository.getMessingToken(application.applicantId);
 
         const message: FCMPayload = {
-            token: await this.fireRepository.getMessingToken(application.applicantId),
+            token: token.token,
             notification: {
                 title: 'TESTS',
                 body: `${post.title}의 테스터 신청이 수락 됐습니다. 함께 성장하는 테스트가 됐으면 좋겠네요.`
@@ -117,6 +153,24 @@ export class AppUseCase {
                 userId: userId
             }
         }
+        if (token.deviceType === 'ios') {
+            const apns: APNs = {
+                headers: {
+                    'apns-priority': '10'
+                },
+                payload: {
+                    aps: {
+                        alert: {
+                            title: 'TESTUS',
+                            body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                        },
+                        sound: 'default'
+                    }
+                }
+            };
+            message['apns'] = apns;
+        }
+
         await sendNotificationToUser(message);
 
         // 캐시 무효화: 게시물 작성자의 게시물 목록 캐시를 삭제합니다.
@@ -137,8 +191,11 @@ export class AppUseCase {
         if (post == null) {
             throw new Error("post not found");
         }
+
+        const token = await this.fireRepository.getMessingToken(application.applicantId);
+
         const message: FCMPayload = {
-            token: await this.fireRepository.getMessingToken(application.applicantId),
+            token: token.token,
             notification: {
                 title: 'TESTUS',
                 body: `아쉽게도 ${post.title}의 테스터 신청이 거절 됐습니다. 다른 프로덕트에 다시 신청해 보세요.`
@@ -147,6 +204,23 @@ export class AppUseCase {
                 postId: post.id,
                 userId: userId
             }
+        }
+        if (token.deviceType === 'ios') {
+            const apns: APNs = {
+                headers: {
+                    'apns-priority': '10'
+                },
+                payload: {
+                    aps: {
+                        alert: {
+                            title: 'TESTUS',
+                            body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                        },
+                        sound: 'default'
+                    }
+                }
+            };
+            message['apns'] = apns;
         }
         await sendNotificationToUser(message);
 

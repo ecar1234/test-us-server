@@ -2,3 +2,6 @@ node_modules
 package-locl.json
 .env
 testus-app-firebase-adminsdk-fbsvc-8e5bb1f2c7.json
+dist/
+logs/
+ecosystem.config.js

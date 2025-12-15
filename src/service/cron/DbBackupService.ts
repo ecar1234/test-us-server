@@ -28,7 +28,7 @@ export class DbBackupService {
 
         // mysqldump 명령어 구성
         // 주의: 보안을 위해 비밀번호가 노출되지 않도록 환경변수를 꼭 사용하세요.
-        const command = `mysqldump -h ${DB_HOST} -u ${DB_USER} -p ${DB_PASS} ${DB_NAME} > ${filePath}`;
+        const command = `mysqldump -u "${DB_USER}" -p${DB_PASS} ${DB_NAME} > ${filePath}`;
 
         console.log(`[Backup] Starting backup: ${fileName}...`);
 

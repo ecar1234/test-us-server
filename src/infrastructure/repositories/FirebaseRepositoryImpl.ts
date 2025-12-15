@@ -14,10 +14,11 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
                 token: fcmToken
             }
         });
-        if (findToken) {
-            throw new Error('Token already exists');
-        }
+        
         const newToken = this.tokenRepo.create();
+        if (findToken) {
+            newToken.id = findToken.id;
+        }
         newToken.token = fcmToken;
         newToken.deviceType = deviceType;
         await this.tokenRepo.save({ ...newToken, user: { userId: userId } });
@@ -56,7 +57,7 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
         }
         return;
     }
-    async getMessingToken(userId: string): Promise<string> {
+    async getMessingToken(userId: string): Promise<FirebaseDeviceTokenEntity> {
         const findToken = await this.tokenRepo.findOne({
             where: {
                 user: { userId }
@@ -65,7 +66,7 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
         if (!findToken) {
             throw new Error('Token not found');
         }
-        return findToken.token;
+        return findToken;
     }
 
     async getMessingTokens(ids: string[]): Promise<string[]> {
