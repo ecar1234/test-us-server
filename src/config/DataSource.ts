@@ -1,26 +1,48 @@
 import { DataSource } from "typeorm";
-import { Env } from "./env";
 import * as mysql2 from "mysql2";
 import * as path from "path";
 
-const env = Env;
+const isProd = process.env.NODE_ENV === "prod";
 
-// console.log('--- Diagnostics from DataSource.ts ---');
-// console.log('Env object being used:', env);
-
-export const AppDataSource = new DataSource({
+const createMainDataSource = () =>
+  new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
-    username: env.DATA_BASE_USER_NAME,
-    password: env.DATA_BASE_PASSWORD,
-    database: env.DATA_BASE_NAME,
-    synchronize: false, // dev용, 배포시 false
+    username: process.env.MAIN_DATA_BASE_USER_NAME,
+    password: process.env.MAIN_DATA_BASE_PASSWORD,
+    database: process.env.MAIN_DATA_BASE_NAME,
+    synchronize: false,
     logging: true,
     driver: mysql2,
-    // authPlugins: {
-    //     mysql_native_password: () => require('mysql2/lib/auth_plugins/mysql_native_password')({}),
-    // },
-    entities: [path.join(__dirname, "..", "infrastructure/entities/*.{js,ts}")],
-    migrations: [path.join(__dirname, "..", "migration/*.{js,ts}")],
-});
+    entities: [
+      path.join(__dirname, "..", "infrastructure/entities/*.js"),
+    ],
+    migrations: [
+      path.join(__dirname, "..", "migration/main/*.js"),
+    ],
+  });
+
+const createDevDataSource = () =>
+  new DataSource({
+    type: "mysql",
+    host: "localhost",
+    port: 3306,
+    username: process.env.DATA_BASE_USER_NAME,
+    password: process.env.DATA_BASE_PASSWORD,
+    database: process.env.DATA_BASE_NAME,
+    synchronize: false,
+    logging: true,
+    driver: mysql2,
+    entities: [
+      path.join(__dirname, "..", "infrastructure/entities/*.ts"),
+    ],
+    migrations: [
+      path.join(__dirname, "..", "migration/dev/*.ts"),
+    ],
+  });
+
+
+export const AppDataSource: DataSource = isProd
+  ? createMainDataSource()
+  : createDevDataSource();

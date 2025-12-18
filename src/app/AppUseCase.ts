@@ -21,14 +21,16 @@ export class AppUseCase {
         }
         const post = await this.postRepository.getPostById(appResult.postId);
         const token = await this.fireRepository.getMessingToken(userId);
-        const message: FCMPayload = {
+        if(token){
+            const message: FCMPayload = {
             token: token.token,
             notification: {
                 title: '테스터 신청',
-                body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                body: `${post.title} 프로덕트에 테스터 신청이 등록 됐습니다.\n테스터 신청을 확인해 주세요.`
             },
             data: {
-                postId: post.id,
+                type:'recruit',
+                postTitle: post.title,
                 userId: userId
             },
         };
@@ -41,15 +43,18 @@ export class AppUseCase {
                     aps: {
                         alert: {
                             title: 'TESTUS',
-                            body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                            body: `${post.title} 프로덕트에 테스터 신청이 등록 됐습니다.\n테스터 신청을 확인해 주세요.`
                         },
-                        sound: 'default'
+                        sound: 'default',
+                       
                     }
                 }
             };
             message['apns'] = apns;
         }
         await sendNotificationToUser(message);
+        }
+        
         if (post != null) {
             result[0] = appResult;
             result[1] = post;
@@ -70,15 +75,16 @@ export class AppUseCase {
         if (appResult.status === 'pending') {
             const post = await this.postRepository.getPostById(appResult.postId);
             const token = await this.fireRepository.getMessingToken(post.author['userId']);
-
-            const message: FCMPayload = {
+            if(token){
+                 const message: FCMPayload = {
                 token: token.token,
                 notification: {
                     title: 'TESTUS',
-                    body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                    body: `${post.title} 프로덕트에 테스터 신청이 등록 됐습니다.\n테스터 신청을 확인해 주세요.`
                 },
                 data: {
-                    postId: post.id,
+                    type:'recruit',
+                    postTitle: post.title,
                     userId: userId
                 },
             };
@@ -91,7 +97,7 @@ export class AppUseCase {
                         aps: {
                             alert: {
                                 title: 'TESTUS',
-                                body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                                body: `${post.title} 프로덕트에 테스터 신청이 등록 됐습니다.\n테스터 신청을 확인해 주세요.`
                             },
                             sound: 'default'
                         }
@@ -100,6 +106,8 @@ export class AppUseCase {
                 message['apns'] = apns;
             }
             await sendNotificationToUser(message);
+            }
+           
         }
         const post = await this.postRepository.getPostById(appResult.postId);
         if (post != null) {
@@ -146,10 +154,11 @@ export class AppUseCase {
             token: token.token,
             notification: {
                 title: 'TESTS',
-                body: `${post.title}의 테스터 신청이 수락 됐습니다. 함께 성장하는 테스트가 됐으면 좋겠네요.`
+                body: `${post.title}의 테스터 신청이 수락 됐습니다.\n함께 성장하는 테스트가 됐으면 좋겠네요.`
             },
             data: {
-                postId: post.id,
+                type:'application',
+                postTitle: post.title,
                 userId: userId
             }
         }
@@ -162,7 +171,7 @@ export class AppUseCase {
                     aps: {
                         alert: {
                             title: 'TESTUS',
-                            body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                            body: `${post.title}의 테스터 신청이 수락 됐습니다.\n함께 성장하는 테스트가 됐으면 좋겠네요.`
                         },
                         sound: 'default'
                     }
@@ -198,10 +207,11 @@ export class AppUseCase {
             token: token.token,
             notification: {
                 title: 'TESTUS',
-                body: `아쉽게도 ${post.title}의 테스터 신청이 거절 됐습니다. 다른 프로덕트에 다시 신청해 보세요.`
+                body: `아쉽게도 ${post.title}의 테스터 신청이 거절 됐습니다.\n다른 프로덕트에 다시 신청해 보세요.`
             },
             data: {
-                postId: post.id,
+                type:'application',
+                postTitle: post.title,
                 userId: userId
             }
         }
@@ -214,7 +224,7 @@ export class AppUseCase {
                     aps: {
                         alert: {
                             title: 'TESTUS',
-                            body: '테스터 신청이 등록 됐습니다. 테스터 신청을 확인해 주세요.'
+                            body: `아쉽게도 ${post.title}의 테스터 신청이 거절 됐습니다.\n다른 프로덕트에 다시 신청해 보세요.`
                         },
                         sound: 'default'
                     }

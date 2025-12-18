@@ -5,7 +5,8 @@ export async function sendNotificationToUser(payload: FCMPayload): Promise<objec
     const message = {
         token: payload.token,
         notification: payload.notification,
-        data: payload.data
+        data: payload.data,
+        apns: payload.apns ? payload.apns : undefined
     };
     try {
         const res = await messaging.send(message);

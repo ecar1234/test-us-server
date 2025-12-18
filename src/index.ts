@@ -1,10 +1,10 @@
 import * as dotenv from 'dotenv';
-const dotenvResult = dotenv.config(); // dotenv.config()의 결과를 변수에 저장
+import path from 'path';
 
-// console.log('--- Diagnostics from index.ts ---');
-// console.log('Dotenv load result:', dotenvResult);
-// console.log('process.env.DATA_BASE_USER_NAME:', process.env.DATA_BASE_USER_NAME);
-// console.log('---------------------------------');
+const isProd = process.env.NODE_ENV === 'production';
+dotenv.config({
+  path: path.resolve(process.cwd(), isProd ? '.env.main' : '.env'),
+});
 
 import express, { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from './config/DataSource';
@@ -15,14 +15,12 @@ import ReviewRoute from './interface/routes/ReviewRoute';
 import MessageRoute from './interface/routes/MessageRoute';
 import JobStateRoute from './interface/routes/JobStateRoute';
 import FirebaseRoute from './interface/routes/FirebaseRoute';
-import { Env } from './config/env';
 import PostRoute from './interface/routes/PostRoute';
+import { Env } from './config/env';
 import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
-// import './service/firebase/Firebase'; 
 
 const app = express();
-const port = parseInt(process.env.SERVER_PORT);
-
+const port = Number(process.env.SERVER_PORT) || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -30,43 +28,39 @@ app.use('/posts', express.static(Env.UPLOAD_URL));
 app.use('/profile', express.static(Env.UPLOAD_USER_URL));
 app.use('/backup', express.static(Env.BACKUP_DB));
 
+// routes
+app.use('/api/v1/auth', AuthRoute);
+app.use('/api/v1/user', UserRoute);
+app.use('/api/v1/post', PostRoute);
+app.use('/api/v1/application', ApplicationRoute);
+app.use('/api/v1/review', ReviewRoute);
+app.use('/api/v1/message', MessageRoute);
+app.use('/api/v1/jobState', JobStateRoute);
+app.use('/api/v1/firebase', FirebaseRoute);
+
+// error handler
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err);
+  if (err.message.includes('already exists')) {
+    res.status(409).json({ status: 409, message: 'data is already exists' });
+    return;
+  }
+  res.status(500).json({ status: 500, message: 'An unexpected error occurred' });
+});
+
 AppDataSource.initialize()
-    .then(() => {
-        console.log("DB 연결 성공!!");
-        // Daliy Task
-        PostUpdateScheduledJob();
-        DbBackupScheduledJob();
+  .then(() => {
+    console.log('DB 연결 성공!!');
+    PostUpdateScheduledJob();
+    DbBackupScheduledJob();
 
-        // routes
-        app.listen(port, '0.0.0.0',() => {
-            console.log(`서버 실행 중: 0.0.0.0:${port}`);
-            
-            app.use('/api/v1/auth', AuthRoute);
-            app.use('/api/v1/user', UserRoute);
-            app.use('/api/v1/post', PostRoute);
-            app.use('/api/v1/application', ApplicationRoute);
-            app.use('/api/v1/review', ReviewRoute);
-            app.use('/api/v1/message', MessageRoute);
-            app.use('/api/v1/jobState', JobStateRoute);
-            app.use('/api/v1/firebase', FirebaseRoute);
-
-            // 중앙 에러 처리 미들웨어
-            app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-                console.error(err); // 서버 로그에 에러 기록
-                if(err.message.includes('already exists')){
-                    res.status(409).json({status: 409, message: 'data is already exists'});
-                    return;
-                }
-                res.status(500).json({
-                    status: 500,
-                    message: 'An unexpected error occurred'
-                });
-                return;
-            });
-        });
-    })
-    .catch((error) => console.error("DB 연결 실패:", error));
-
-
+    app.listen(port, '0.0.0.0', () => {
+      console.log(`서버 실행 중: 0.0.0.0:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('DB 연결 실패:', err);
+    process.exit(1);
+  });
 
 export default app;
