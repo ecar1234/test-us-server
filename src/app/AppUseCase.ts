@@ -20,7 +20,7 @@ export class AppUseCase {
             throw new Error("application create failed");
         }
         const post = await this.postRepository.getPostById(appResult.postId);
-        const token = await this.fireRepository.getMessingToken(userId);
+        const token = await this.fireRepository.getMessingToken(post.author['userId']);
         if(token){
             const message: FCMPayload = {
             token: token.token,

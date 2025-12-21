@@ -27,12 +27,15 @@ const firebaseRepo = new FirebaseRepositoryImpl();
 const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, firebaseRepo);
 const postController = new PostController(postUseCase);
 
-const UPLOAD_URL = Env.UPLOAD_URL;
-if(!fs.existsSync(UPLOAD_URL)) fs.mkdirSync(UPLOAD_URL, { recursive: true });
+const isProd = process.env.NODE_ENV === 'prod';
+const url = isProd ? path.resolve(Env.MAIN_UPLOAD_URL) : path.resolve(Env.UPLOAD_URL);
+
+// const UPLOAD_URL = Env.UPLOAD_URL;
+if(!fs.existsSync(url)) fs.mkdirSync(url, { recursive: true });
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, UPLOAD_URL);
+        cb(null, url);
     },
     filename: (req, file, cb) => {
        const ext = path.extname(file.originalname);

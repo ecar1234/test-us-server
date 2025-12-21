@@ -15,12 +15,14 @@ const route = Router();
 const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new UserReviewRepositoryImpl());
 const userController: UserController = new UserController(userUseCase);
 
-const UPLOAD_USER_URL = Env.UPLOAD_USER_URL;
-if(!fs.existsSync(UPLOAD_USER_URL)) fs.mkdirSync(UPLOAD_USER_URL, { recursive: true });
+const isProd = process.env.NODE_ENV === 'prod';
+const url = isProd ? path.resolve(process.env.MAIN_UPLOAD_USER_URL) : path.resolve(process.env.UPLOAD_USER_URL);
+
+if(!fs.existsSync(url)) fs.mkdirSync(url, { recursive: true });
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, UPLOAD_USER_URL);
+        cb(null, url);
     },
     filename: (req, file, cb) => {
         const ext = path.extname(file.originalname);

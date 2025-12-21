@@ -59,13 +59,15 @@ export class PostUseCase {
         if (!existingPost) {
             throw new Error("Post not found");
         }
+        const isProd = process.env.NODE_ENV === "prod";
+        const envPath = isProd ? process.env.MAIN_UPLOAD_URL : process.env.UPLOAD_URL;
 
         // 2. 이미지 파일 삭제 처리
         if (deleteImages && deleteImages.length > 0) {
                 const deletePromises = deleteImages.map(async (image) => {
                     try {
                         const filename = path.basename(new URL(image.url).pathname);
-                        const imagePath = path.join(Env.UPLOAD_URL, filename);
+                        const imagePath = path.join(envPath, filename);
                         await fs.promises.unlink(imagePath);
                     } catch (error) {
                         if (error.code !== 'ENOENT') {
@@ -172,13 +174,14 @@ export class PostUseCase {
         if (!existingPost) {
             throw new Error("Post not found");
         }
-
+        const isProd = process.env.NODE_ENV === "prod";
+        const envPath = isProd ? process.env.MAIN_UPLOAD_URL : process.env.UPLOAD_URL;
         // 2. 이미지 파일 삭제 처리
         if (deleteImages && deleteImages.length > 0) {
             const deletePromises = deleteImages.map(async (image) => {
                 try {
                     const filename = path.basename(new URL(image.url).pathname);
-                    const imagePath = path.join(Env.UPLOAD_URL, filename);
+                    const imagePath = path.join(envPath, filename);
                     await fs.promises.unlink(imagePath);
                 } catch (error) {
                     if (error.code !== 'ENOENT') {

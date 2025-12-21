@@ -1,9 +1,12 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
 
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === 'prod';
+// dotenv.config({
+//   path: path.resolve(process.cwd(), isProd ? '.env.main' : '.env'),
+// });
 dotenv.config({
-  path: path.resolve(process.cwd(), isProd ? '.env.main' : '.env'),
+  path: path.resolve(process.cwd(), '.env'),
 });
 
 import express, { Request, Response, NextFunction } from 'express';
@@ -18,15 +21,21 @@ import FirebaseRoute from './interface/routes/FirebaseRoute';
 import PostRoute from './interface/routes/PostRoute';
 import { Env } from './config/env';
 import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
+import { randomUUID } from 'crypto';
 
 const app = express();
 const port = Number(process.env.SERVER_PORT) || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/posts', express.static(Env.UPLOAD_URL));
-app.use('/profile', express.static(Env.UPLOAD_USER_URL));
-app.use('/backup', express.static(Env.BACKUP_DB));
+
+// const uploadRoot = isProd
+//   ? path.resolve(Env.MAIN_UPLOAD_URL)
+//   : path.resolve(Env.UPLOAD_URL);
+
+app.use('/posts', express.static(isProd ? path.resolve(process.env.MAIN_UPLOAD_URL) : path.resolve(process.env.UPLOAD_URL)));
+app.use('/profile', express.static(isProd ? path.resolve(process.env.MAIN_UPLOAD_USER_URL) : path.resolve(process.env.UPLOAD_USER_URL)));
+app.use('/backup', express.static(isProd ? path.resolve(process.env.MAIN_BACKUP_DB) : path.resolve(process.env.BACKUP_DB)));
 
 // routes
 app.use('/api/v1/auth', AuthRoute);
@@ -38,19 +47,28 @@ app.use('/api/v1/message', MessageRoute);
 app.use('/api/v1/jobState', JobStateRoute);
 app.use('/api/v1/firebase', FirebaseRoute);
 
+
+//
+app.use((req, res, next) => {
+  req.id = randomUUID();
+  console.log(`[REQ:${req.id}] ${req.method} ${req.url}`)
+  next();
+
+});
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err);
+  console.error(`[REQ:${req.id}`,err);
   if (err.message.includes('already exists')) {
     res.status(409).json({ status: 409, message: 'data is already exists' });
     return;
   }
-  res.status(500).json({ status: 500, message: 'An unexpected error occurred' });
+  res.status(500).json({ status: 500, reqId: req.id, message: 'An unexpected error occurred' });
 });
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('DB 연결 성공!!');
+    console.log(`[BOOT] DB 연결 성공 - ${new Date().toISOString()}`);
+    console.log(`Current Environment: ${process.env.NODE_ENV}`);
     PostUpdateScheduledJob();
     DbBackupScheduledJob();
 

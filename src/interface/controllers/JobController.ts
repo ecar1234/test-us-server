@@ -50,7 +50,8 @@ export class JobController {
                 return;
             }
             if (await job.isCompleted()) {
-                console.log(await job.getState());
+                console.log(job.id, await job.getState());
+                // console.log(job.id, await job.returnvalue);
 
                 const result = await job.returnvalue;
                 if (result && result['state'] === 'success') {
