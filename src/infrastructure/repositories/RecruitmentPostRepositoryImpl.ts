@@ -5,7 +5,7 @@ import { IRecruitmentPostRepository } from "../../domain/interface_repositories/
 import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
-import { BasePostStateType, BasePostEntity } from "../entities/BasePostEntity";
+import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
 
 
@@ -18,24 +18,159 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         this.applicationRepository = new ApplicationRepositoryImpl();
         this.reviewRepository = new PostReviewRepositoryImpl();
     }
-    
+    private transferCategoryToString(category: PostCategory): string {
+        switch (category) {
+            case PostCategory.GAME:
+                return 'game';
+            case PostCategory.TRAVEL:
+                return 'travel';
+            case PostCategory.DEVELOPER_TOOL:
+                return 'developerTool';
+            case PostCategory.HEALTH:
+                return 'health';
+            case PostCategory.EDUCATION:
+                return 'education';
+            case PostCategory.FINANCE:
+                return 'finance';
+            case PostCategory.WEATHER:
+                return 'weather';
+            case PostCategory.NEWS:
+                return 'news';
+            case PostCategory.BOOKS:
+                return 'books';
+            case PostCategory.LIFE:
+                return 'life';
+            case PostCategory.BUSINESS:
+                return 'business';
+            case PostCategory.PHOTOGRAPHY:
+                return 'photography';
+            case PostCategory.SOCIAL:
+                return 'social';
+            case PostCategory.SPORTS:
+                return 'sports';
+            case PostCategory.SHOPPING:
+                return 'shopping';
+            case PostCategory.FOOD:
+                return 'food';
+            case PostCategory.UTILITY:
+                return 'utility';
+            case PostCategory.MEDICAL:
+                return 'medical';
+            case PostCategory.MAGAZINE:
+                return 'magazine';
+            case PostCategory.MUSIC:
+                return 'music';
+            case PostCategory.ENTERTAINMENT:
+                return 'entertainment';
+            case PostCategory.ETC:
+                return 'etc';
+            default:
+                return 'etc';
+        }
+    }
+    private transferStringToCategory(category: string): PostCategory {
+        switch (category) {
+            case 'game':
+                return PostCategory.GAME;
+            case 'travel':
+                return PostCategory.TRAVEL;
+            case 'developerTool':
+                return PostCategory.DEVELOPER_TOOL;
+            case 'health':
+                return PostCategory.HEALTH;
+            case 'education':
+                return PostCategory.EDUCATION;
+            case 'finance':
+                return PostCategory.FINANCE;
+            case 'weather':
+                return PostCategory.WEATHER;
+            case 'news':
+                return PostCategory.NEWS;
+            case 'books':
+                return PostCategory.BOOKS;
+            case 'life':
+                return PostCategory.LIFE;
+            case 'business':
+                return PostCategory.BUSINESS;
+            case 'photography':
+                return PostCategory.PHOTOGRAPHY;
+            case 'social':
+                return PostCategory.SOCIAL;
+            case 'sports':
+                return PostCategory.SPORTS;
+            case 'shopping':
+                return PostCategory.SHOPPING;
+            case 'food':
+                return PostCategory.FOOD;
+            case 'utility':
+                return PostCategory.UTILITY;
+            case 'medical':
+                return PostCategory.MEDICAL;
+            case 'magazine':
+                return PostCategory.MAGAZINE;
+            case 'music':
+                return PostCategory.MUSIC;
+            case 'entertainment':
+                return PostCategory.ENTERTAINMENT;
+            case 'etc':
+                return PostCategory.ETC;
+            default:
+                return PostCategory.ETC;
+        }
+    }
+    private transferOsToString(os: MobileOsType[]): string[] {
+        let res = [];
+        if(os.length !== 0){
+            res = os.map(os => {
+                switch(os){
+                    case MobileOsType.ANDROID:
+                        res.push('android');
+                        break;
+                    case MobileOsType.IOS:
+                        res.push('ios');
+                        break;
+                }
+            });
+        }
+        return res;
+    }
+    private transferStringToOs(os: string[]): MobileOsType[] {
+        let res = [];
+        if(os.length !== 0){
+            res = os.map(os => {
+                switch(os){
+                    case 'android':
+                        res.push(MobileOsType.ANDROID);
+                        break;
+                    case 'ios':
+                        res.push(MobileOsType.IOS);
+                        break;
+                }
+            });
+        }
+        return res;
+    }
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
-        const authorInfo = postEntity.author 
+        const authorInfo = postEntity.author
             ? {
                 userId: postEntity.author.userId,
                 nickname: postEntity.author.nickname,
                 profileImg: postEntity.author.image
-              }
+            }
             : null;
         const status = postEntity.status === BasePostStateType.ACTIVE ?
             'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
+        const category = this.transferCategoryToString(postEntity.category);
+        const mobbileOs = this.transferOsToString(postEntity.mobileOs);
         return new RecruitmentPostModel(
             postEntity.postId,
             authorInfo,
             postEntity.title,
             postEntity.subtitle,
             postEntity.platform,
+            mobbileOs,
+            category,
             postEntity.contents,
             status,
             postEntity.period,
@@ -45,7 +180,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
             postEntity.createdAt,
             postEntity.updatedAt,
-            postEntity.applications ? postEntity.applications.map(app => this.applicationRepository.toDomainApplication(app)) : []
+            postEntity.applications ? postEntity.applications.map(app => app.appId) : []
         );
     }
     private toEntityPost(post: RecruitmentPostModel): RecruitmentPostEntity {
@@ -70,6 +205,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             title: post.title,
             subtitle: post.subtitle,
             platform: post.platform,
+            mobileOs: this.transferStringToOs(post.mobileOs),
+            category: this.transferStringToCategory(post.category),
             contents: post.contents,
             images: post.images as BasePostEntity['images'],
             status: postStatus,
@@ -130,7 +267,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
         const updatedPost = await this.postRepository.save(postEntity);
         const domainPost = this.toDomainPost(updatedPost);
-        
+
         const keys = await redisClient.keys('recruitPosts:page:*');
         if (keys.length > 0) {
             await redisClient.del(keys);
@@ -173,7 +310,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             } catch (error) {
                 // JSON 파싱 실패 시, 캐시를 삭제하여 다음 요청 시 DB에서 새로 가져오도록 합니다.
                 console.error('Failed to parse cached posts, deleting cache key:', cacheKey, error);
-                await redisClient.del(cacheKey);   
+                await redisClient.del(cacheKey);
             }
         }
 

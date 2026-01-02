@@ -8,6 +8,7 @@ import {
     TableInheritance,
     Entity,
     OneToMany,
+    AfterLoad,
 } from "typeorm";
 import { UserEntity } from "./UserEntity";
 import { PostReviewEntity } from "./PostReviewEntity";
@@ -19,6 +20,34 @@ export enum BasePostStateType {
     EXPIRED = 'expired',
     END = 'end',
     DELETE = 'delete'
+}
+export enum MobileOsType{
+    ANDROID = 'android',
+    IOS = 'ios',
+}
+export enum PostCategory {
+    GAME = 'game',
+    TRAVEL = 'travel',
+    DEVELOPER_TOOL = 'developerTool',
+    HEALTH = 'health',
+    EDUCATION = 'education',
+    FINANCE = 'finance',
+    WEATHER = 'weather',
+    NEWS = 'news',
+    BOOKS = 'books',
+    LIFE = 'life',
+    BUSINESS = 'business',
+    PHOTOGRAPHY = 'photography',
+    SOCIAL = 'social',
+    SPORTS = 'sports',
+    SHOPPING = 'shopping',
+    FOOD = 'food',
+    UTILITY = 'utility',
+    MEDICAL = 'medical',
+    MAGAZINE = 'magazine',
+    MUSIC = 'music',
+    ENTERTAINMENT = 'entertainment',
+    ETC = 'etc'
 }
 
 @Entity('base_post_entity')
@@ -40,8 +69,14 @@ export abstract class BasePostEntity {
     @Column("varchar", { length: 100 })
     subtitle: string;
 
-    @Column({ type: 'simple-array', nullable: false })
-    platform: string[];
+    @Column({ type: 'varchar', length: 10, nullable: false, default: 'mobile'})
+    platform: string;
+
+    @Column({type: 'simple-array', nullable: true})
+    mobileOs: MobileOsType[];
+
+    @Column({type: 'enum', enum: PostCategory, default: 'etc'})
+    category: PostCategory;
 
     @Column('text')
     contents: string;
@@ -66,4 +101,14 @@ export abstract class BasePostEntity {
 
     @OneToMany(() => PostReviewEntity, review => review.post)
     receivedReviews: PostReviewEntity[]
+
+    @AfterLoad()
+    setDefaults() {
+        if (!this.mobileOs) {
+            this.mobileOs = [];
+        }
+        if (!this.images) {
+            this.images = [];
+        }
+    }
 }

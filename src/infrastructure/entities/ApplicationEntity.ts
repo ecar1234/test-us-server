@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, One
 import { RecruitmentPostEntity } from "./RecruitmentPostEntity";
 import { UserEntity } from "./UserEntity";
 import { UserReviewEntity } from "./UserReviewEntiry";
+import { MobileOsType } from "./BasePostEntity";
 
 // 신청 상태를 정의하는 Enum
 export enum ApplicationStatus {
@@ -12,8 +13,7 @@ export enum ApplicationStatus {
 }
 export enum ApplicationsPlatform {
     WEB = 'web',
-    IOS = 'ios',
-    ANDROID = 'android',
+    MOBILE = 'mobile'
 }
 
 @Entity('applications')
@@ -24,6 +24,9 @@ export class ApplicationEntity {
 
     @Column({type: 'enum', enum: ApplicationsPlatform, default: ApplicationsPlatform.WEB})
     platform: ApplicationsPlatform
+
+    @Column({type: 'enum', enum: MobileOsType, nullable: true})
+    mobileOs: MobileOsType
 
     @Column({
         type: 'enum',

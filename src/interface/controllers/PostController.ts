@@ -42,7 +42,7 @@ export class PostController {
     // CHECK: Recruit post
     async createRecruitPost(req: Request, res: Response): Promise<void> {
         try {
-            const { author, title, subtitle, platform, contents } = JSON.parse(req.body.post);
+            const { author, title, subtitle, platform, mobileOs, category, contents } = JSON.parse(req.body.post);
 
             const files = req.files as Express.Multer.File[];
             const images = files.map((file: Express.Multer.File) =>
@@ -61,7 +61,7 @@ export class PostController {
             }
             // console.log("post controller", images);
 
-            const newPost = await this.postUseCase.createRecruitPost(author, title, subtitle, platform, contents, images);
+            const newPost = await this.postUseCase.createRecruitPost(author, title, subtitle, platform, mobileOs, category, contents, images);
             res.status(200).json({ status: 200, post: newPost });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -70,7 +70,7 @@ export class PostController {
 
     async updateRecruitPost(req: Request, res: Response): Promise<void> {
         try {
-            const { author, id, title, subtitle, platform, contents, status } = JSON.parse(req.body.post);;
+            const { author, id, title, subtitle, platform, mobileOs, category, contents, status } = JSON.parse(req.body.post);;
             const deleteImages = req.body.deleteImages ? JSON.parse(req.body.deleteImages) : []; // deleteImages가 없으면 빈 배열로 초기화
 
             const newImageFiles = (req.files as Express.Multer.File[] || []).map(file => ({
@@ -81,7 +81,7 @@ export class PostController {
                 url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             }));
 
-            const updatedPost = await this.postUseCase.updateRecruitPost(id, author, title, subtitle, platform, contents, status, deleteImages, newImageFiles);
+            const updatedPost = await this.postUseCase.updateRecruitPost(id, author, title, subtitle, platform, mobileOs, category, contents, status, deleteImages, newImageFiles);
             if (updatedPost) {
                 res.status(200).json({ status: 200, post: updatedPost, message: "Post updated successfully" });
             } else {
@@ -198,7 +198,7 @@ export class PostController {
     // CHECK: Promotion post
     async createPromotionPost(req: Request, res: Response): Promise<void> {
         try {
-            const { title, subtitle, platform, contents, author, domain } = JSON.parse(req.body.post);
+            const { title, subtitle, platform, mobileOs, category, contents, author, domain } = JSON.parse(req.body.post);
 
             const files = req.files as Express.Multer.File[];
             const images = files.map((file: Express.Multer.File) =>
@@ -210,7 +210,7 @@ export class PostController {
                 url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             })
             );
-            const post = await this.postUseCase.createPromotionPost(author, title, subtitle, platform, contents, images, domain);
+            const post = await this.postUseCase.createPromotionPost(author, title, subtitle, platform, mobileOs, category, contents, images, domain);
             res.status(200).json({ status: 200, post: post });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -220,7 +220,7 @@ export class PostController {
     async updatePromotionPost(req: Request, res: Response): Promise<void> {
         try {
             // 업데이트 시에도 클라이언트가 'post' 필드에 모든 데이터를 JSON 문자열로 보내므로, req.body.post를 파싱합니다.
-            const { author, id, title, subtitle, platform, contents, domain, status } = JSON.parse(req.body.post);
+            const { author, id, title, subtitle, platform, mobileOs, category, contents, domain, status } = JSON.parse(req.body.post);
             const deleteImages = req.body.deleteImages ? JSON.parse(req.body.deleteImages) : [];
 
             const newImageFiles = (req.files as Express.Multer.File[] || []).map(file => ({
@@ -231,7 +231,7 @@ export class PostController {
                 url: `${req.protocol}://${req.get('host')}/posts/${file.filename}`,
             }));
 
-            const updatedPost = await this.postUseCase.updatePromotionPost(id, author, title, subtitle, platform, contents, domain, status, deleteImages, newImageFiles);
+            const updatedPost = await this.postUseCase.updatePromotionPost(id, author, title, subtitle, platform, mobileOs, category, contents, domain, status, deleteImages, newImageFiles);
             res.status(200).json({ status: 200, post: updatedPost });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });

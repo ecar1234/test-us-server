@@ -2,13 +2,14 @@ import { AppDataSource } from "../../config/DataSource";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import { UserModel } from "../../domain/entities/UserModel";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
+import { ApplicationStatus } from "../entities/ApplicationEntity";
 import { UserEntity, UserMethod, UserRole, UserStatus, UserType } from "../entities/UserEntity";
-import { In } from "typeorm";
+import { In, Not } from "typeorm";
 
 
 export class UserRepositoryImpl implements IUserRepository {
     private userRepository = AppDataSource.getRepository(UserEntity);
-    
+
     private toDomainUser(userEntity: UserEntity): UserModel {
         // console.log(userEntity);
         return new UserModel(
@@ -16,7 +17,7 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.email,
             userEntity.nickname,
             userEntity.password_hash,
-            userEntity.type === UserType.INDIVIDUALS ? 'INDIVIDUALS' : 'COMPANIES',
+            userEntity.type === UserType.INDIVIDUALS ? 'INDIVIDUALS' : (userEntity.type === UserType.COMPANIES ? 'COMPANIES' : 'NORMAL'),
             userEntity.status === UserStatus.ACTIVE ? 'ACTIVE' : 'INACTIVE',
             this.getUserRoleString(userEntity.role),
             userEntity.userName,
@@ -40,7 +41,7 @@ export class UserRepositoryImpl implements IUserRepository {
             email: user.email,
             password_hash: user.password,
             nickname: user.nickname,
-            type: user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS : UserType.COMPANIES,
+            type: user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS :(user.userType === 'COMPANIES' ? UserType.COMPANIES : UserType.NORMAL),
             status: user.status === 'ACTIVE' ? UserStatus.ACTIVE : UserStatus.INACTIVE,
             role: this.getUserRole(user.role),
             userName: user.userName,
@@ -48,7 +49,7 @@ export class UserRepositoryImpl implements IUserRepository {
             ...(user.posts && { posts: user.posts.map(post => ({ postId: post })) }),
             ...(user.applications && { applications: user.applications.map(application => ({ appId: application.id })) }),
             ...(user.profileImg && { image: user.profileImg as { url: string; filename: string; originalname: string; mimetype: string; size: number } }),
-            method: user.method === 'EMAIL' ? UserMethod.EMAIL : (  user.method === 'GOOGLE' ? UserMethod.GOOGLE : UserMethod.NAVER),
+            method: user.method === 'EMAIL' ? UserMethod.EMAIL : (user.method === 'GOOGLE' ? UserMethod.GOOGLE : UserMethod.NAVER),
             // ...(user.sentMessages && { sentMessages: user.sentMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.receiveMessages && { receiveMessages: user.receiveMessages.map(message => ({ messageId: message.id })) }),
             // ...(user.givenReviews && { givenReviews: user.givenReviews.map(review => ({ reviewId: review.id })) }),
@@ -80,6 +81,9 @@ export class UserRepositoryImpl implements IUserRepository {
                 return UserRole.QA;
             case 'CS':
                 return UserRole.CS;
+            case 'USER':
+                return UserRole.USER;
+
             default:
                 throw new Error('Invalid role');
         }
@@ -108,6 +112,9 @@ export class UserRepositoryImpl implements IUserRepository {
                 return 'QA';
             case UserRole.CS:
                 return 'CS';
+            case UserRole.USER:
+                return 'USER';
+
             default:
                 throw new Error('Invalid role');
         }
@@ -131,7 +138,7 @@ export class UserRepositoryImpl implements IUserRepository {
         return true;
     }
     async updateUserInfo(user: UserModel): Promise<UserModel> {
-        const newUserEntity  = this.toEntityUser(user);
+        const newUserEntity = this.toEntityUser(user);
 
         const findUser = await this.userRepository.findOne({ where: { userId: newUserEntity.userId } });
         if (!findUser) {
@@ -141,10 +148,10 @@ export class UserRepositoryImpl implements IUserRepository {
         // DB에서 조회한 엔티티의 속성을 직접 수정합니다.
         findUser.nickname = newUserEntity.nickname;
         findUser.type = newUserEntity.type,
-        findUser.role = newUserEntity.role;
+            findUser.role = newUserEntity.role;
         findUser.userName = newUserEntity.userName;
         findUser.birth = newUserEntity.birth;
-        if(newUserEntity.image){
+        if (newUserEntity.image) {
             findUser.image = newUserEntity.image;
         }
 

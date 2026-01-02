@@ -9,10 +9,10 @@ export class ApplicationController {
 
     async createApplication(req: Request, res: Response): Promise<void> {
         try {
-            const { applicantId, postId, platfrom } = req.body;
+            const { applicantId, postId, platfrom, mobileOs } = req.body;
 
-            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.createApplication(applicantId, postId, platfrom);
-            res.status(200).json({ status: 200, application: result[0], post: result[1] });
+            const result: ApplicationModel = await this.appUseCase.createApplication(applicantId, postId, platfrom, mobileOs);
+            res.status(200).json({ status: 200, application: result});
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
 
@@ -20,11 +20,11 @@ export class ApplicationController {
     }
     async updateApplication(req: Request, res: Response): Promise<void> {
         try {
-            const {id ,applicantId, postId, platform, status } = req.body;
+            const {id ,applicantId, postId, platform, mobileOs, status } = req.body;
 
-            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.updateApplication(id, postId, applicantId, platform, status);
+            const result: ApplicationModel = await this.appUseCase.updateApplication(id, postId, applicantId, platform, mobileOs, status);
             console.log(result);
-            res.status(200).json({ status: 200, application: result[0], post: result[1] });
+            res.status(200).json({ status: 200, application: result });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message })
         }
@@ -34,7 +34,7 @@ export class ApplicationController {
             const applicationId = req.body.applicationId;
             const result = await this.appUseCase.cancelApplication(applicationId);
             if (result) {
-                res.status(200).json({ status: 200, application: result[0], post: result[1] });
+                res.status(200).json({ status: 200, application: result });
             } else {
                 res.status(404).json({ status: 404, error: "Application not found" });
             }
@@ -47,7 +47,7 @@ export class ApplicationController {
             const { userId, postId } = req.body;
             const data = await this.appUseCase.acceptUser(userId, postId);
 
-            res.status(200).json({ status: 200, updatePost: data[1] });
+            res.status(200).json({ status: 200, application: data });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
@@ -56,7 +56,7 @@ export class ApplicationController {
         try {
             const { userId, postId } = req.body;
             const data = await this.appUseCase.rejectUser(userId, postId);
-            res.status(200).json({ status: 200, application: data[0], updatePost: data[1] });
+            res.status(200).json({ status: 200, application: data });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
@@ -76,5 +76,20 @@ export class ApplicationController {
         } catch (error) {
 
         }
+    }
+
+    async getRecruitApplications(req: Request, res: Response): Promise<void> {
+        try {
+            const { applicationIds } = req.body;
+            const applications = await this.appUseCase.getRecruitApplications(applicationIds);
+            if(applications.length === 0){
+                res.status(200).json({ status: 200, applications: [] });
+                return;
+            }
+            res.status(200).json({ status: 200, applications: applications });
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    
     }
 }

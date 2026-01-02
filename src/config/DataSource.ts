@@ -1,6 +1,9 @@
 import { DataSource } from "typeorm";
 import * as mysql2 from "mysql2";
 import * as path from "path";
+import * as dotenv from "dotenv";
+dotenv.config();
+
 
 const isProd = process.env.NODE_ENV === "prod";
 

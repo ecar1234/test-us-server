@@ -22,6 +22,8 @@ router.put("/update", authMiddleware, applicationController.updateApplication.bi
 router.put("/cancelAppUser", authMiddleware, applicationController.cancelApplication.bind(applicationController));
 router.put("/acceptUser", authMiddleware, applicationController.acceptUser.bind(applicationController));
 router.put("/rejectUser", authMiddleware, applicationController.rejectUser.bind(applicationController));
+
+router.post('/getRecruitApplications', authMiddleware, applicationController.getRecruitApplications.bind(applicationController));
 // router.post("/getAppPostList/:postId", applicationController.countApplicationsByPostId.bind(applicationController)); user에서 가져오기
 // router.post("/applications/status/:postId/:userId/:status", applicationController.findApplicationByPostAndUserAndStatus.bind(applicationController));
 // router.post("/applications/pagination/:postId", applicationController.findApplicationsWithPagination.bind(applicationController));

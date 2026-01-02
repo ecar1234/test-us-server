@@ -8,6 +8,7 @@ import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity";
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',
     COMPANIES = 'COMPANIES',
+    NORMAL = 'NORMAL'
 }
 export enum UserStatus {
     ACTIVE = 'ACTIVE',
@@ -26,7 +27,7 @@ export enum UserRole {
     PM='PM',
     QA='QA',
     CS='CS',
-    NORMAL='NORMAL',
+    USER='USER',
 }
 export enum UserMethod {
     GOOGLE='GOOGLE',

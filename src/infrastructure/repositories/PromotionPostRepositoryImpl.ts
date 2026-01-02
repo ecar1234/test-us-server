@@ -1,7 +1,7 @@
 import { AppDataSource } from "../../config/DataSource";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel";
 import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository";
-import { BasePostStateType, BasePostEntity } from "../entities/BasePostEntity";
+import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity";
 import { PromotionPostEntity } from "../entities/PromotionPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
@@ -15,7 +15,138 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
     constructor() {
         this.reviewRepository = new PostReviewRepositoryImpl();
     }
-    
+    private transferCategoryToString(category: PostCategory): string {
+        switch (category) {
+            case PostCategory.GAME:
+                return 'game';
+            case PostCategory.TRAVEL:
+                return 'travel';
+            case PostCategory.DEVELOPER_TOOL:
+                return 'developerTool';
+            case PostCategory.HEALTH:
+                return 'health';
+            case PostCategory.EDUCATION:
+                return 'education';
+            case PostCategory.FINANCE:
+                return 'finance';
+            case PostCategory.WEATHER:
+                return 'weather';
+            case PostCategory.NEWS:
+                return 'news';
+            case PostCategory.BOOKS:
+                return 'books';
+            case PostCategory.LIFE:
+                return 'life';
+            case PostCategory.BUSINESS:
+                return 'business';
+            case PostCategory.PHOTOGRAPHY:
+                return 'photography';
+            case PostCategory.SOCIAL:
+                return 'social';
+            case PostCategory.SPORTS:
+                return 'sports';
+            case PostCategory.SHOPPING:
+                return 'shopping';
+            case PostCategory.FOOD:
+                return 'food';
+            case PostCategory.UTILITY:
+                return 'utility';
+            case PostCategory.MEDICAL:
+                return 'medical';
+            case PostCategory.MAGAZINE:
+                return 'magazine';
+            case PostCategory.MUSIC:
+                return 'music';
+            case PostCategory.ENTERTAINMENT:
+                return 'entertainment';
+            case PostCategory.ETC:
+                return 'etc';
+            default:
+                return 'etc';
+        }
+    }
+    private transferStringToCategory(category: string): PostCategory {
+        switch (category) {
+            case 'game':
+                return PostCategory.GAME;
+            case 'travel':
+                return PostCategory.TRAVEL;
+            case 'developerTool':
+                return PostCategory.DEVELOPER_TOOL;
+            case 'health':
+                return PostCategory.HEALTH;
+            case 'education':
+                return PostCategory.EDUCATION;
+            case 'finance':
+                return PostCategory.FINANCE;
+            case 'weather':
+                return PostCategory.WEATHER;
+            case 'news':
+                return PostCategory.NEWS;
+            case 'books':
+                return PostCategory.BOOKS;
+            case 'life':
+                return PostCategory.LIFE;
+            case 'business':
+                return PostCategory.BUSINESS;
+            case 'photography':
+                return PostCategory.PHOTOGRAPHY;
+            case 'social':
+                return PostCategory.SOCIAL;
+            case 'sports':
+                return PostCategory.SPORTS;
+            case 'shopping':
+                return PostCategory.SHOPPING;
+            case 'food':
+                return PostCategory.FOOD;
+            case 'utility':
+                return PostCategory.UTILITY;
+            case 'medical':
+                return PostCategory.MEDICAL;
+            case 'magazine':
+                return PostCategory.MAGAZINE;
+            case 'music':
+                return PostCategory.MUSIC;
+            case 'entertainment':
+                return PostCategory.ENTERTAINMENT;
+            case 'etc':
+                return PostCategory.ETC;
+            default:
+                return PostCategory.ETC;
+        }
+    }
+    private transferOsToString(os: MobileOsType[]): string[] {
+        let res = [];
+        if (os.length !== 0) {
+            res = os.map(os => {
+                switch (os) {
+                    case MobileOsType.ANDROID:
+                        res.push('android');
+                        break;
+                    case MobileOsType.IOS:
+                        res.push('ios');
+                        break;
+                }
+            });
+        }
+        return res;
+    }
+    private transferStringToOs(os: string[]): MobileOsType[] {
+        let res = [];
+        if (os.length !== 0) {
+            res = os.map(os => {
+                switch (os) {
+                    case 'android':
+                        res.push(MobileOsType.ANDROID);
+                        break;
+                    case 'ios':
+                        res.push(MobileOsType.IOS);
+                        break;
+                }
+            });
+        }
+        return res;
+    }
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
         const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)
 
@@ -34,6 +165,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             title: post.title,
             subtitle: post.subtitle,
             platform: post.platform,
+            mobileOs: this.transferStringToOs(post.mobileOs),
+            category: this.transferStringToCategory(post.category),
             contents: post.contents,
             images: post.images as BasePostEntity['images'],
             status: status,
@@ -51,16 +184,19 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
                 userId: post.author.userId,
                 nickname: post.author.nickname,
                 profileImg: post.author.image
-              }
+            }
             : null;
         const status = post.status === BasePostStateType.ACTIVE ?
             'active' : (post.status === BasePostStateType.EXPIRED ? 'expired' : 'delete');
+        const category = this.transferCategoryToString(post.category);
         return new PromotionPostModel(
             post.postId,
             authorInfo,
             post.title,
             post.subtitle,
             post.platform,
+            this.transferOsToString(post.mobileOs),
+            category,
             post.contents,
             status,
             post.period,
