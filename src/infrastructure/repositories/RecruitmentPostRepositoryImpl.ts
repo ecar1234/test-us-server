@@ -118,33 +118,29 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
                 return PostCategory.ETC;
         }
     }
-    private transferOsToString(os: MobileOsType[]): string[] {
+    private transferOsToString(mobileOs: MobileOsType[]): string[] {
         let res = [];
-        if(os.length !== 0){
-            res = os.map(os => {
+        if(mobileOs.length !== 0){
+            res = mobileOs.map(os => {
                 switch(os){
                     case MobileOsType.ANDROID:
-                        res.push('android');
-                        break;
+                        return 'android';
                     case MobileOsType.IOS:
-                        res.push('ios');
-                        break;
+                        return 'ios';
                 }
             });
         }
         return res;
     }
-    private transferStringToOs(os: string[]): MobileOsType[] {
+    private transferStringToOs(mobileOs: string[]): MobileOsType[] {
         let res = [];
-        if(os.length !== 0){
-            res = os.map(os => {
+        if(mobileOs.length !== 0){
+            res = mobileOs.map(os => {
                 switch(os){
                     case 'android':
-                        res.push(MobileOsType.ANDROID);
-                        break;
+                        return MobileOsType.ANDROID;
                     case 'ios':
-                        res.push(MobileOsType.IOS);
-                        break;
+                        return MobileOsType.IOS;
                 }
             });
         }

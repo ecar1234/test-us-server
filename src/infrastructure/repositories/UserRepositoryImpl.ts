@@ -28,7 +28,15 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.updatedAt,
             userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
             userEntity.applications ? userEntity.applications.map(
-                applicationEntity => new ApplicationModel(applicationEntity.appId, applicationEntity.platform, applicationEntity.status, applicationEntity.appliedAt, applicationEntity.updatedAt, applicationEntity.post.postId, applicationEntity.applicant.userId)) : [],
+                applicationEntity => new ApplicationModel(
+                    applicationEntity.appId, 
+                    applicationEntity.platform, 
+                    applicationEntity.mobileOs,
+                    applicationEntity.status, 
+                    applicationEntity.appliedAt, 
+                    applicationEntity.updatedAt, 
+                    applicationEntity.post.postId, 
+                    applicationEntity.applicant.userId)) : [],
             // userEntity.sentMessages && userEntity.sentMessages.map(message => message.messageId),
             // userEntity.receiveMessages && userEntity.receiveMessages.map(message => message.messageId),
             // userEntity.givenReviews && userEntity.givenReviews.map(review => review.reviewId),
