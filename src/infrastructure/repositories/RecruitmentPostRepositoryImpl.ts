@@ -256,6 +256,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         postEntity.title = post.title;
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
+        postEntity.mobileOs = this.transferStringToOs(post.mobileOs);
+        postEntity.category = this.transferStringToCategory(post.category);
         postEntity.contents = post.contents;
         postEntity.images = post.images as BasePostEntity['images'];
         postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'end' ? BasePostStateType.END : BasePostStateType.EXPIRED);

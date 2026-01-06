@@ -121,11 +121,9 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             res = os.map(os => {
                 switch (os) {
                     case MobileOsType.ANDROID:
-                        res.push('android');
-                        break;
+                       return 'android';
                     case MobileOsType.IOS:
-                        res.push('ios');
-                        break;
+                        return 'ios';
                 }
             });
         }
@@ -137,11 +135,9 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             res = os.map(os => {
                 switch (os) {
                     case 'android':
-                        res.push(MobileOsType.ANDROID);
-                        break;
+                        return MobileOsType.ANDROID;
                     case 'ios':
-                        res.push(MobileOsType.IOS);
-                        break;
+                        return MobileOsType.IOS;
                 }
             });
         }
@@ -239,6 +235,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         postEntity.title = post.title;
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
+        postEntity.mobileOs = this.transferStringToOs(post.mobileOs);
+        postEntity.category = this.transferStringToCategory(post.category);
         postEntity.contents = post.contents;
         postEntity.images = post.images as BasePostEntity['images'];
         postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED);

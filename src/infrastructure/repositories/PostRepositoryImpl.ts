@@ -3,7 +3,7 @@ import { AppDataSource } from "../../config/DataSource";
 import { redisClient } from "../../config/RedisConfig";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
-import { BasePostEntity } from "../entities/BasePostEntity";
+import { BasePostEntity, BasePostStateType } from "../entities/BasePostEntity";
 import { PromotionPostEntity } from "../entities/PromotionPostEntity";
 import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 import { PromotionPostRepositoryImpl } from "./PromotionPostRepositoryImpl";
@@ -30,7 +30,7 @@ export class PostRepositoryImpl implements IPostRepository {
 
         const favoritePostEntities = await this.baseRepo.find({
             relations: ['author'],
-            where: { views: MoreThan(50),  },
+            where: { views: MoreThan(50) , status: BasePostStateType.ACTIVE},
             order: { views: 'DESC' },
             take: 10
         });
