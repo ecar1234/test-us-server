@@ -11,6 +11,10 @@ import { Env } from "../config/env";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 import { FCMPayload } from "../interface/interfaces/types";
 import { sendNotificationToMultiUser } from "../service/firebase/FcmService";
+import { ApplicationModel } from "../domain/entities/ApplicationModel";
+import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
+import { TResRecruitApplicationUserInfo } from "../infrastructure/entities/package/RecruitPostPackage";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 
 interface UploadedImageInfo {
     filename: string;
@@ -27,13 +31,15 @@ interface ImageToDelete {
 
 export class PostUseCase {
     constructor(
+        private userRepo: UserRepositoryImpl,
         private postRepo: PostRepositoryImpl,
         private recruitRepo: RecruitmentPostRepositoryImpl,
         private promotionRepo: PromotionPostRepositoryImpl,
-        private fireRepository: FirebaseRepositoryImpl
+        private fireRepository: FirebaseRepositoryImpl,
+        private applicationRepo: ApplicationRepositoryImpl
     ) { }
 
-    async getInitPosts(): Promise<[ (RecruitmentPostModel | PromotionPostModel | PromotionPostModel)[], RecruitmentPostModel[], PromotionPostModel[] ]> {
+    async getInitPosts(): Promise<[(RecruitmentPostModel | PromotionPostModel | PromotionPostModel)[], RecruitmentPostModel[], PromotionPostModel[]]> {
         const favoritePosts = await this.postRepo.getFavoritePosts();
         const recriutPosts = await this.recruitRepo.getPostsPaginations(1);
         const promotionPosts = await this.promotionRepo.getPostsPaginations(1);
@@ -48,8 +54,8 @@ export class PostUseCase {
         // console.log(recruitPosts);
         return [recruitPosts, promotionPosts];
     }
-   // Recruitment
-        async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, images: UploadedImageInfo[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
+    // Recruitment
+    async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, images: UploadedImageInfo[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
         const post = new RecruitmentPostModel(null, author.userId, title, subtitle, platform, mobileOs, category, contents, status, period, 0, images);
         return this.recruitRepo.createPost(post);
     }
@@ -64,18 +70,18 @@ export class PostUseCase {
 
         // 2. 이미지 파일 삭제 처리
         if (deleteImages && deleteImages.length > 0) {
-                const deletePromises = deleteImages.map(async (image) => {
-                    try {
-                        const filename = path.basename(new URL(image.url).pathname);
-                        const imagePath = path.join(envPath, filename);
-                        await fs.promises.unlink(imagePath);
-                    } catch (error) {
-                        if (error.code !== 'ENOENT') {
-                            console.error(`Failed to delete image file: ${error.message}`);
-                        }
+            const deletePromises = deleteImages.map(async (image) => {
+                try {
+                    const filename = path.basename(new URL(image.url).pathname);
+                    const imagePath = path.join(envPath, filename);
+                    await fs.promises.unlink(imagePath);
+                } catch (error) {
+                    if (error.code !== 'ENOENT') {
+                        console.error(`Failed to delete image file: ${error.message}`);
                     }
-                });
-                await Promise.all(deletePromises);
+                }
+            });
+            await Promise.all(deletePromises);
         }
 
         // 3. 이미지 목록 업데이트
@@ -100,18 +106,18 @@ export class PostUseCase {
             tokens: await this.fireRepository.getMessingTokens(post.applications.map(app => app.user.id)),
             notification: {
                 title: 'TESTUS',
-                body:`${post.title}의 테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.`
+                body: `${post.title}의 테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.`
             },
             data: {
-                type:'recruit',
+                type: 'recruit',
                 postTitle: post.title,
             }
         }
         const result = await sendNotificationToMultiUser(message);
-        if(result.length > 0){
+        if (result.length > 0) {
             await this.fireRepository.revmoeMessingTokens(result);
         }
-        
+
         return this.recruitRepo.updatePost(post);
     }
     async deleteRecruitPost(id: string): Promise<boolean> {
@@ -158,6 +164,42 @@ export class PostUseCase {
 
     async getAppRecruitPosts(ids: string[]): Promise<RecruitmentPostModel[]> {
         return this.recruitRepo.getAppRecruitPosts(ids);
+    }
+    async getRecruitApplicationsByPostId(postId: string): Promise<TResRecruitApplicationUserInfo[]> {
+        const post = await this.recruitRepo.getPostById(postId);
+        if (!post) {
+            throw new Error("Post not found");
+        }
+        const applications = await this.applicationRepo.getPostApplicantsInfo(post.applications as number[]);
+        const users = await this.userRepo.findUsersByIds(applications.map(app => app.applicantId));
+        const res: TResRecruitApplicationUserInfo[] = [];
+        applications.forEach((app, idx) => {
+            let user = users.find(user => user.userId === app.applicantId);
+            res.push(
+                {
+                    user: {
+                        userId: user.userId,
+                        email: user.email,
+                        nickname: user.nickname,
+                        profileImg: user.profileImg,
+                        userType: user.userType,
+                        role: user.role,
+                        createdAt: user.createdAt,
+                        updatedAt: user.updatedAt
+                    },
+                    application: {
+                        id: app.id,
+                        postId: app.postId,
+                        status: app.status,
+                        platform: app.platform,
+                        mobileOs: app.mobileOs,
+                        appliedAt: app.appliedAt,
+                        updatedAt: app.updatedAt
+                    }
+                }
+            );
+        });
+        return res;
     }
     // async getPostsByNickname(nickname: string): Promise<PostModel[]> {
     //    return this.postRepository.getPostsByNickname(nickname);
@@ -236,7 +278,7 @@ export class PostUseCase {
     }
     async getPromotionPostPagination(page: number, size: number): Promise<PromotionPostModel[]> {
         const posts = await this.promotionRepo.getPostsPaginations(page, size);
-        if(!posts){
+        if (!posts) {
             return [];
         }
         return this.promotionRepo.getPostsPaginations(page, size);

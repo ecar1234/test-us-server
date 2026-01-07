@@ -16,7 +16,7 @@ export class UserModel {
         public readonly createdAt: Date | null = null,
         public updatedAt: Date | null = null,
         public posts: string[] = [],
-        public applications: ApplicationModel[] = [],
+        public applications: number[] = [],
         // public sentMessages: string[] = [],
         // public receiveMessages: string[] = [],
     ) {}

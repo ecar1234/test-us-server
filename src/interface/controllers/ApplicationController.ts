@@ -78,18 +78,18 @@ export class ApplicationController {
         }
     }
 
-    async getRecruitApplications(req: Request, res: Response): Promise<void> {
-        try {
-            const { applicationIds } = req.body;
-            const applications = await this.appUseCase.getRecruitApplications(applicationIds);
-            if(applications.length === 0){
-                res.status(200).json({ status: 200, applications: [] });
-                return;
-            }
-            res.status(200).json({ status: 200, applications: applications });
-        } catch (error) {
-            res.status(500).json({ status: 500, error: error.message });
-        }
+    // async getRecruitApplications(req: Request, res: Response): Promise<void> {
+    //     try {
+    //         const { applicationIds } = req.body;
+    //         const applications = await this.appUseCase.getRecruitApplications(applicationIds);
+    //         if(applications.length === 0){
+    //             res.status(200).json({ status: 200, applications: [] });
+    //             return;
+    //         }
+    //         res.status(200).json({ status: 200, applications: applications });
+    //     } catch (error) {
+    //         res.status(500).json({ status: 500, error: error.message });
+    //     }
     
-    }
+    // }
 }

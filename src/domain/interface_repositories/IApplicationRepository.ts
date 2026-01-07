@@ -7,5 +7,5 @@ export interface IApplicationRepository {
     acceptUser(userId: string, postId: string): Promise<ApplicationModel>;
     rejectUser(userId: string, postId: string): Promise<ApplicationModel>;
     findApplicationsByUserId(userId: string): Promise<ApplicationModel[]>;
-    getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]>;
+    // getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]>;
 }

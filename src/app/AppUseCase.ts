@@ -225,8 +225,8 @@ export class AppUseCase {
         return this.applicationRepository.findApplicationsByUserId(userId);
     }
 
-    async getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]> {
-        return this.applicationRepository.getRecruitApplications(applicationIds);
-    }
+    // async getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]> {
+    //     return this.applicationRepository.getRecruitApplications(applicationIds);
+    // }
 
 }

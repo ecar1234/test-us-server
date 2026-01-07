@@ -11,6 +11,9 @@ import path from "path";
 import fs from "fs";
 import { Env } from "../../config/env";
 import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
+import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
+// import { app } from "firebase-admin";
 
 
 const route = Router();
@@ -20,11 +23,14 @@ const postRepo = new PostRepositoryImpl();
 const recruitRepo = new RecruitmentPostRepositoryImpl();
 const promotionRepo = new PromotionPostRepositoryImpl();
 const firebaseRepo = new FirebaseRepositoryImpl();
+const applicationRepo = new ApplicationRepositoryImpl();
+const userRepo = new UserRepositoryImpl();
+
 
 // const appRepo = new ApplicationRepositoryImpl();
 // const recruitmentPostUseCase = new RecruitmentPostUseCase(recruitRepo);
 
-const postUseCase = new PostUseCase(postRepo, recruitRepo, promotionRepo, firebaseRepo);
+const postUseCase = new PostUseCase(userRepo, postRepo, recruitRepo, promotionRepo, firebaseRepo, applicationRepo);
 const postController = new PostController(postUseCase);
 
 const isProd = process.env.NODE_ENV === 'prod';
@@ -60,6 +66,7 @@ route.get('/getRecruitPostByTitle/:title', postController.getRecruitPostByTitle.
 route.post('/getRecruitPostPagination', postController.getRecruitPostPagination.bind(postController));
 route.get('/getRecruitPostsByAuthor/:authorId', authMiddleware, postController.getRecruitPostsByAuthor.bind(postController));
 route.post('/getAppRecruitPosts', postController.getAppRecruitPosts.bind(postController));
+route.post('/getRecruitApplicationsByPostId', postController.getRecruitApplicationsByPostId.bind(postController));;
 // route.get('/getPostByNickname/:nickname', postController.getPostsByNickname.bind(postController));
 
 // PromotionDELETE /api/v1/post/deleteImage 라우트를 만들 수 있습니다. update에 통합하는 것이 더 효율적입니다.

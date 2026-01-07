@@ -195,6 +195,17 @@ export class PostController {
     
     }
 
+    async getRecruitApplicationsByPostId(req: Request, res: Response): Promise<void> {
+        try {
+            const { postId } = req.body;
+            const applications = await this.postUseCase.getRecruitApplicationsByPostId(postId);
+            res.status(200).json({ status: 200, applications: applications });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+
+    }
+
     // CHECK: Promotion post
     async createPromotionPost(req: Request, res: Response): Promise<void> {
         try {

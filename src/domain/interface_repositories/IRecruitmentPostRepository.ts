@@ -1,3 +1,4 @@
+import { ApplicationModel } from "../entities/ApplicationModel";
 import { RecruitmentPostModel } from "../entities/RecruitmentPostModel";
 
 export interface IRecruitmentPostRepository {

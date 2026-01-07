@@ -415,6 +415,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         return postEntities.map(entity => this.toDomainPost(entity));
     }
 
+
     // async getPostsByNickname(nickname: string): Promise<PostModel[]> {
     //     const userEntity = await this.userRepository.findOne({
     //         where: { nickname },

@@ -140,11 +140,11 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         });
         return applicants.map(entity => this.toDomainApplication(entity));
     }
-    public async getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]> {
-        const applications = await this.applicationRepository.find({
-            where: { appId: In(applicationIds) },
-            relations: ['applicant', 'post', 'reviews']
-        });
-        return applications.map(entity => this.toDomainApplication(entity));
-    }
+    // public async getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]> {
+    //     const applications = await this.applicationRepository.find({
+    //         where: { appId: In(applicationIds) },
+    //         relations: ['applicant', 'post', 'reviews']
+    //     });
+    //     return applications.map(entity => this.toDomainApplication(entity));
+    // }
 }
