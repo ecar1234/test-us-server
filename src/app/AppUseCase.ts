@@ -15,7 +15,7 @@ export class AppUseCase {
         private postRepository: RecruitmentPostRepositoryImpl,
         private fireRepository: FirebaseRepositoryImpl) { }
 
-    async createApplication(userId: string, postId: string, platform: string, mobileOs: string, status: string = 'pending'): Promise<ApplicationModel> {
+    async createApplication(userId: string, postId: string, platform: string, mobileOs: string, status: string = 'pending'): Promise<[ApplicationModel, RecruitmentPostModel]> {
         const application = new ApplicationModel(null, platform, mobileOs, status, null, null, postId, userId);
         const appResult = await this.applicationRepository.create(application);
         if (appResult == null) {
@@ -60,10 +60,10 @@ export class AppUseCase {
 
         // console.log(result)
 
-        return appResult;
+        return [appResult, post];
     }
 
-    async updateApplication(id: string, postId: string, userId: string, platform: string, mobileOs: string, status: string): Promise<ApplicationModel> {
+    async updateApplication(id: string, postId: string, userId: string, platform: string, mobileOs: string, status: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
         const application = new ApplicationModel(parseInt(id), platform, mobileOs, status, null, null, postId, userId);
         // console.log(application);
         const appResult = await this.applicationRepository.update(application);
@@ -109,17 +109,21 @@ export class AppUseCase {
         }
         const post = await this.postRepository.getPostById(appResult.postId);
         // console.log('use case result', result);
-        return appResult;
+        return [appResult, post];
     }
 
-    async cancelApplication(id: string): Promise<ApplicationModel> {
+    async cancelApplication(id: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
 
         const application = await this.applicationRepository.cancel(parseInt(id));
         if (application == null) {
             throw new Error("application cancel failed");
         }
+        const post = await this.postRepository.getPostById(application.postId);
+        if (post == null) {
+            throw new Error("post not found");
+        }
 
-        return application;
+        return [application, post];
     }
 
     async acceptUser(userId: string, postId: string): Promise<ApplicationModel> {

@@ -11,8 +11,8 @@ export class ApplicationController {
         try {
             const { applicantId, postId, platfrom, mobileOs } = req.body;
 
-            const result: ApplicationModel = await this.appUseCase.createApplication(applicantId, postId, platfrom, mobileOs);
-            res.status(200).json({ status: 200, application: result});
+            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.createApplication(applicantId, postId, platfrom, mobileOs);
+            res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
 
@@ -22,9 +22,9 @@ export class ApplicationController {
         try {
             const {id ,applicantId, postId, platform, mobileOs, status } = req.body;
 
-            const result: ApplicationModel = await this.appUseCase.updateApplication(id, postId, applicantId, platform, mobileOs, status);
-            console.log(result);
-            res.status(200).json({ status: 200, application: result });
+            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.updateApplication(id, postId, applicantId, platform, mobileOs, status);
+            // console.log(result);
+            res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message })
         }
@@ -34,7 +34,7 @@ export class ApplicationController {
             const applicationId = req.body.applicationId;
             const result = await this.appUseCase.cancelApplication(applicationId);
             if (result) {
-                res.status(200).json({ status: 200, application: result });
+                res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
             } else {
                 res.status(404).json({ status: 404, error: "Application not found" });
             }

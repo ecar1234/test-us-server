@@ -5,6 +5,7 @@ import { ApplicationModel } from "../../domain/entities/ApplicationModel";
 import createError from "http-errors";
 import { In } from "typeorm";
 import { MobileOsType } from "../entities/BasePostEntity";
+import { app } from "firebase-admin";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
@@ -13,8 +14,8 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         // applicant 객체가 존재하고 userId가 있는지 확인하는 방어 코드 추가
         return new ApplicationModel(
             applicationEntity.appId,
-            applicationEntity.platform === ApplicationsPlatform.WEB ? 'web' : 'mobbile',
-            applicationEntity.mobileOs === 'android' ? 'android' : (applicationEntity.mobileOs === 'ios' ? 'ios' : null),
+            applicationEntity.platform === ApplicationsPlatform.WEB ? 'web' : 'mobile',
+            applicationEntity.platform === ApplicationsPlatform.MOBILE ? (applicationEntity.mobileOs === MobileOsType.ANDROID ? 'android' : 'ios') : null,
             applicationEntity.status === ApplicationStatus.PENDING ? 'pending' :
                 (applicationEntity.status === ApplicationStatus.ACCEPTED ? 'accepted' :
                     (applicationEntity.status === ApplicationStatus.REJECTED ? 'rejected' : 'cancel')),
@@ -28,7 +29,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         return this.applicationRepository.create({
             ...(application.id && { appId: application.id }),
             platform: application.platform === 'web' ? ApplicationsPlatform.WEB : ApplicationsPlatform.MOBILE,
-            mobileOs: application.mobileOs === 'android' ? MobileOsType.ANDROID : (application.mobileOs === 'ios' ? MobileOsType.IOS : null),
+            mobileOs: application.platform === 'mobile' ? (application.mobileOs === 'android' ? MobileOsType.ANDROID : MobileOsType.IOS ) : null,
             status: application.status === 'pending' ? ApplicationStatus.PENDING :
                 (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
                     (ApplicationStatus.REJECTED ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL)),
@@ -55,13 +56,15 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     }
 
     public async update(application: ApplicationModel): Promise<ApplicationModel> {
-        const status = application.status === 'pending' ? ApplicationStatus.PENDING :
-            (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
-                (application.status === 'rejected' ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL));
+        // const status = application.status === 'pending' ? ApplicationStatus.PENDING :
+        //     (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
+        //         (application.status === 'rejected' ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL));
         
-        await this.applicationRepository.update(application.id, {
-            status: status
-        });
+        // await this.applicationRepository.update(application.id, {
+        //     status: status
+        // });
+        const appEntity = this.toEntityApplication(application);
+        await this.applicationRepository.save(appEntity);
     
         const result = await this.applicationRepository.findOne({
             where: { appId: application.id },
