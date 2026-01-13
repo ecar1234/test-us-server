@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import { redisClient } from "../config/RedisConfig";
+import { bullMqConnection, redisClient } from "../config/RedisConfig";
 import { RecruitmentPostUseCase } from "../app/RecruitmentPostUseCase";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
@@ -12,6 +12,7 @@ import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseR
 import { app } from "firebase-admin";
 import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
 
+const isProd = process.env.NODE_ENV === "prod";
 const postWorker = new Worker(
     'getInitPostsQueue',
     async (job) => {
@@ -38,7 +39,7 @@ const postWorker = new Worker(
                 throw new Error(`Unknown job name: ${job.name}`);
         }
     },
-    { connection: redisClient }
+    { connection: bullMqConnection, prefix: isProd ? 'prod:bull' : 'dev:bull'}
 );
 
 

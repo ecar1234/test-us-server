@@ -7,8 +7,9 @@ dotenv.config();
 
 const isProd = process.env.NODE_ENV === "prod";
 
-const createMainDataSource = () =>
-  new DataSource({
+const createMainDataSource = () => {
+  console.log(`[DataSource] 🚀 Initializing PRODUCTION DataSource (DB: ${process.env.MAIN_DATA_BASE_NAME})`);
+  return new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
@@ -25,9 +26,11 @@ const createMainDataSource = () =>
       path.join(__dirname, "..", "migration/main/*.js"),
     ],
   });
+}
 
-const createDevDataSource = () =>
-  new DataSource({
+const createDevDataSource = () => {
+  console.log(`[DataSource] 🛠️ Initializing DEVELOPMENT DataSource (DB: ${process.env.DATA_BASE_NAME})`);
+  return new DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
@@ -44,6 +47,7 @@ const createDevDataSource = () =>
       path.join(__dirname, "..", "migration/dev/*.ts"),
     ],
   });
+}
 
 
 export const AppDataSource: DataSource = isProd

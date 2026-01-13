@@ -43,7 +43,6 @@ export class PostUseCase {
         const recriutPosts = await this.recruitRepo.getPostsPaginations(1);
         const promotionPosts = await this.promotionRepo.getPostsPaginations(1);
         // const promotionPosts = await this.promotionRepo.getPostsPaginations(1);
-
         return [favoritePosts, recriutPosts, promotionPosts];
     }
 

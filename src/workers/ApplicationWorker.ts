@@ -1,11 +1,13 @@
 import { Worker } from "bullmq";
-import { redisClient } from "../config/RedisConfig";
+import { bullMqConnection, redisClient } from "../config/RedisConfig";
 import { AppUseCase } from "../app/AppUseCase";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
+
+const isProd = process.env.NODE_ENV === "prod";
 
 const applicationWorker = new Worker(
     'getApplicationsByIdQueue',
@@ -23,7 +25,7 @@ const applicationWorker = new Worker(
         }
         return { 'state': 'success', 'applications': applications };
     },
-    { connection: redisClient }
+    { connection: bullMqConnection, prefix: isProd ? 'prod:bull' : 'dev:bull'}
 );
 
 applicationWorker.on('completed', (job) => {
