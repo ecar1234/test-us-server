@@ -84,5 +84,12 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
 
         return reviews.map(review => this.toDomainUserReview(review));
     }
-    
+    async getReviewByReviewId(reviewId: string): Promise<UserReviewModel> {
+        const review = await this.userReviewDataSource.findOne({
+            where: { reviewId: reviewId },
+            relations: ['application', 'application.post', 'reviewer', 'reviewed']
+        });
+        if (!review) throw new Error("Review not found");
+        return this.toDomainUserReview(review);
+    }
 }
