@@ -6,6 +6,7 @@ import { UserReviewEntity } from "../entities/UserReviewEntiry";
 
 
 export class UserReviewRepositoryImpl implements IUserReviewRepository {
+  
     private userReviewDataSource = AppDataSource.getRepository(UserReviewEntity);
 
     public toDomainUserReview(reviewEntity: UserReviewEntity): UserReviewModel {
@@ -74,4 +75,14 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
 
         return reviews.map(review => this.toDomainUserReview(review));
     }
+
+    async getReviewsByApplicationIds(appIds: number[]): Promise<UserReviewModel[]> {
+        const reviews = await this.userReviewDataSource.find({
+            where: { application: { appId: In(appIds) } },
+            relations: ['application', 'application.post', 'reviewer', 'reviewed']
+        });
+
+        return reviews.map(review => this.toDomainUserReview(review));
+    }
+    
 }

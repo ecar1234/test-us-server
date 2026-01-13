@@ -20,5 +20,6 @@ route.get('/getReviewByPostId/:postId', authMiddleware, reviewController.getRevi
 route.get('/getReviewByUserId/:userId', authMiddleware, reviewController.getReviewByUserId.bind(reviewController));
 route.get('/getUserReview/:userId', authMiddleware, reviewController.getReviewsByUserId.bind(reviewController));
 route.post('/getReviewByTesters', authMiddleware, reviewController.getReviewByTesterIds.bind(reviewController));
+route.get('/getReviewByPostReviewId/:reviewId', authMiddleware, reviewController.getReviewByPostReviewId.bind(reviewController));
 
 export default route;

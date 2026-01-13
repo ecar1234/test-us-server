@@ -10,6 +10,7 @@ import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/Prom
 import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 import { app } from "firebase-admin";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
 
 const postWorker = new Worker(
     'getInitPostsQueue',

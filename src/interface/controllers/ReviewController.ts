@@ -21,6 +21,11 @@ export class ReviewController {
         const review = await this.reviewUseCase.addUserReview(rating, comment, reviewerUserId, reviewedUserId, applicationId, postId);
         res.status(200).json({ status: 200, review: review });
     }
+    async getReviewByPostReviewId(req: Request, res: Response): Promise<void> {
+        const reviewId = req.params.reviewId;
+        const review = await this.reviewUseCase.getReviewByPostReviewId(reviewId);
+        res.status(200).json({ status: 200, review: review });
+    }
     async getReviewByPostId(req: Request, res: Response): Promise<void> {
         const { postId } = req.body;
         const review = await this.reviewUseCase.getPostReviewByPostId(postId);

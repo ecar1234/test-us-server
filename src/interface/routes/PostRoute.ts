@@ -13,6 +13,7 @@ import { Env } from "../../config/env";
 import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
 import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
 import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
+import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
 // import { app } from "firebase-admin";
 
 
@@ -25,6 +26,7 @@ const promotionRepo = new PromotionPostRepositoryImpl();
 const firebaseRepo = new FirebaseRepositoryImpl();
 const applicationRepo = new ApplicationRepositoryImpl();
 const userRepo = new UserRepositoryImpl();
+// const userReviewRepo = new UserReviewRepositoryImpl();
 
 
 // const appRepo = new ApplicationRepositoryImpl();

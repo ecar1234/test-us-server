@@ -6,6 +6,7 @@ import { BasePostEntity } from "../entities/BasePostEntity";
 import { UserEntity } from "../entities/UserEntity";
 
 export class PostReviewRepositoryImpl implements IPostReviewRepository {
+  
     private postReviewDataSource = AppDataSource.getRepository(PostReviewEntity);
 
     public toDomainPostReview(reviewEntity: PostReviewEntity): PostReviewModel {
@@ -16,7 +17,7 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
             reviewType: reviewEntity.reviewType,
             createdAt: reviewEntity.createdAt,
             reviewerUserId: reviewEntity.reviewer.userId,
-            // postId: reviewEntity.post.postId
+            postId: reviewEntity.post.postId
         });
     }
 
@@ -56,5 +57,13 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
 
         return review ? this.toDomainPostReview(review) : null;
     }
-    // 필요하다면 다른 조회 메서드 추가
+    async getReviewByPostReviewId(reviewId: string): Promise<PostReviewModel> {
+        const review = await this.postReviewDataSource.findOne({
+            where: { reviewId: reviewId },
+            relations: ['reviewer', 'post']
+        });
+        if (!review) throw new Error("Review not found");
+
+        return this.toDomainPostReview(review);
+    }
 }

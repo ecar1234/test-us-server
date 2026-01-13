@@ -11,7 +11,6 @@ import { Env } from "../config/env";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 import { FCMPayload } from "../interface/interfaces/types";
 import { sendNotificationToMultiUser } from "../service/firebase/FcmService";
-import { ApplicationModel } from "../domain/entities/ApplicationModel";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
 import { TResRecruitApplicationUserInfo } from "../infrastructure/entities/package/RecruitPostPackage";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
@@ -36,7 +35,7 @@ export class PostUseCase {
         private recruitRepo: RecruitmentPostRepositoryImpl,
         private promotionRepo: PromotionPostRepositoryImpl,
         private fireRepository: FirebaseRepositoryImpl,
-        private applicationRepo: ApplicationRepositoryImpl
+        private applicationRepo: ApplicationRepositoryImpl,
     ) { }
 
     async getInitPosts(): Promise<[(RecruitmentPostModel | PromotionPostModel | PromotionPostModel)[], RecruitmentPostModel[], PromotionPostModel[]]> {
@@ -201,6 +200,8 @@ export class PostUseCase {
         });
         return res;
     }
+
+
     // async getPostsByNickname(nickname: string): Promise<PostModel[]> {
     //    return this.postRepository.getPostsByNickname(nickname);
     // }

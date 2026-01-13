@@ -6,10 +6,18 @@ import { ApplicationController } from "../controllers/ApplicationController";
 import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
 import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
+import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
 
 const router = Router();
 
-const applicationUseCase = new AppUseCase(new ApplicationRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new FirebaseRepositoryImpl());
+const applicationUseCase = new AppUseCase(
+    new ApplicationRepositoryImpl(),
+    new RecruitmentPostRepositoryImpl(),
+    new FirebaseRepositoryImpl(),
+    new UserRepositoryImpl(),
+    new UserReviewRepositoryImpl());
+    
 const applicationController = new ApplicationController(applicationUseCase);
 
 // router.get("/findByPostId/:postId", applicationController.findApplicationsByPostId.bind(applicationController)); post에서 appilcations 가져오기
@@ -22,6 +30,7 @@ router.put("/update", authMiddleware, applicationController.updateApplication.bi
 router.put("/cancelAppUser", authMiddleware, applicationController.cancelApplication.bind(applicationController));
 router.put("/acceptUser", authMiddleware, applicationController.acceptUser.bind(applicationController));
 router.put("/rejectUser", authMiddleware, applicationController.rejectUser.bind(applicationController));
+router.post("/getTesterReviewsByAppIds", authMiddleware, applicationController.getTesterReviews.bind(applicationController))
 
 // router.post('/getRecruitApplications', authMiddleware, applicationController.getRecruitApplications.bind(applicationController));
 // router.post("/getAppPostList/:postId", applicationController.countApplicationsByPostId.bind(applicationController)); user에서 가져오기

@@ -264,9 +264,9 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             throw new Error("Promotion Post not found");
         }
         postEntity.views += 1;
-        const newPost = await this.repository.save(postEntity);
-        const domainPost = this.toDomain(newPost);
-        return domainPost;
+        await this.repository.save(postEntity);
+    
+        return this.toDomain(postEntity);;
     }
     async getUserPromotionPosts(userId: string): Promise<PromotionPostModel[]> {
         const postEntities = await this.repository.find({

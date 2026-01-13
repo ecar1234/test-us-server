@@ -66,6 +66,7 @@ export class ReviewUseCase {
         return review; 
     }
 
+   
     // 게시물 ID로 리뷰를 조회하는 것은 이제 PostReviewRepository에서 담당
     async getPostReviewByPostId(postId: string): Promise<PostReviewModel>{
         const reviews = await this.postReviewRepo.getPostReviewByPostId(postId);
@@ -78,6 +79,10 @@ export class ReviewUseCase {
     }
     async getReviewsByUserId(userId: string): Promise<UserReviewModel[]>{
         const reviews = await this.userReviewRepo.getUserReviewsByUserId(userId);
+        return reviews;
+    }
+    async getReviewByPostReviewId(reviewId: string): Promise<PostReviewModel>{
+        const reviews = await this.postReviewRepo.getReviewByPostReviewId(reviewId);
         return reviews;
     }
 

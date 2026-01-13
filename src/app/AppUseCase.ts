@@ -8,12 +8,19 @@ import { sendNotificationToUser } from "../service/firebase/FcmService";
 import { APNs, FCMPayload } from "../interface/interfaces/types";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
 import { app } from "firebase-admin";
+import { TResRecruitTesterReviewInfo } from "../infrastructure/entities/package/UserReviewPackage";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
+import { UserReviewModel } from "../domain/entities/UserReviewModel";
 
 export class AppUseCase {
     constructor(
         private applicationRepository: ApplicationRepositoryImpl,
         private postRepository: RecruitmentPostRepositoryImpl,
-        private fireRepository: FirebaseRepositoryImpl) { }
+        private fireRepository: FirebaseRepositoryImpl,
+        private userRepo: UserRepositoryImpl,
+        private userReviewRepo: UserReviewRepositoryImpl
+    ) { }
 
     async createApplication(userId: string, postId: string, platform: string, mobileOs: string, status: string = 'pending'): Promise<[ApplicationModel, RecruitmentPostModel]> {
         const application = new ApplicationModel(null, platform, mobileOs, status, null, null, postId, userId);
@@ -225,8 +232,34 @@ export class AppUseCase {
         return this.applicationRepository.findApplicationsByUserId(userId);
     }
 
-    // async getRecruitApplications(applicationIds: number[]): Promise<ApplicationModel[]> {
-    //     return this.applicationRepository.getRecruitApplications(applicationIds);
-    // }
+    async getTesterReviews(appIds: number[]): Promise<TResRecruitTesterReviewInfo[]> {
+        const applications = await this.applicationRepository.getPostApplicantsInfo(appIds);
+        if (applications.length === 0) return [];
+
+        const users = await this.userRepo.findUsersByIds(applications.map(app => app.applicantId));
+        const reviews = await this.userReviewRepo.getReviewsByApplicationIds(appIds);
+
+        const result: TResRecruitTesterReviewInfo[] = [];
+
+        applications.forEach(app => {
+            const user = users.find(u => u.userId === app.applicantId);
+            if (user) {
+                const review: UserReviewModel | null = reviews.find(r => r.applicationId === app.id);
+                result.push({
+                    user: {
+                        userId: user.userId,
+                        email: user.email,
+                        nickname: user.nickname,
+                        profileImg: user.profileImg,
+                        userType: user.userType,
+                        role: user.role
+                    },
+                    review: review ? review : null,
+                    appId: app.id
+                });
+            }
+        });
+        return result;
+    }
 
 }
