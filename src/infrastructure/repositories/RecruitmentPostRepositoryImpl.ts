@@ -1,4 +1,4 @@
-import { In, Not } from "typeorm";
+import { In, Like, Not } from "typeorm";
 import { AppDataSource } from "../../config/DataSource";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
 import { IRecruitmentPostRepository } from "../../domain/interface_repositories/IRecruitmentPostRepository";
@@ -412,6 +412,21 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             where: { postId: In(ids) },
             relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post']
         });
+        return postEntities.map(entity => this.toDomainPost(entity));
+    }
+
+    async searchPosts(keyword: string): Promise<RecruitmentPostModel[]> {
+        const postEntities = await this.postRepository.find({
+            where: [
+                { title: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE },
+                { subtitle: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE },
+                { contents: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE }
+            ],
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post']
+        });
+        if (!postEntities) {
+            return [];
+        }
         return postEntities.map(entity => this.toDomainPost(entity));
     }
 

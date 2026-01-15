@@ -9,5 +9,5 @@ export interface IPromotionPostRepository {
         getPostByTitle(title: string): Promise<PromotionPostModel>;
         getPostsByAuthor(authorId: string): Promise<PromotionPostModel[]>;
         getPostsPaginations(page: number): Promise<PromotionPostModel[]>;
-
+        searchPosts(keyword: string): Promise<PromotionPostModel[]>;
 }

@@ -52,6 +52,13 @@ export class PostUseCase {
         // console.log(recruitPosts);
         return [recruitPosts, promotionPosts];
     }
+    async searchPosts(keyword: string): Promise<[RecruitmentPostModel[], PromotionPostModel[]]> {
+        const recruitPosts = await this.recruitRepo.searchPosts(keyword);
+        const promotionPosts = await this.promotionRepo.searchPosts(keyword);
+        return [recruitPosts, promotionPosts];
+    }
+
+
     // Recruitment
     async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, images: UploadedImageInfo[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
         const post = new RecruitmentPostModel(null, author.userId, title, subtitle, platform, mobileOs, category, contents, status, period, 0, images);

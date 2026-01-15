@@ -39,6 +39,16 @@ export class PostController {
         }
     }
 
+    async searchPosts(req: Request, res: Response): Promise<void> {
+        try {
+            const { keyword } = req.params;
+            const posts = await this.postUseCase.searchPosts(keyword);
+            res.status(200).json({ status: 200, recruit: posts[0], promotion: posts[1] });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
     // CHECK: Recruit post
     async createRecruitPost(req: Request, res: Response): Promise<void> {
         try {

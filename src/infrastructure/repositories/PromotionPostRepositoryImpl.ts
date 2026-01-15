@@ -5,6 +5,7 @@ import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from ".
 import { PromotionPostEntity } from "../entities/PromotionPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
+import { Like } from "typeorm";
 
 
 
@@ -15,6 +16,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
     constructor() {
         this.reviewRepository = new PostReviewRepositoryImpl();
     }
+   
     private transferCategoryToString(category: PostCategory): string {
         switch (category) {
             case PostCategory.GAME:
@@ -323,5 +325,20 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         });
         const domainPosts = posts.map(postEntity => this.toDomain(postEntity));
         return domainPosts;
+    }
+
+     async searchPosts(keyword: string): Promise<PromotionPostModel[]> {
+        const postEntities = await this.repository.find({
+            where: [
+                { title: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE },
+                { subtitle: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE  },
+                { contents: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE  }
+            ],
+            relations: ['author']
+        });
+        if (!postEntities) {
+            return [];
+        }
+        return postEntities.map(entity => this.toDomain(entity));
     }
 }
