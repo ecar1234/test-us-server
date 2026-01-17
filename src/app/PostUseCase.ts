@@ -107,21 +107,24 @@ export class PostUseCase {
             throw new Error("Post not found");
         }
 
-        const message: FCMPayload = {
-            tokens: await this.fireRepository.getMessingTokens(post.applications.map(app => app.user.id)),
-            notification: {
-                title: 'TESTUS',
-                body: `${post.title}의 테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.`
-            },
-            data: {
-                type: 'recruit',
-                postTitle: post.title,
+        if (post.applications.length !== 0) {
+            const message: FCMPayload = {
+                tokens: await this.fireRepository.getMessingTokens(post.applications.map(app => app.user.id)),
+                notification: {
+                    title: 'TESTUS',
+                    body: `${post.title}의 테스트가 종료되었습니다. 리뷰 관리에서 피드백을 남겨주세요.`
+                },
+                data: {
+                    type: 'recruit',
+                    postTitle: post.title,
+                }
+            }
+            const result = await sendNotificationToMultiUser(message);
+            if (result.length > 0) {
+                await this.fireRepository.revmoeMessingTokens(result);
             }
         }
-        const result = await sendNotificationToMultiUser(message);
-        if (result.length > 0) {
-            await this.fireRepository.revmoeMessingTokens(result);
-        }
+
 
         return this.recruitRepo.updatePost(post);
     }
