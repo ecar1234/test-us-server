@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { UserEntity } from "./UserEntity";
 import { PostReviewEntity } from "./PostReviewEntity";
+import { RoomEntity } from "./MessagesEntities/RoomEntity";
 
 
 
@@ -101,6 +102,9 @@ export abstract class BasePostEntity {
 
     @OneToMany(() => PostReviewEntity, review => review.post)
     receivedReviews: PostReviewEntity[]
+
+    @OneToMany(() => RoomEntity, room => room.id)
+    rooms: RoomEntity[]
 
     @AfterLoad()
     setDefaults() {

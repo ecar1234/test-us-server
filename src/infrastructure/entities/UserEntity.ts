@@ -1,9 +1,10 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 import { ApplicationEntity } from "./ApplicationEntity";
-import { MessagesEntity } from "./MessageEntity";
+import { MessagesEntity } from "./MessagesEntities/MessageEntity";
 import { UserReviewEntity } from "./UserReviewEntiry";
 import { BasePostEntity } from "./BasePostEntity";
 import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity";
+import { RoomMemberEntity } from "./MessagesEntities/RoomMemberEntity";
 
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',
@@ -83,17 +84,17 @@ export class UserEntity {
     @OneToMany(() => ApplicationEntity, app => app.applicant)
     applications: ApplicationEntity[]
 
-    @OneToMany(() => MessagesEntity, message => message.sender)
-    sentMessages: MessagesEntity[]
-
-    @OneToMany(() => MessagesEntity, message => message.receiver)
-    receiveMessages: MessagesEntity[]
-
     @OneToMany(() => UserReviewEntity, review => review.reviewer)
     givenReviews: UserReviewEntity[]
 
     @OneToMany(() => UserReviewEntity, review => review.reviewed)
     receivedReviews: UserReviewEntity[]
+
+    @OneToMany(() => RoomMemberEntity, room => room.user)
+    members: RoomMemberEntity[];
+
+    @OneToMany(() => MessagesEntity, message => message.sender)
+    sentMessages: MessagesEntity[];
 
     @OneToMany(() => FirebaseDeviceTokenEntity, token => token.user)
     deviceTokens: FirebaseDeviceTokenEntity[];

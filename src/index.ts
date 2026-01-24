@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
+import { createServer } from 'http';
 
 const isProd = process.env.NODE_ENV === 'prod';
 // dotenv.config({
@@ -22,9 +23,15 @@ import PostRoute from './interface/routes/PostRoute';
 import { Env } from './config/env';
 import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
 import { randomUUID } from 'crypto';
+import { initSocket } from './service/socket.io';
 
 const app = express();
-const port = Number(process.env.SERVER_PORT) || 3000;
+const httpServer = createServer(app);
+
+const basePost = parseInt(process.env.SERVER_PORT) || 3000;
+const instanceIdx = parseInt(process.env.NODE_APP_INSTANCE || '0');
+const port = basePost + instanceIdx;
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -66,13 +73,15 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 AppDataSource.initialize()
-  .then(() => {
+  .then(async () => {
     console.log(`[BOOT] DB 연결 성공 - ${new Date().toISOString()}`);
     console.log(`Current Environment: ${process.env.NODE_ENV}`);
     PostUpdateScheduledJob();
     DbBackupScheduledJob();
 
-    app.listen(port, '0.0.0.0', () => {
+    await initSocket(httpServer);
+
+    httpServer.listen(port, '127.0.0.1', () => {
       console.log(`서버 실행 중: 0.0.0.0:${port}`);
     });
   })
