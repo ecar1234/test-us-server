@@ -21,6 +21,7 @@ const createMainDataSource = () => {
     driver: mysql2,
     entities: [
       path.join(__dirname, "..", "infrastructure/entities/*.js"),
+      path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/*.js"),
     ],
     migrations: [
       path.join(__dirname, "..", "migration/main/*.js"),
@@ -42,6 +43,7 @@ const createDevDataSource = () => {
     driver: mysql2,
     entities: [
       path.join(__dirname, "..", "infrastructure/entities/*.ts"),
+      path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/*.ts"),
     ],
     migrations: [
       path.join(__dirname, "..", "migration/dev/*.ts"),
