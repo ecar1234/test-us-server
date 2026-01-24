@@ -1,6 +1,6 @@
 import { UserUseCase } from "../../app/UserUseCase";
 import { Request, Response } from "express";
-import { generateToken } from "../../utils/jwt";
+import { decodeToken, generateToken, verifyToken } from "../../utils/jwt";
 
 export class UserController {
     constructor(private userUseCase: UserUseCase) { }
@@ -21,15 +21,15 @@ export class UserController {
         }
     }
 
-    async authRegister (req: Request, res: Response):Promise<void> {
+    async authRegister(req: Request, res: Response): Promise<void> {
         try {
             const { email, nickname, profileImg, userType, role, method } = req.body;
             const user = await this.userUseCase.authUserRegister(email, nickname, profileImg.url, userType, role, method);
             const token = generateToken(user);
 
-            res.status(200).json({status: 200, user: user, token: token});
+            res.status(200).json({ status: 200, user: user, token: token });
         } catch (error) {
-            res.status(500).json({status: 500, error: error.message});
+            res.status(500).json({ status: 500, error: error.message });
         }
     }
 
@@ -67,13 +67,41 @@ export class UserController {
             res.status(500).json({ status: 500, error: error.message });
         }
     }
+    async autoLogin(req: Request, res: Response): Promise<void> {
+        // const { user } = req.user;
+        // const serverUser = await this.userUseCase.getUserById(user.userId);
+
+        try {
+            res.status(200).json({ status: 200 });
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+    async refreshToken(req: Request, res: Response): Promise<void> {
+        const { token } = req.body;
+        try {
+            const decoded = verifyToken(token.split(' ')[1]);
+            const user = await this.userUseCase.getUserById(decoded.userId);
+            if (!user) {
+                res.status(404).json({ error: "User not found" });
+                return;
+            }
+            const newToken = generateToken(user);
+            res.status(200).json({ status: 200, token: newToken });
+        } catch (error) {
+            if (error.message === 'jwt expired') {
+                res.status(401).json({ status: 401, error: 'Token expired' });
+            }
+            res.status(401).json({ status: 401, error: error.message });
+        }
+    }
 
     async authLogin(req: Request, res: Response): Promise<void> {
         try {
             const { email } = req.body;
             const user = await this.userUseCase.getUserByEmail(email);
             const token = generateToken(user);
-            res.status(200).json({status: 200, user: user, token: token});
+            res.status(200).json({ status: 200, user: user, token: token });
 
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -101,13 +129,13 @@ export class UserController {
             const { userId, nickname, userType, role, userName, birth, method } = JSON.parse(req.body.user);
             // const { filename, originalname, mimetype, size, url } = JSON.parse(req.body.newImage);
             const oldImage = JSON.parse(req.body.oldImage);
-           
+
             const file = req.file;
             if (!file) {
                 res.status(400).json({ status: 400, message: 'Image is required.' });
                 return;
             }
-            
+
             const image = {
                 filename: file.filename,
                 originalname: file.originalname,
@@ -118,8 +146,8 @@ export class UserController {
 
             const user = await this.userUseCase.updateUserInfoWithImg(userId, nickname, userType, role, userName, birth, image, oldImage, method);
             res.status(200).json({ status: 200, user: user });
-            
-        }catch(error){
+
+        } catch (error) {
             res.status(500).json({ error: error.message });
         }
     }
@@ -143,7 +171,7 @@ export class UserController {
             const { ids } = req.body;
             const data = await this.userUseCase.getUsersByIds(ids);
             // console.log('controller : ', users);
-            res.status(200).json({ status: 200, users: data});
+            res.status(200).json({ status: 200, users: data });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
@@ -217,9 +245,9 @@ export class UserController {
         try {
             const nickname: string = req.params.nickname;
             const isAvailable = await this.userUseCase.isNicknameAvailable(nickname);
-            if(!isAvailable){
+            if (!isAvailable) {
                 res.status(200).json({ status: 200, available: isAvailable });
-            }else{
+            } else {
                 res.status(409).json({ status: 409, available: isAvailable });
             }
         } catch (error) {
