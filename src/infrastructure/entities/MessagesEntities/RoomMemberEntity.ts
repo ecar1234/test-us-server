@@ -3,7 +3,7 @@ import { RoomEntity } from "./RoomEntity";
 import { UserEntity } from "../UserEntity";
 
 @Entity('room_members')
-@Unique(['userId'])
+@Unique(['room', 'userId'])
 export class RoomMemberEntity {
     @PrimaryGeneratedColumn()
     id: number;

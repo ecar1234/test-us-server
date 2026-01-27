@@ -19,8 +19,25 @@ export class MessageController {
        }
     }
 
-    async sendMessage(req: Request, res: Response): Promise<void> {
-       
+    // Message
+    async getMessageByRoomId(req: Request, res: Response): Promise<void> {
+        try {
+            const { roomId } = req.body;
+            const messages: MessageModel[] = await this.messageUseCase.getMessageByRoomId(roomId);
+            res.status(200).json({ status: 200, messages: messages });
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+    async getMessageByPostId(req: Request, res: Response): Promise<void> {
+        try {
+            const { postId, targetId } = req.body;
+            const messages: MessageModel[] = await this.messageUseCase.getMessageByPostId(postId, targetId);
+            
+            res.status(200).json({ status: 200, messages: messages });
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
     }
     
 }

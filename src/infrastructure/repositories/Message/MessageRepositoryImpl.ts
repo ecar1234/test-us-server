@@ -10,30 +10,12 @@ import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity";
 
 
 export class MessageRepositoryImpl implements IMessageRepository {
-   
     private messageAppData = AppDataSource.getRepository(MessagesEntity);
-    private toDomainModelMessage(messageEntity:MessagesEntity):MessageModel{
-         const room = messageEntity.room ? new RoomModel({
-            id: messageEntity.room.id,
-            type: messageEntity.room.type,
-            post: messageEntity.room.post ? {
-                postId: String(messageEntity.room.post.postId),
-                images: [],
-                title: messageEntity.room.post.title
-            } : { postId: '', images: [], title: '' },
-            targetUserId: messageEntity.room.targetUserId,
-            lastMessage: null as any,
-            lastMessageContent: messageEntity.room.lastMessageContent,
-            lastMessageAt: messageEntity.room.lastMessageAt,
-            members: [],
-            messages: [],
-            createdAt: messageEntity.room.createdAt
-        }) : null as any;
-
+    public toDomainModelMessage(messageEntity:MessagesEntity):MessageModel{
         return new MessageModel({
             id: messageEntity.id,
             content: messageEntity.content,
-            room: room,
+            roomId: messageEntity.room.id,
             sender: messageEntity.sender ? {
                 userId: messageEntity.sender.userId,
                 nickname: messageEntity.sender.nickname,
@@ -50,9 +32,9 @@ export class MessageRepositoryImpl implements IMessageRepository {
         entity.content = messageModel.content;
         entity.createdAt = messageModel.createdAt;
 
-        if (messageModel.room) {
+        if (messageModel.roomId) {
             const room = new RoomEntity();
-            room.id = messageModel.room.id;
+            room.id = messageModel.roomId;
             entity.room = room;
         }
 
@@ -73,7 +55,7 @@ export class MessageRepositoryImpl implements IMessageRepository {
         await messageRepo.save(message);
         return this.toDomainModelMessage(message);
     }
-    async getMessagesByRoonId(roomId: number): Promise<MessageModel[]> {
+    async getMessagesByRoomId(roomId: number): Promise<MessageModel[]> {
         const messages = await this.messageAppData.find({
             where: { room: {id: roomId} },
             relations: ['room']

@@ -6,7 +6,7 @@ export class MessageModel {
             {
                 id: number | null,
                 content: string,
-                room: RoomModel,
+                roomId: number,
                 sender: {
                     userId: string;
                     nickname: string;
@@ -17,14 +17,14 @@ export class MessageModel {
     ) {
         this.id = props.id;
         this.content = props.content;
-        this.room = props.room;
+        this.roomId = props.roomId;
         this.sender = props.sender;
         this.createdAt = props.createdAt;
     }
 
     public id: number | null;
     public content: string;
-    public room: RoomModel;
+    public roomId: number;
     public sender: {
         userId: string;
         nickname: string;

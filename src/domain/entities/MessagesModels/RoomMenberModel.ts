@@ -7,7 +7,7 @@ export class RoomMemberModel {
         props:
             {
                 id: number,
-                room: RoomModel,
+                roomId: number,
                 user: UserModel,
                 userId: string,
                 unreadCount: number,
@@ -17,7 +17,7 @@ export class RoomMemberModel {
             }
     ) {
         this.id = props.id;
-        this.room = props.room;
+        this.roomId = props.roomId;
         this.user = props.user;
         this.userId = props.userId;
         this.unreadCount = props.unreadCount;
@@ -27,7 +27,7 @@ export class RoomMemberModel {
     }
 
     public id: number;
-    public room: RoomModel;
+    public roomId: number;
     public user: UserModel;
     public userId: string;
     public unreadCount: number;

@@ -20,7 +20,10 @@ router.get('/getRoomList/:userId', authMiddleware, messageController.getRoomList
 
 // room roomMember
 // message
-router.post('/sendMessage', messageController.sendMessage.bind(messageController));
+// router.post('/sendMessage', messageController.sendMessage.bind(messageController));
+// router.post('/markAsRead', messageController.markAsRead.bind(messageController));
+router.post('/getMessageByRoomId/', messageController.getMessageByRoomId.bind(messageController));
+router.post('/getMessageByPostId/', messageController.getMessageByPostId.bind(messageController));
 
 
 export default router;

@@ -9,7 +9,7 @@ export class RoomModel {
                 id: number,
                 type: RoomType,
                 post: {
-                    postId: string;
+                    id: string;
                     images: { url: string; filename: string; originalname: string; mimetype: string; size: number; }[],
                     title: string;
                 },
@@ -37,7 +37,7 @@ export class RoomModel {
     public id: number;
     public type: RoomType;
     public post: {
-        postId: string;
+        id: string;
         images: { url: string; filename: string; originalname: string; mimetype: string; size: number; }[],
         title: string;
     }
