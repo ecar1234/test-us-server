@@ -26,7 +26,7 @@ export class MessageUseCase {
 
     async getMessageByPostId(postId: string, targetId: string): Promise<MessageModel[]> {
         const messages = await this.roomRepo.getMessagesByPostId(postId, targetId);
-        messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        // messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         return messages;
     }
 
@@ -63,7 +63,7 @@ export class MessageUseCase {
     }
     async getMessageByRoomId(roomId: number): Promise<MessageModel[]> {
         const messages = await this.messageRepo.getMessagesByRoomId(roomId);
-        messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        // messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         return messages;
     }
 }

@@ -62,7 +62,7 @@ export class RoomRepositoryImpl implements IRoomRepository {
             relations: ['messages']
         });
 
-        room.lastMessage = {id : message.id} as MessagesEntity;
+        room.lastMessage = { id: message.id } as MessagesEntity;
         room.lastMessageContent = message.content;
         room.lastMessageAt = message.createdAt;
 
@@ -83,7 +83,10 @@ export class RoomRepositoryImpl implements IRoomRepository {
     }
     async getRoomsByUserId(userId: string): Promise<RoomModel[]> {
         const rooms = await this.roomData.find({
-            where: { targetUserId: userId },
+            where: [
+                { post: { author: { userId: userId } } },
+                { targetUserId: userId }
+            ],
             relations: ['post', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
         });
         return rooms.map(room => this.toDomain(room));
