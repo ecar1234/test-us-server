@@ -10,6 +10,7 @@ export class RoomMemberEntity {
 
     // 관계 유지: 유저 정보(닉네임, 프로필 등) 조회용
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'userId' }) // 기존 userId 컬럼을 외래 키로 사용하도록 매핑
     user: UserEntity;
 
     @Column()

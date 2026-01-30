@@ -16,13 +16,18 @@ export class MessageUseCase {
     // room 
     async getRoomList(userId: string): Promise<RoomModel[]> {
         const rooms = await this.roomRepo.getRoomsByUserId(userId);
-
         if(!rooms){
             return [];
         }
 
         return rooms;
     }
+
+    async getRoomById(roomId: number): Promise<RoomModel> {
+        const room = await this.roomRepo.getRoomById(Number(roomId));
+        return room;
+    }
+
 
     async getMessageByPostId(postId: string, targetId: string): Promise<MessageModel[]> {
         const messages = await this.roomRepo.getMessagesByPostId(postId, targetId);
@@ -35,19 +40,37 @@ export class MessageUseCase {
     async sendMessage(roomId: number | null, postId: string, senderId: string, targetId: string, content: string): Promise<MessageModel> {
         return this.unitOfWork.runInTransaction(async (manager) => {
            let room;
-           if(roomId){
-            room = await this.roomRepo.getRoomById(roomId);
-           }
-           if(!room){
-            room = await this.roomRepo.createRoom(postId, targetId, manager);
-            await this.roomMemberRepo.upsertMembers(room.id, [senderId, targetId], manager);
+           try {
+               if(roomId){
+                room = await this.roomRepo.getRoomById(roomId);
+               }
+               if(!room){
+                room = await this.roomRepo.createRoom(postId, targetId, manager);
+                await this.roomMemberRepo.upsertMembers(room.id, [senderId, targetId], manager);
+               }
+           } catch (error) {
+               console.error('[MessageUseCase] Failed to find or create room:', error);
+               throw error;
            }
 
-           const message = await this.messageRepo.saveMessage(room.id, senderId, content, manager);
-           await this.roomRepo.updateLastMessage(room.id, message, manager);
-           
-           // 3. 나를 제외한 모든 멤버의 unreadCount + 1 증가
-           await this.roomMemberRepo.incrementUnreadCount(room.id, senderId, manager);
+           let message;
+           try {
+               message = await this.messageRepo.saveMessage(room.id, senderId, content, manager);
+           } catch (error) {
+               // 주로 여기서 messageId AUTO_INCREMENT 누락으로 인한 에러가 발생합니다.
+               console.error('[MessageUseCase] Failed to save message (Check DB AUTO_INCREMENT):', error);
+               throw error;
+           }
+
+           try {
+               await this.roomRepo.updateLastMessage(room.id, message, manager);
+               
+               // 3. 나를 제외한 모든 멤버의 unreadCount + 1 증가
+               await this.roomMemberRepo.incrementUnreadCount(room.id, senderId, manager);
+           } catch (error) {
+               console.error('[MessageUseCase] Failed to update room stats:', error);
+               throw error;
+           }
 
            return message;
         });

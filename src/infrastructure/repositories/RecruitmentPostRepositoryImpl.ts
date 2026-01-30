@@ -270,7 +270,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         if (keys.length > 0) {
             await redisClient.del(keys);
         }
-        await redisClient.del(`userPosts:${post.author['userId']}`);
 
         return domainPost;
     }
@@ -357,30 +356,12 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     }
 
     async getUserRecuritmentPosts(userId: string): Promise<RecruitmentPostModel[]> {
-        const redisKey = `userPosts:${userId}`;
-        const cachedPosts = await redisClient.get(redisKey);
-        if (cachedPosts && cachedPosts.length > 0) {
-            try {
-                const parsedPosts = JSON.parse(cachedPosts);
-                if (Array.isArray(parsedPosts)) {
-                    // 캐시된 데이터도 도메인 모델로 변환하여 반환합니다.
-                    return parsedPosts.map(postEntity => this.toDomainPost(postEntity));
-                }
-            } catch (error) {
-                console.error('Failed to parse cached user posts, deleting cache key:', redisKey, error);
-                await redisClient.del(redisKey);
-            }
-        }
-
         const postEntities = await this.postRepository.find({
             where: { author: { userId }, status: Not(BasePostStateType.DELETE) },
             relations: ['author', 'applications', 'applications.applicant', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post'],
         });
 
         const domainPosts = postEntities.map(postEntity => this.toDomainPost(postEntity));
-
-        // 도메인 모델이 아닌 DB Entity를 캐싱해야 toDomainPost를 재사용할 수 있습니다.
-        await redisClient.set(redisKey, JSON.stringify(postEntities), 'EX', 60 * 10);
 
         return domainPosts;
 

@@ -28,7 +28,7 @@ export class RoomEntity {
      * [최적화] 목록 조회 시 Join을 방지하기 위한 필드
      */
     @OneToOne(() => MessagesEntity, { nullable: true, onDelete: 'SET NULL' })
-    @JoinColumn({ name: 'lastMessageId' })
+    @JoinColumn({ name: 'last_message_id' }) // 컬럼명을 snake_case로 변경하여 일관성 유지
     lastMessage: MessagesEntity;
 
     @Column({ nullable: true })

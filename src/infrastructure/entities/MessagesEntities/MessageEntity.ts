@@ -4,7 +4,7 @@ import { RoomEntity } from "./RoomEntity";
 
 @Entity('messages')
 export class MessagesEntity {
-   @PrimaryGeneratedColumn()
+   @PrimaryGeneratedColumn({ name: 'id' }) // 컬럼명을 'id'로 명시
    id: number;
 
    @Column('text')

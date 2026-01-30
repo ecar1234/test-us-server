@@ -19,6 +19,16 @@ export class MessageController {
        }
     }
 
+    async getRoomById(req: Request, res: Response): Promise<void> {
+        try {
+            const roomId = req.params.roomId;
+            const room = await this.messageUseCase.getRoomById(parseInt(roomId));
+            res.status(200).json({ status: 200, room: room });
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+
     // Message
     async getMessageByRoomId(req: Request, res: Response): Promise<void> {
         try {
