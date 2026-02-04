@@ -11,7 +11,7 @@ import { authMiddleware } from "../middlewares/AuthMiddleware";
 
 const router: Router = Router();
 
-const messageUseCase = new MessageUseCase(new MessageRepositoryImpl(), new RoomRepositoryImpl(), new RoomMemberRepositoryImpl(), new TypeOrmUnitOfWork(AppDataSource));
+const messageUseCase = new MessageUseCase(new MessageRepositoryImpl(), new RoomRepositoryImpl(new RoomMemberRepositoryImpl(), new MessageRepositoryImpl()), new RoomMemberRepositoryImpl(), new TypeOrmUnitOfWork(AppDataSource));
 const messageController = new MessageController(messageUseCase);
 
 

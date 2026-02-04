@@ -14,9 +14,9 @@ export class RoomRepositoryImpl implements IRoomRepository {
 
     private memberRepo: RoomMemberRepositoryImpl;
     private messageRepo: MessageRepositoryImpl;
-    constructor() {
-        this.memberRepo = new RoomMemberRepositoryImpl,
-            this.messageRepo = new MessageRepositoryImpl
+    constructor(memberRepo: RoomMemberRepositoryImpl, messageRepo: MessageRepositoryImpl) {
+        this.memberRepo = memberRepo;
+        this.messageRepo = messageRepo;
     }
 
     private roomData = AppDataSource.getRepository(RoomEntity);
@@ -69,7 +69,9 @@ export class RoomRepositoryImpl implements IRoomRepository {
         await roomData.save(room);
     }
     async deleteRoom(roomId: number): Promise<void> {
-        throw new Error("Method not implemented.");
+        await this.roomData.delete(
+            { id: roomId }
+        );
     }
     async getRoomById(roomId: number): Promise<RoomModel> {
         const room = await this.roomData.findOne({

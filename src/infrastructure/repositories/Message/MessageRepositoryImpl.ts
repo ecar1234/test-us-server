@@ -53,12 +53,17 @@ export class MessageRepositoryImpl implements IMessageRepository {
         message.room = { id: roomId } as RoomEntity;
         message.sender = { userId: senderId } as UserEntity;
         await messageRepo.save(message);
-        return this.toDomainModelMessage(message);
+        const savedMessage = await messageRepo.findOne({
+            where: { id: message.id },
+            relations: ['room', 'sender']
+        });
+        
+        return this.toDomainModelMessage(savedMessage);
     }
     async getMessagesByRoomId(roomId: number): Promise<MessageModel[]> {
         const messages = await this.messageAppData.find({
             where: { room: {id: roomId} },
-            relations: ['room']
+            relations: ['room', 'sender', 'room.members']
         });
         return messages.map(message => this.toDomainModelMessage(message));
     }

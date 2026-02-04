@@ -31,7 +31,18 @@ export class MessageUseCase {
 
     async getMessageByPostId(postId: string, targetId: string): Promise<MessageModel[]> {
         const messages = await this.roomRepo.getMessagesByPostId(postId, targetId);
-        // messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        if(messages && messages.length !== 0){
+            const room = await this.getRoomById(messages[0].roomId);
+            if(room){
+                const anotherUser = room.members.find(member => member.userId !== targetId);
+                if(anotherUser){
+                    await this.markAsRead(room.id, anotherUser.userId);
+                    await this.roomMemberRepo.updateLastRead(room.id, anotherUser.userId, messages[messages.length -1].id);
+                }else {
+                    console.log('[MessageUseCase] getMessageByPostId: not found anotherUser');
+                }
+            }
+        }
         return messages;
     }
 
@@ -53,7 +64,7 @@ export class MessageUseCase {
                throw error;
            }
 
-           let message;
+           let message: MessageModel;
            try {
                message = await this.messageRepo.saveMessage(room.id, senderId, content, manager);
            } catch (error) {
@@ -84,9 +95,14 @@ export class MessageUseCase {
             await this.roomMemberRepo.updateLastRead(roomId, userId, lastMessage.id);
         }
     }
-    async getMessageByRoomId(roomId: number): Promise<MessageModel[]> {
+    async getMessageByRoomId(roomId: number, userId: string): Promise<MessageModel[]> {
         const messages = await this.messageRepo.getMessagesByRoomId(roomId);
-        // messages.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        const room = await this.getRoomById(roomId);
+        if(room){
+            await this.roomMemberRepo.updateLastRead(room.id, userId, messages[messages.length -1].id);
+            await this.markAsRead(room.id, userId);
+        }
+        
         return messages;
     }
 }

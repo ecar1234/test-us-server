@@ -32,8 +32,8 @@ export class MessageController {
     // Message
     async getMessageByRoomId(req: Request, res: Response): Promise<void> {
         try {
-            const { roomId } = req.body;
-            const messages: MessageModel[] = await this.messageUseCase.getMessageByRoomId(roomId);
+            const { roomId, userId } = req.body;
+            const messages: MessageModel[] = await this.messageUseCase.getMessageByRoomId(roomId, userId);
             res.status(200).json({ status: 200, messages: messages });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });

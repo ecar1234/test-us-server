@@ -29,10 +29,6 @@ export class UserRepositoryImpl implements IUserRepository {
             userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
             userEntity.applications ? userEntity.applications.map(
                 applicationEntity => applicationEntity.appId) : [],
-            // userEntity.sentMessages && userEntity.sentMessages.map(message => message.messageId),
-            // userEntity.receiveMessages && userEntity.receiveMessages.map(message => message.messageId),
-            // userEntity.givenReviews && userEntity.givenReviews.map(review => review.reviewId),
-            // userEntity.receivedReviews && userEntity.receivedReviews.map(review => review.reviewId)
         );
     }
     private toEntityUser(user: UserModel): UserEntity {
@@ -50,10 +46,6 @@ export class UserRepositoryImpl implements IUserRepository {
             ...(user.applications && { applications: user.applications.map(applicationId => ({ appId: applicationId })) }),
             ...(user.profileImg && { image: user.profileImg as { url: string; filename: string; originalname: string; mimetype: string; size: number } }),
             method: user.method === 'EMAIL' ? UserMethod.EMAIL : (user.method === 'GOOGLE' ? UserMethod.GOOGLE : UserMethod.NAVER),
-            // ...(user.sentMessages && { sentMessages: user.sentMessages.map(message => ({ messageId: message.id })) }),
-            // ...(user.receiveMessages && { receiveMessages: user.receiveMessages.map(message => ({ messageId: message.id })) }),
-            // ...(user.givenReviews && { givenReviews: user.givenReviews.map(review => ({ reviewId: review.id })) }),
-            // ...(user.receivedReviews && { receivedReviews: user.receivedReviews.map(review => ({ reviewId: review.id })) }  )
         });
         return dbUser;
     }

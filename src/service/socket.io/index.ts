@@ -10,15 +10,35 @@ import { RoomMemberRepositoryImpl } from "../../infrastructure/repositories/Mess
 import { TypeOrmUnitOfWork } from "../../infrastructure/repositories/Message/UnitOfWorkImpl";
 import { AppDataSource } from "../../config/DataSource";
 import { verifyToken } from "../../utils/jwt";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
+import { notificationHandler } from "./handlers/notificationHandler";
+import { redisClient } from "../../config/RedisConfig";
+import { MessageControlService } from "./messageControlService";
 
 export const initSocket = async (server: httpServer) => {
-    
+    const messageRepo = new MessageRepositoryImpl();
+    const memberRepo = new RoomMemberRepositoryImpl();
+    const roomRepo = new RoomRepositoryImpl(memberRepo, messageRepo);
+
+    const messageUseCase = new MessageUseCase(
+        messageRepo,
+        roomRepo,
+        memberRepo,
+        new TypeOrmUnitOfWork(AppDataSource)
+    );
+
     const pubClient = new Redis({
         port: 6379,
         host: '127.0.0.1',
         family: 4,
     });
     const subClient = pubClient.duplicate();
+
+    const cacheClient = new Redis({
+        port: 6379,
+        host: '127.0.0.1',
+        family: 4,
+    });
 
     pubClient.on("error", (err) => {
         console.error("Socket.IO Redis Pub Error:", err);
@@ -27,13 +47,8 @@ export const initSocket = async (server: httpServer) => {
     subClient.on("error", (err) => {
         console.error("Socket.IO Redis Sub Error:", err);
     });
-    
-    const messageUseCase = new MessageUseCase(
-        new MessageRepositoryImpl(), 
-        new RoomRepositoryImpl(),
-        new RoomMemberRepositoryImpl(),
-        new TypeOrmUnitOfWork(AppDataSource)
-    );
+
+
     const io = new Server(server, {
         adapter: createAdapter(pubClient, subClient),
         cors: {
@@ -61,14 +76,18 @@ export const initSocket = async (server: httpServer) => {
         next();
     });
 
-    io.on("connection", (socket) => {
+    io.on("connection", async (socket) => {
         console.log(`[Socket] Connected: ${socket.id}`);
-        chatHandler(socket, io, messageUseCase);
-        // notificationHandler(socket, io);
 
-        socket.on("disconnect", () => {
+        await cacheClient.set(`online${socket.data.userId}`, socket.id, "EX", 60);
+        console.log(`[Socket] cache_set_${socket.data.userId}`);
+        chatHandler(socket, io, messageUseCase, cacheClient);
+        // notificationHandler(socket, io, fmcRepo);
+
+        socket.on("disconnect", async () => {
             console.log(`[Socket] Disconnected: ${socket.id}`);
         });
+
     });
 
     return io;
