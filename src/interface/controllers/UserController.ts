@@ -10,12 +10,21 @@ export class UserController {
             const { email, nickname, password, userType, role, userName, birth } = req.body;
             // console.log(`userType : ${userType} / role : ${role}`);
             const userValue = await this.userUseCase.registerUser(email, nickname, password, userType, role, userName, birth);
-            if (userValue[1] === 409) {
-                res.status(409).json({ status: 409, findUser: userValue[0] });
+            if (userValue.status !== 'ACTIVE') {
+                res.status(409).json({ status: 409, findUser: userValue });
                 return;
             }
-            const user = userValue[0];
-            res.status(200).json({ status: 200, user: { userId: user.userId, email: user.email, nickname: user.nickname, userType: user.userType, userName: user.userName, birth: user.birth, createdAt: user.createdAt } });
+            res.status(200).json({
+                status: 200, user: {
+                    userId: userValue.userId,
+                    email: userValue.email,
+                    nickname: userValue.nickname,
+                    userType: userValue.userType,
+                    userName: userValue.userName,
+                    birth: userValue.birth,
+                    createdAt: userValue.createdAt
+                }
+            });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
@@ -50,19 +59,18 @@ export class UserController {
     async login(req: Request, res: Response): Promise<void> {
         try {
             const { email, password } = req.body;
-            const user = await this.userUseCase.getUserByEmail(email);
+            const [user, message] = await this.userUseCase.login(email, password);
             if (!user) {
-                res.status(404).json({ error: "User not found" });
+                if (message === "User not found") {
+                    res.status(404).json({ status: 404, error: message });
+                } else if (message === "Invalid password") {
+                    res.status(401).json({ status: 401, error: message });
+                }
                 return;
             }
-            const isValid = await this.userUseCase.isPasswordValid(user.userId, password);
-            // console.log(isValid);
-            if (isValid) {
-                const token = generateToken(user);
-                res.status(200).json({ status: 200, token: token, user: user });
-            } else {
-                res.status(401).json({ status: 401, error: "Invalid password" });
-            }
+            const token = generateToken(user);
+            res.status(200).json({ status: 200, user: user, token: token });
+
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
@@ -222,6 +230,7 @@ export class UserController {
     async changePassword(req: Request, res: Response): Promise<void> {
         try {
             const { userId, newPassword } = req.body;
+
             const success = await this.userUseCase.changePassword(userId, newPassword);
             if (success) {
                 res.status(200).json({ status: 200, success: success, message: "Password changed successfully" });

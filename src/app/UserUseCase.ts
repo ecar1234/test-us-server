@@ -30,14 +30,15 @@ interface ImageToDelete {
 export class UserUseCase {
     constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: UserReviewRepositoryImpl) { }
 
-    async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date, profileImg?: UploadedImageInfo, method: string = 'EMAIL'): Promise<[UserModel, number]> {
+    async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date, profileImg?: UploadedImageInfo, method: string = 'EMAIL'): Promise<UserModel> {
         const findUser = await this.userRepo.findUserByEmail(email);
         if (findUser) {
-            return [findUser, 409];
+            return findUser;
         }
         const passwordHash = await bcrypt.hash(password, 10);
-        const user = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth, profileImg, method);
-        return [await this.userRepo.registerUser(user), 200];
+        const userInfo = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth, profileImg, method);
+        const newUser = await this.userRepo.registerUser(userInfo);
+        return newUser;
     }
     async authUserRegister(email: string, nickname: string, profileUrl: string, userType: string, role: string, method: string): Promise<UserModel> {
         const user = new UserModel(
@@ -55,13 +56,18 @@ export class UserUseCase {
         );
         return await this.userRepo.registerUser(user);
     }
+    async login(email: string, password: string): Promise<[UserModel | null, string]> { 
+        const user = await this.userRepo.findUserByEmail(email);
+        if (user.status !== 'ACTIVE') {
+            return [null, "User not found"];
+        }
+        const isValid = await this.isPasswordValid(user.userId, password);
+        if (!isValid) {
+            return [null, "Invalid password"];
+        }
+        return [user, "Login successful"];
+    }
     async deleteUser(userId: string): Promise<[boolean, string]> {
-        // console.log(userId);
-        // const user = await this.userRepo.findUserByEmail(userId);
-        // if (!user) {
-        //     return [false, "User not found"];
-        // }
-
         const isDeleted = await this.userRepo.deleteUser(userId);
         if (!isDeleted) {
             return [false, "Failed to delete user"];

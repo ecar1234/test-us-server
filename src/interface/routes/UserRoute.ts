@@ -5,7 +5,7 @@ import { UserRepositoryImpl } from "../../infrastructure/repositories/UserReposi
 import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { authMiddleware } from "../middlewares/AuthMiddleware";
-import { Env } from "../../config/env";
+// import { Env } from "../../config/env";
 import fs from "fs";
 import multer from "multer";
 import path from "path";
@@ -43,7 +43,7 @@ route.put('/changePassword', authMiddleware, userController.changePassword.bind(
 route.get('/getAllUsers', authMiddleware, userController.getAllUsers.bind(userController));
 route.get('/isNicknameAvailable/:nickname', userController.isNicknameAvailable.bind(userController));
 route.get('/isEmailAvailable/:email', userController.isEmailAvailable.bind(userController));
-route.post('/isPasswordValid', userController.isPasswordValid.bind(userController));
+route.post('/isPasswordValid', authMiddleware, userController.isPasswordValid.bind(userController));
 route.put('/updateUserInfo', authMiddleware, userController.update.bind(userController));
 route.post('/updateUserInfoWithImg', authMiddleware, uploadWithFile.single('image'), userController.updateUserInfoWithImg.bind(userController));
 

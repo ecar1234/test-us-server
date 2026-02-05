@@ -20,5 +20,6 @@ route.post('/refreshToken', userController.refreshToken.bind(userController));
 route.post('/authLogin', userController.authLogin.bind(userController));
 route.post('/authSignup', userController.authRegister.bind(userController));
 route.post('/delete', userController.delete.bind(userController));
+route.post('/updatePassword', authMiddleware, userController.changePassword.bind(userController));
 
 export default route;

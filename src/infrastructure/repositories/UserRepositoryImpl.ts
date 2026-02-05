@@ -4,7 +4,7 @@ import { UserModel } from "../../domain/entities/UserModel";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
 import { ApplicationStatus } from "../entities/ApplicationEntity";
 import { UserEntity, UserMethod, UserRole, UserStatus, UserType } from "../entities/UserEntity";
-import { In, Not } from "typeorm";
+import { In } from "typeorm";
 
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -37,7 +37,7 @@ export class UserRepositoryImpl implements IUserRepository {
             email: user.email,
             password_hash: user.password,
             nickname: user.nickname,
-            type: user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS :(user.userType === 'COMPANIES' ? UserType.COMPANIES : UserType.NORMAL),
+            type: user.userType === 'INDIVIDUALS' ? UserType.INDIVIDUALS : (user.userType === 'COMPANIES' ? UserType.COMPANIES : UserType.NORMAL),
             status: user.status === 'ACTIVE' ? UserStatus.ACTIVE : UserStatus.INACTIVE,
             role: this.getUserRole(user.role),
             userName: user.userName,
@@ -166,9 +166,13 @@ export class UserRepositoryImpl implements IUserRepository {
         // console.log(users[0].applications[0]);
         return users.map((user) => this.toDomainUser(user));
     }
-    findUserByEmail(email: string): Promise<UserModel | null> {
-        return this.userRepository.findOne({ where: { email } })
-            .then(userEntity => userEntity ? this.toDomainUser(userEntity) : null);
+    async findUserByEmail(email: string): Promise<UserModel | null> {
+        const user = await this.userRepository.findOne(
+            { where: { email: email } });
+        if (!user) {
+            return null;
+        }
+        return this.toDomainUser(user);
     }
     findUserByNickname(nickname: string): Promise<UserModel | null> {
         return this.userRepository.findOne({ where: { nickname } })
