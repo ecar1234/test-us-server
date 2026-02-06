@@ -7,6 +7,7 @@ import { redisClient } from "../../config/RedisConfig";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl";
 import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
+import { UserStatus } from "../entities/UserEntity";
 
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
@@ -152,7 +153,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             ? {
                 userId: postEntity.author.userId,
                 nickname: postEntity.author.nickname,
-                profileImg: postEntity.author.image
+                profileImg: postEntity.author.image,
+                status: postEntity.author.status === UserStatus.ACTIVE ? 'ACTIVE' : ( postEntity.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE' )
             }
             : null;
         const status = postEntity.status === BasePostStateType.ACTIVE ?

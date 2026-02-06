@@ -6,6 +6,7 @@ import { PromotionPostEntity } from "../entities/PromotionPostEntity";
 import { redisClient } from "../../config/RedisConfig";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
 import { Like } from "typeorm";
+import { UserStatus } from "../entities/UserEntity";
 
 
 
@@ -181,7 +182,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             ? {
                 userId: post.author.userId,
                 nickname: post.author.nickname,
-                profileImg: post.author.image
+                profileImg: post.author.image,
+                status: post.author.status === UserStatus.ACTIVE ? 'ACTIVE' : ( post.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE' )
             }
             : null;
         const status = post.status === BasePostStateType.ACTIVE ?

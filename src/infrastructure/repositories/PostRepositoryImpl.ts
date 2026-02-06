@@ -9,6 +9,7 @@ import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
 import { PromotionPostRepositoryImpl } from "./PromotionPostRepositoryImpl";
 import { RecruitmentPostRepositoryImpl } from "./RecruitmentPostRepositoryImpl";
 import { IPostRepository } from "../../domain/interface_repositories/IPostRepository";
+import { UserStatus } from "../entities/UserEntity";
 
 export class PostRepositoryImpl implements IPostRepository {
     private baseRepo = AppDataSource.getRepository(BasePostEntity);
@@ -30,7 +31,7 @@ export class PostRepositoryImpl implements IPostRepository {
 
         const favoritePostEntities = await this.baseRepo.find({
             relations: ['author'],
-            where: { views: MoreThan(50) , status: BasePostStateType.ACTIVE},
+            where: { views: MoreThan(50) , status: BasePostStateType.ACTIVE, author: {status: UserStatus.ACTIVE}},
             order: { views: 'DESC' },
             take: 10
         });
