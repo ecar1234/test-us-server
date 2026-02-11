@@ -1,25 +1,37 @@
 import express, { Router } from 'express';
-import { UserRepositoryImpl } from '../../infrastructure/repositories/UserRepositoryImpl';
 import { UserUseCase } from '../../app/UserUseCase';
-import { UserController } from '../controllers/UserController';
+import { UserRepositoryImpl } from '../../infrastructure/repositories/UserRepositoryImpl';
 import { RecruitmentPostRepositoryImpl } from '../../infrastructure/repositories/RecruitmentPostRepositoryImpl';
-import { UserReviewRepositoryImpl } from '../../infrastructure/repositories/UserReviewRepositoryImpl';
-import { auth } from 'firebase-admin';
+import { OtpSevice } from '../../service/otp/OtpService';
+import { MailService } from '../../service/otp/MailService';
+import { OtpRepositoryImpl } from '../../infrastructure/repositories/Otp/OtpRedisRepositoryImpl';
+import { OtpUseCase } from '../../app/OtpUseCase';
+import { AuthConroller } from '../controllers/AuthController';
 import { authMiddleware } from '../middlewares/AuthMiddleware';
+import { UserReviewRepositoryImpl } from '../../infrastructure/repositories/UserReviewRepositoryImpl';
+import { AuthUseCase } from '../../app/AuthUseCase';
+
 
 const route: Router = express.Router();
 // post, app, message, review useCase 추가해서 user usecase에 주입 해야함.(목록 조회용)
 
 const userUseCase: UserUseCase = new UserUseCase(new UserRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new UserReviewRepositoryImpl());
-const userController: UserController = new UserController(userUseCase);
+const authUseCase: AuthUseCase = new AuthUseCase(new UserRepositoryImpl(), new OtpRepositoryImpl(), new MailService(), new OtpSevice());
+const otpUseCase: OtpUseCase = new OtpUseCase(new OtpRepositoryImpl(), new MailService(), new OtpSevice());
+const authController: AuthConroller = new AuthConroller(userUseCase, authUseCase, otpUseCase);
 
-route.post('/register', userController.register.bind(userController));
-route.post('/login', userController.login.bind(userController));
-route.get('/autoLogin', authMiddleware, userController.autoLogin.bind(userController));
-route.post('/refreshToken', userController.refreshToken.bind(userController));
-route.post('/authLogin', userController.authLogin.bind(userController));
-route.post('/authSignup', userController.authRegister.bind(userController));
-route.post('/delete', userController.delete.bind(userController));
-route.post('/updatePassword', authMiddleware, userController.changePassword.bind(userController));
+route.post('/register', authController.register.bind(authController));
+route.post('/login', authController.login.bind(authController));
+route.get('/autoLogin', authMiddleware, authController.autoLogin.bind(authController));
+route.post('/refreshToken', authController.refreshToken.bind(authController));
+route.post('/authLogin', authController.authLogin.bind(authController));
+route.post('/authSignup', authController.authRegister.bind(authController));
+route.post('/delete', authController.delete.bind(authController));
+route.post('/updatePassword', authMiddleware, authController.updatePassword.bind(authController));
+route.post('/changePassword', authController.changePassword.bind(authController));
+route.post('/findEmail', authController.findEmail.bind(authController));
+route.post('/findPassword', authController.findPassword.bind(authController));
+route.post('/verifyOtp', authController.verifyOtp.bind(authController));
+
 
 export default route;

@@ -1,15 +1,12 @@
 import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
-import { TResUserAndReivews, UserModel } from "../domain/entities/UserModel";
-import { UserStatus } from "../infrastructure/entities/UserEntity";
+import { UserModel } from "../domain/entities/UserModel";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
 import { Env } from "../config/env";
-// import { ImagesModel } from "../domain/entities/ImagesModel"
-import uuid from 'uuid';
-import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
 
 
 
@@ -30,50 +27,7 @@ interface ImageToDelete {
 export class UserUseCase {
     constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: UserReviewRepositoryImpl) { }
 
-    async registerUser(email: string, nickname: string, password: string, userType: string, role: string, userName: string, birth: Date, profileImg?: UploadedImageInfo, method: string = 'EMAIL'): Promise<UserModel> {
-        const findUser = await this.userRepo.findUserByEmail(email);
-        if (findUser) {
-            return findUser;
-        }
-        const passwordHash = await bcrypt.hash(password, 10);
-        const userInfo = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth, profileImg, method);
-        const newUser = await this.userRepo.registerUser(userInfo);
-        return newUser;
-    }
-    async authUserRegister(email: string, nickname: string, profileUrl: string, userType: string, role: string, method: string): Promise<UserModel> {
-        const user = new UserModel(
-            null,
-            email,
-            nickname?? `User${uuid.v4}`,
-            'authUserRegister',
-            userType,
-            UserStatus.ACTIVE,
-            role, 
-            null,
-            null, 
-            { url: profileUrl, filename: null, originalname: null, mimetype: null, size: null },
-            method
-        );
-        return await this.userRepo.registerUser(user);
-    }
-    async login(email: string, password: string): Promise<[UserModel | null, string]> { 
-        const user = await this.userRepo.findUserByEmail(email);
-        if (user.status !== 'ACTIVE') {
-            return [null, "User not found"];
-        }
-        const isValid = await this.isPasswordValid(user.userId, password);
-        if (!isValid) {
-            return [null, "Invalid password"];
-        }
-        return [user, "Login successful"];
-    }
-    async deleteUser(userId: string): Promise<[boolean, string]> {
-        const isDeleted = await this.userRepo.deleteUser(userId);
-        if (!isDeleted) {
-            return [false, "Failed to delete user"];
-        }
-        return [true, "User deleted successfully"];
-    }
+   
     async updateUserInfo(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date,method: string = 'EMAIL'): Promise<UserModel> {
         // console.log("use case : ", birth);
         const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, null, method);
@@ -122,10 +76,6 @@ export class UserUseCase {
 
         // 3. 얻은 userId를 사용하여 PostRepository를 통해 해당 사용자의 모든 게시물을 한 번의 쿼리로 효율적으로 조회합니다.
         return this.postRepo.getPostsByAuthor(user.userId);
-    }
-    async changePassword(userId: string, newPassword: string): Promise<boolean> {
-        const passwordHash = await bcrypt.hash(newPassword, 10);
-        return this.userRepo.changePassword(userId, passwordHash);
     }
     async getAllUsers(): Promise<UserModel[]> {
         return this.userRepo.findAllUsers();

@@ -18,6 +18,8 @@ export const redisClient = new IORedis({
   keyPrefix: isProd ? 'prod:' : 'dev:'
 });
 
+export const redisOtp = redisClient;
+
 // 2. BullMQ용 커넥션 (Prefix 미사용 - BullMQ 제약사항 준수)
 export const bullMqConnection = new IORedis(baseConfig);
 

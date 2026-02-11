@@ -9,6 +9,6 @@ export interface IUserRepository {
     findUserByEmail(email: string): Promise<UserModel | null>;
     findUserByNickname(nickname: string): Promise<UserModel | null>;
     findPostsByNickname(nickname: string): Promise<UserModel>;
-    changePassword(userId: string, newPassword: string): Promise<boolean>;
+    updatePassword(userId: string, newPassword: string): Promise<boolean>;
     findAllUsers(): Promise<UserModel[]>;
 }

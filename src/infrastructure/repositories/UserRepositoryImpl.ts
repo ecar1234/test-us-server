@@ -8,6 +8,7 @@ import { In } from "typeorm";
 
 
 export class UserRepositoryImpl implements IUserRepository {
+  
     private userRepository = AppDataSource.getRepository(UserEntity);
 
     private toDomainUser(userEntity: UserEntity): UserModel {
@@ -188,7 +189,7 @@ export class UserRepositoryImpl implements IUserRepository {
         }
         return this.toDomainUser(user);
     }
-    changePassword(userId: string, newPassword: string): Promise<boolean> {
+    async updatePassword(userId: string, newPassword: string): Promise<boolean> {
         return this.userRepository.update({ userId }, { password_hash: newPassword })
             .then(result => result.affected !== 0);
     }
