@@ -154,7 +154,7 @@ export class UserRepositoryImpl implements IUserRepository {
         return this.toDomainUser(savedUser);
     }
     findUserById(userId: string): Promise<UserModel | null> {
-        return this.userRepository.findOne({ where: { userId } })
+        return this.userRepository.findOne({ where: {userId: userId, status: UserStatus.ACTIVE} })
             .then(userEntity => userEntity ? this.toDomainUser(userEntity) : null);
     }
     async findUsersByIds(ids: string[]): Promise<UserModel[]> {

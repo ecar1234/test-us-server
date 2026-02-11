@@ -3,6 +3,7 @@ import { decodeToken, generateToken, verifyToken } from "../../utils/jwt";
 import { AuthUseCase } from "../../app/AuthUseCase";
 import { UserUseCase } from "../../app/UserUseCase";
 import { OtpUseCase } from "../../app/OtpUseCase";
+import { JwtPayload } from "jsonwebtoken";
 
 export class AuthConroller {
     constructor(private userUseCase: UserUseCase, private authUseCase: AuthUseCase, private otpUseCase: OtpUseCase) { }
@@ -75,10 +76,18 @@ export class AuthConroller {
         }
     }
     async autoLogin(req: Request, res: Response): Promise<void> {
-        // const { user } = req.user;
-        // const serverUser = await this.userUseCase.getUserById(user.userId);
-
         try {
+            const user: JwtPayload | string = req.user;
+            if (typeof user === 'string') {
+                res.status(401).json({ status: 401, error: user });
+                return;
+            }
+            const userId = user.userId;
+            const userValue = await this.userUseCase.getUserById(userId);
+            if (!userValue) {
+                res.status(404).json({ status: 404, error: "User not found" });
+                return;
+            }
             res.status(200).json({ status: 200 });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
@@ -133,7 +142,7 @@ export class AuthConroller {
             const success = await this.authUseCase.changePassword(email, newPassword);
             if (success) {
                 res.status(200).json({ status: 200 });
-            }else {
+            } else {
                 res.status(400).json({ status: 400 });
             }
         } catch (error) {
@@ -147,7 +156,7 @@ export class AuthConroller {
             const { nickname } = req.body;
             const email = await this.authUseCase.findEmail(nickname);
             res.status(200).json({ status: 200, email: email });
-        }catch (error) {
+        } catch (error) {
             res.status(500).json({ status: 400, error: error.message });
         }
     }
@@ -157,7 +166,7 @@ export class AuthConroller {
             const ip = req.ip;
             const code = await this.authUseCase.findPassword(email, ip);
             res.status(200).json({ status: 200, code: code });
-        } catch (error){
+        } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
     }
@@ -170,7 +179,7 @@ export class AuthConroller {
             } else {
                 res.status(401).json({ status: 401 });
             }
-        } catch (error){
+        } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
     }
