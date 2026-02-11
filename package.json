@@ -10,10 +10,9 @@
     "build": "tsc",
     "start": "NODE_ENV=prod pm2 start ecosystem.config.js --env prod",
     "migration:dev:run": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
-    "migration:dev:gen": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:generate -d src/config/DataSource.ts src/migration/dev/AutoGen",
-    "migration:dev:revert": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/DataSource.ts",
     "migration:prod:run": "NODE_ENV=prod node ./node_modules/typeorm/cli.js migration:run -d dist/config/DataSource.js",
-    "migration:prod:gen": "NODE_ENV=prod node ./node_modules/typeorm/cli.js migration:generate -d dist/config/DataSource.js src/migration/main/AutoGen",
+    "migration:gen": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:generate -d src/config/DataSource.ts src/migration/AutoGen",
+    "migration:dev:revert": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/DataSource.ts",
     "migration:prod:revert": "NODE_ENV=prod node ./node_modules/typeorm/cli.js migration:revert -d dist/config/DataSource.js"
   },
   "keywords": [],

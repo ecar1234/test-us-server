@@ -119,33 +119,21 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
                 return PostCategory.ETC;
         }
     }
-    private transferOsToString(mobileOs: MobileOsType[]): string[] {
-        let res = [];
-        if(mobileOs.length !== 0){
-            res = mobileOs.map(os => {
-                switch(os){
-                    case MobileOsType.ANDROID:
-                        return 'android';
-                    case MobileOsType.IOS:
-                        return 'ios';
-                }
-            });
+    private transferOsToString(mobileOs: MobileOsType): string {
+        switch (mobileOs) {
+            case MobileOsType.ANDROID:
+                return 'android';
+            case MobileOsType.IOS:
+                return 'ios';
         }
-        return res;
     }
-    private transferStringToOs(mobileOs: string[]): MobileOsType[] {
-        let res = [];
-        if(mobileOs.length !== 0){
-            res = mobileOs.map(os => {
-                switch(os){
-                    case 'android':
-                        return MobileOsType.ANDROID;
-                    case 'ios':
-                        return MobileOsType.IOS;
-                }
-            });
+    private transferStringToOs(mobileOs: string): MobileOsType {
+        switch (mobileOs) {
+            case 'android':
+                return MobileOsType.ANDROID;
+            case 'ios':
+                return MobileOsType.IOS;
         }
-        return res;
     }
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
@@ -154,7 +142,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
                 userId: postEntity.author.userId,
                 nickname: postEntity.author.nickname,
                 profileImg: postEntity.author.image,
-                status: postEntity.author.status === UserStatus.ACTIVE ? 'ACTIVE' : ( postEntity.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE' )
+                status: postEntity.author.status === UserStatus.ACTIVE ? 'ACTIVE' : (postEntity.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE')
             }
             : null;
         const status = postEntity.status === BasePostStateType.ACTIVE ?

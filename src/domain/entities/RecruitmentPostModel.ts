@@ -7,7 +7,7 @@ export class RecruitmentPostModel {
         public title: string,
         public subtitle: string,
         public platform: string,
-        public mobileOs: string[],
+        public mobileOs: string|null,
         public category: string,
         public contents: string,
         public status: string = 'active',

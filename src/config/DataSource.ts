@@ -24,7 +24,7 @@ const createMainDataSource = () => {
       path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/*.js"),
     ],
     migrations: [
-      path.join(__dirname, "..", "migration/main/*.js"),
+      path.join(__dirname, "..", "migration/*.js"),
     ],
   });
 }
@@ -46,7 +46,7 @@ const createDevDataSource = () => {
       path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/*.ts"),
     ],
     migrations: [
-      path.join(__dirname, "..", "migration/dev/*.ts"),
+      path.join(__dirname, "..", "migration/*.ts"),
     ],
   });
 }

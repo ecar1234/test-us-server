@@ -118,33 +118,21 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
                 return PostCategory.ETC;
         }
     }
-    private transferOsToString(os: MobileOsType[]): string[] {
-        let res = [];
-        if (os.length !== 0) {
-            res = os.map(os => {
-                switch (os) {
-                    case MobileOsType.ANDROID:
-                       return 'android';
-                    case MobileOsType.IOS:
-                        return 'ios';
-                }
-            });
+    private transferOsToString(os: MobileOsType): string {
+        switch (os) {
+            case MobileOsType.ANDROID:
+                return 'android';
+            case MobileOsType.IOS:
+                return 'ios';
         }
-        return res;
     }
-    private transferStringToOs(os: string[]): MobileOsType[] {
-        let res = [];
-        if (os.length !== 0) {
-            res = os.map(os => {
-                switch (os) {
-                    case 'android':
-                        return MobileOsType.ANDROID;
-                    case 'ios':
-                        return MobileOsType.IOS;
-                }
-            });
+    private transferStringToOs(os: string): MobileOsType {
+        switch (os) {
+            case 'android':
+                return MobileOsType.ANDROID;
+            case 'ios':
+                return MobileOsType.IOS;
         }
-        return res;
     }
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
         const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)

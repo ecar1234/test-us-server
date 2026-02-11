@@ -60,11 +60,11 @@ export class PostUseCase {
 
 
     // Recruitment
-    async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, images: UploadedImageInfo[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
+    async createRecruitPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string, category: string, contents: string, images: UploadedImageInfo[], status: string = 'active', period: number = 7): Promise<RecruitmentPostModel> {
         const post = new RecruitmentPostModel(null, author.userId, title, subtitle, platform, mobileOs, category, contents, status, period, 0, images);
         return this.recruitRepo.createPost(post);
     }
-    async updateRecruitPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, status: string = 'active', deleteImages: ImageToDelete[] = [], newImages: UploadedImageInfo[] = []): Promise<RecruitmentPostModel> {
+    async updateRecruitPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string, category: string, contents: string, status: string = 'active', deleteImages: ImageToDelete[] = [], newImages: UploadedImageInfo[] = []): Promise<RecruitmentPostModel> {
         // 1. 기존 게시물 정보 가져오기
         const existingPost = await this.recruitRepo.getPostById(id);
         if (!existingPost) {
@@ -216,11 +216,11 @@ export class PostUseCase {
     // }
 
     // Promotion
-    async createPromotionPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, images: object[], domain: string[], status: string = 'active', period: number = 7): Promise<PromotionPostModel> {
+    async createPromotionPost(author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string, category: string, contents: string, images: object[], domain: string, status: string = 'active', period: number = 7): Promise<PromotionPostModel> {
         const post = new PromotionPostModel(null, author.userId, title, subtitle, platform, mobileOs, category, contents, status, period, 0, images, domain);
         return this.promotionRepo.createPost(post);
     }
-    async updatePromotionPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string[], category: string, contents: string, domain: string[], status: string = 'active', deleteImages: ImageToDelete[] = [], newImages: UploadedImageInfo[] = []): Promise<PromotionPostModel> {
+    async updatePromotionPost(id: string, author: UserEntity, title: string, subtitle: string, platform: string, mobileOs: string, category: string, contents: string, domain: string, status: string = 'active', deleteImages: ImageToDelete[] = [], newImages: UploadedImageInfo[] = []): Promise<PromotionPostModel> {
         // 1. 기존 게시물 정보 가져오기
         const existingPost = await this.promotionRepo.getPostById(id);
         if (!existingPost) {

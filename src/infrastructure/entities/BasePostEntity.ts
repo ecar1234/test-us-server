@@ -73,8 +73,8 @@ export abstract class BasePostEntity {
     @Column({ type: 'varchar', length: 10, nullable: false, default: 'mobile'})
     platform: string;
 
-    @Column({type: 'simple-array', nullable: true})
-    mobileOs: MobileOsType[];
+    @Column({type: 'enum', enum: MobileOsType, nullable: true})
+    mobileOs: MobileOsType;
 
     @Column({type: 'enum', enum: PostCategory, default: 'etc'})
     category: PostCategory;
@@ -109,7 +109,7 @@ export abstract class BasePostEntity {
     @AfterLoad()
     setDefaults() {
         if (!this.mobileOs) {
-            this.mobileOs = [];
+            this.mobileOs = null;
         }
         if (!this.images) {
             this.images = [];
