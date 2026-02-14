@@ -13,7 +13,7 @@ export class MessageControlService {
     ) { }
 
     async firstMessage(message: MessageModel, targetId: string): Promise<void> {
-        const socketId = this.cacheClient.get(`online${targetId}`);
+        const socketId = await this.cacheClient.get(`online${targetId}`);
         if (socketId) {
             this.io.to(`user_${targetId}`).emit("chat_message", message);
             this.io.to(`user_${message.sender.userId}`).emit("chat_mwssage", message);
@@ -46,6 +46,7 @@ export class MessageControlService {
             const token = await this.fmcRepo.getMessingToken(targetId);
             if (token) {
                 await notificationHandler(token, message);
+                console.log('[FCM] sent notification');
             } else {
                 console.log('[FCM] Token not found');
             }

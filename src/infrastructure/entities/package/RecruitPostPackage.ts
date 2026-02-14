@@ -8,6 +8,7 @@ export interface TResRecruitApplicationUserInfo {
         email: string;
         nickname: string;
         profileImg: object | null;
+        status: string;
         userType: string;
         role: string;
         createdAt: Date;

@@ -34,5 +34,4 @@ export class RoomMemberModel {
     public lastReadMessageId: number;
     public isActive: boolean;
     public joinedAt: Date;
-
 }

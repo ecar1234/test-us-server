@@ -33,8 +33,8 @@ const instanceIdx = parseInt(process.env.NODE_APP_INSTANCE || '0');
 const port = basePost + instanceIdx;
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // const uploadRoot = isProd
 //   ? path.resolve(Env.MAIN_UPLOAD_URL)
@@ -67,6 +67,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(`[REQ:${req.id}`,err);
   if (err.message.includes('already exists')) {
     res.status(409).json({ status: 409, message: 'data is already exists' });
+    return;
+  }
+  if ((err as any).code === 'LIMIT_FILE_SIZE') {
+    res.status(413).json({ status: 413, message: 'File size too large' });
     return;
   }
   res.status(500).json({ status: 500, reqId: req.id, message: 'An unexpected error occurred' });

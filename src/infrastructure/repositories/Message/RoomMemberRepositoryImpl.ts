@@ -4,7 +4,7 @@ import { AppDataSource } from "../../../config/DataSource";
 import { RoomMemberEntity } from "../../entities/MessagesEntities/RoomMemberEntity";
 import { RoomMemberModel } from "../../../domain/entities/MessagesModels/RoomMenberModel";
 import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity";
-import { UserEntity } from "../../entities/UserEntity";
+import { UserEntity, UserStatus } from "../../entities/UserEntity";
 import { UserRepositoryImpl } from "../UserRepositoryImpl";
 import { RoomRepositoryImpl } from "./RoomRepositoryImpl";
 import { UserModel } from "../../../domain/entities/UserModel";
@@ -19,6 +19,8 @@ export class RoomMemberRepositoryImpl implements IRoomMemberRepository {
             userId: entity.user.userId,
             nickname: entity.user.nickname,
             profileImg: entity.user.image,
+            status: entity.user.status === UserStatus.ACTIVE ? 'ACTIVE' : (UserStatus.INACTIVE ? 'INACTIVE' : 'DELETED'),
+            email: entity.user.email,
             createdAt: entity.user.createdAt,
             updatedAt: entity.user.updatedAt
         } as UserModel : null;

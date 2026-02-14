@@ -289,25 +289,9 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         return domainPosts;
     }
     async getPostsPaginations(page: number, size: number = 20): Promise<PromotionPostModel[]> {
-        const cacheKey = `promotionPosts:page:${page}`;
-        const cachedPosts = await redisClient.get(cacheKey);
-
-        if (cachedPosts && cachedPosts.length > 0) {
-            try {
-                const parsedPosts = JSON.parse(cachedPosts);
-                if (Array.isArray(parsedPosts)) {
-                    const domainPosts = parsedPosts.map(postEntity => this.toDomain(postEntity));
-                    return domainPosts;
-                }
-            } catch (error) {
-                // JSON 파싱 실패 시, 캐시를 삭제하여 다음 요청 시 DB에서 새로 가져오도록 합니다.
-                console.error('Failed to parse cached promotion posts, deleting cache key:', cacheKey, error);
-                await redisClient.del(cacheKey);
-            }
-        }
 
         const posts = await this.repository.find({
-            where: { status: BasePostStateType.ACTIVE },
+            where: { status: BasePostStateType.ACTIVE, author: { status: UserStatus.ACTIVE } },
             relations: ['author'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,

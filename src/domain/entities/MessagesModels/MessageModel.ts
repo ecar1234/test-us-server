@@ -11,6 +11,7 @@ export class MessageModel {
                     userId: string;
                     nickname: string;
                     profileImg: { url: string; filename: string; originalname: string; mimetype: string; size: number; };
+                    status: string;
                 },
                 createdAt: Date
             }
@@ -29,6 +30,7 @@ export class MessageModel {
         userId: string;
         nickname: string;
         profileImg: { url: string; filename: string; originalname: string; mimetype: string; size: number; };
+        status: string;
     }
     public createdAt: Date;
 }

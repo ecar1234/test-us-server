@@ -3,7 +3,7 @@ import { AppDataSource } from "../../../config/DataSource";
 import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel";
 import { IMessageRepository } from "../../../domain/interface_repositories/MessageRepo/IMessageRepository";
 import { MessagesEntity } from "../../entities/MessagesEntities/MessageEntity";
-import { UserEntity } from "../../entities/UserEntity";
+import { UserEntity, UserStatus } from "../../entities/UserEntity";
 import { RoomModel } from "../../../domain/entities/MessagesModels/RoomModel";
 import { RoomMemberModel } from "../../../domain/entities/MessagesModels/RoomMenberModel";
 import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity";
@@ -19,8 +19,9 @@ export class MessageRepositoryImpl implements IMessageRepository {
             sender: messageEntity.sender ? {
                 userId: messageEntity.sender.userId,
                 nickname: messageEntity.sender.nickname,
-                profileImg: messageEntity.sender.image
-            } : { userId: '', nickname: '', profileImg: { url: '', filename: '', originalname: '', mimetype: '', size: 0 } },
+                profileImg: messageEntity.sender.image,
+                status: messageEntity.sender.status === UserStatus.ACTIVE ? 'ACTIVE' : (UserStatus.INACTIVE ? 'INACTIVE' : 'DELETED')
+            } : { userId: '', nickname: '', profileImg: { url: '', filename: '', originalname: '', mimetype: '', size: 0 }, status: ''},
             createdAt: messageEntity.createdAt
         });
     };

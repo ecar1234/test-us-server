@@ -283,26 +283,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     }
 
     async getPostsPaginations(page: number, size: number = 20): Promise<RecruitmentPostModel[]> {
-        const cacheKey = `recruitPosts:page:${page}`;
-        const cachedPosts = await redisClient.get(cacheKey);
-
-        if (cachedPosts && cachedPosts.length > 0) {
-            try {
-                const parsedPosts = JSON.parse(cachedPosts);
-                // 파싱된 데이터가 배열인지 확인합니다.
-                if (Array.isArray(parsedPosts)) {
-                    const domainPosts = parsedPosts.map(postEntity => this.toDomainPost(postEntity));
-                    return domainPosts;
-                }
-            } catch (error) {
-                // JSON 파싱 실패 시, 캐시를 삭제하여 다음 요청 시 DB에서 새로 가져오도록 합니다.
-                console.error('Failed to parse cached posts, deleting cache key:', cacheKey, error);
-                await redisClient.del(cacheKey);
-            }
-        }
-
         const posts = await this.postRepository.find({
-            where: { status: BasePostStateType.ACTIVE },
+            where: { status: BasePostStateType.ACTIVE , author: { status: UserStatus.ACTIVE } },
             relations: ['author'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,
@@ -310,10 +292,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         });
 
         const domainPosts = posts.map(postEntity => this.toDomainPost(postEntity));
-
-        if (posts.length > 0) {
-            await redisClient.set(cacheKey, JSON.stringify(posts), 'EX', 60 * 10); // 10분 동안 캐시
-        }
 
         return domainPosts;
     }

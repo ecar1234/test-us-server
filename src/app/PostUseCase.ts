@@ -190,6 +190,7 @@ export class PostUseCase {
                         email: user.email,
                         nickname: user.nickname,
                         profileImg: user.profileImg,
+                        status: user.status,
                         userType: user.userType,
                         role: user.role,
                         createdAt: user.createdAt,
