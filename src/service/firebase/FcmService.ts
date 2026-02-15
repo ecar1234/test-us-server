@@ -1,7 +1,11 @@
+import { AuthUseCase } from "../../app/AuthUseCase";
+import { FirebaseUseCase } from "../../app/FirebaseUseCase";
+import { UserUseCase } from "../../app/UserUseCase";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
 import { FCMPayload } from "../../interface/interfaces/types";
 import { messaging } from "../../service/firebase/Firebase";
 
-export async function sendNotificationToUser(payload: FCMPayload): Promise<object>{
+export async function sendNotificationToUser(payload: FCMPayload, targetId: string): Promise<object> {
     const message = {
         token: payload.token,
         notification: payload.notification,
@@ -11,16 +15,22 @@ export async function sendNotificationToUser(payload: FCMPayload): Promise<objec
     try {
         const res = await messaging.send(message);
         console.log(`FCM send success : ${res}`);
-        return {'success': true, 'result': res};
-    
+        return { 'success': true, 'result': res };
+
     } catch (error) {
         console.log(error);
-        return {'success': false, 'result': error};
+        if (error.code === 'messaging/registration-token-not-registered') {
+            console.log('❌ Invalid FCM token. Removing from DB');
+            const fmcRepo = new FirebaseRepositoryImpl();
+    
+            await fmcRepo.revmoeMessingToken(targetId);
+            console.log('FCM token removed from DB');
+        }
+        return { 'success': false, 'result': error };
     }
-
 }
 
-export async function sendNotificationToMultiUser(payload: FCMPayload): Promise<string[] | undefined>{
+export async function sendNotificationToMultiUser(payload: FCMPayload): Promise<string[] | undefined> {
     const message = {
         tokens: payload.tokens,
         notification: payload.notification,
@@ -31,9 +41,9 @@ export async function sendNotificationToMultiUser(payload: FCMPayload): Promise<
         console.log(`FCM multi cast end success : ${res}`);
 
         const failedTokens: string[] = [];
-        if(res.failureCount > 0){
+        if (res.failureCount > 0) {
             res.responses.forEach((response, index) => {
-                if(!response.success){
+                if (!response.success) {
                     const failedToken = message.tokens[index];
                     failedTokens.push(failedToken);
                     // 'messaging/registration-token-not-registered' 에러 코드를 확인하여,

@@ -26,8 +26,8 @@ export class FirebaseController {
     }
     async revmoeMessingToken(req: Request, res: Response) {
         try {
-            const { userId, fcmToken } = req.body;
-            await this.firebaseUseCase.revmoeMessingToken(userId, fcmToken);
+            const { userId } = req.body;
+            await this.firebaseUseCase.revmoeMessingToken(userId);
             res.status(200).json({ status: 200, result: true });
         } catch (error) {
             console.log(error);

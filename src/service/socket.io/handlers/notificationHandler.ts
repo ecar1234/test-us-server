@@ -15,7 +15,7 @@ export const notificationHandler = async(token: FirebaseDeviceTokenEntity, messa
         },
         data: {
             type: 'chat',
-            roomId: message.roomId.toString()
+            roomId: message.roomId.toString(),
         }
     };
     if (token.deviceType === 'ios') {
@@ -36,5 +36,5 @@ export const notificationHandler = async(token: FirebaseDeviceTokenEntity, messa
         };
     }
     console.log('[FCM] set payload completed');
-    await sendNotificationToUser(fcmPayload);
+    await sendNotificationToUser(fcmPayload, token.user.userId);
 };

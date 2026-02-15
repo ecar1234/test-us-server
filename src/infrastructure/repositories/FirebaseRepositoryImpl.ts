@@ -8,46 +8,36 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
     private tokenRepo = AppDataSource.getRepository(FirebaseDeviceTokenEntity);
 
     async createMessingToken(userId: string, fcmToken: string, deviceType: string): Promise<void> {
-        const findToken = await this.tokenRepo.findOne({
-            where: {
-                user: { userId },
-                token: fcmToken,
-            }
+        const newToken = this.tokenRepo.create({
+            user: { userId },
+            token: fcmToken,
+            deviceType: deviceType
         });
-        
-       if(findToken){
-        findToken.token = fcmToken;
-        findToken.deviceType = deviceType;
-        await this.tokenRepo.save(findToken);
+        await this.tokenRepo.save(newToken);
         return;
-       }
-       const newToken = this.tokenRepo.create({
-        user: { userId },
-        token: fcmToken,
-        deviceType: deviceType
-       });
-       await this.tokenRepo.save(newToken);
-       return;
     }
     async updateMessingToken(userId: string, fcmToken: string, deviceType: string): Promise<void> {
         const findToken = await this.tokenRepo.findOne({
             where: {
                 user: { userId },
-                token: fcmToken
             }
         });
         if (!findToken) {
             throw new Error('Token not found');
         }
         findToken.deviceType = deviceType;
+        if (findToken.token !== fcmToken) {
+            findToken.token = fcmToken;
+        }
+
         this.tokenRepo.save(findToken);
         return;
     }
-    async revmoeMessingToken(userId: string, fcmToken: string): Promise<void> {
-        const findToken = await this.tokenRepo.delete({
-            user: { userId },
-            token: fcmToken
-        });
+    async revmoeMessingToken(userId: string): Promise<void> {
+        const findToken = await this.tokenRepo.createQueryBuilder()
+            .delete()
+            .where("userId = :userId", { userId })
+            .execute();
         if (findToken.affected === 0) {
             throw new Error('Token not found');
         }
@@ -66,7 +56,8 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
         const findToken = await this.tokenRepo.findOne({
             where: {
                 user: { userId }
-            }
+            },
+            relations: ['user']
         });
         if (!findToken) {
             return new FirebaseDeviceTokenEntity();

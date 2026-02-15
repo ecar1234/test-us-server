@@ -62,7 +62,7 @@ export class AppUseCase {
                 };
                 message['apns'] = apns;
             }
-            await sendNotificationToUser(message);
+            await sendNotificationToUser(message, token.user.userId);
         }
 
         // console.log(result)
@@ -110,7 +110,7 @@ export class AppUseCase {
                     };
                     message['apns'] = apns;
                 }
-                await sendNotificationToUser(message);
+                await sendNotificationToUser(message, token.user.userId);
             }
 
         }
@@ -174,7 +174,7 @@ export class AppUseCase {
                 };
                 message['apns'] = apns;
             }
-            await sendNotificationToUser(message);
+            await sendNotificationToUser(message, token.user.userId);
         }
         return application;
 
@@ -222,7 +222,7 @@ export class AppUseCase {
             };
             message['apns'] = apns;
         }
-        await sendNotificationToUser(message);
+        await sendNotificationToUser(message, token.user.userId);
         }
        
         return application;
