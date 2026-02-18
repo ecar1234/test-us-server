@@ -18,6 +18,7 @@ const messageController = new MessageController(messageUseCase);
 // room
 router.get('/getRoomList/:userId', authMiddleware, messageController.getRoomList.bind(messageController));
 router.get('/getRoomById/:roomId', authMiddleware, messageController.getRoomById.bind(messageController));
+router.post('/resetUnreadCount', authMiddleware, messageController.resetUnreadCount.bind(messageController));
 
 // room roomMember
 // message

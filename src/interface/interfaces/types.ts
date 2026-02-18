@@ -20,9 +20,9 @@ export interface FCMPayload {
         body: string;
     };
     data: {
-        postTitle?: string;
-        userId?: string;
         type: string;
+        title?: string;
+        userId?: string;
         roomId?: string;
     }
     apns?: APNs

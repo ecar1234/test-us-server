@@ -7,7 +7,7 @@ import { MessageModel } from "../../../domain/entities/MessagesModels/MessageMod
 import { FirebaseDeviceTokenEntity } from "../../../infrastructure/entities/FirebaseDeviceTokenEntity";
 
 export const notificationHandler = async(token: FirebaseDeviceTokenEntity, message: MessageModel):Promise<void> => {
-    const fcmPayload = {
+    const fcmPayload: FCMPayload = {
         token: token.token,
         notification: {
             title: '새로운 메시지',
@@ -16,6 +16,7 @@ export const notificationHandler = async(token: FirebaseDeviceTokenEntity, messa
         data: {
             type: 'chat',
             roomId: message.roomId.toString(),
+            title: `${message.sender.nickname}님 메시지`
         }
     };
     if (token.deviceType === 'ios') {

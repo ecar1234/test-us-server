@@ -46,6 +46,16 @@ export class MessageUseCase {
         return messages;
     }
 
+    // member
+
+    async resetUnreadCount(roomId: number, userId: string): Promise<RoomModel> {
+        // 1. 별도의 조회 없이 바로 업데이트 (효율성)
+        await this.roomMemberRepo.resetUnreadCount(roomId, userId);
+        // 2. 업데이트된 방 정보를 조회하여 리턴
+        return await this.getRoomById(roomId);
+    }
+
+
     // message
 
     async sendMessage(roomId: number | null, postId: string, senderId: string, targetId: string, content: string): Promise<MessageModel> {

@@ -116,7 +116,7 @@ export class PostUseCase {
                 },
                 data: {
                     type: 'recruit',
-                    postTitle: post.title,
+                    title: post.title,
                 }
             }
             const result = await sendNotificationToMultiUser(message);

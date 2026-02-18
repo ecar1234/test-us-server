@@ -40,7 +40,7 @@ export class AppUseCase {
                 },
                 data: {
                     type: 'recruit',
-                    postTitle: post.title,
+                    title: post.title,
                     userId: userId
                 },
             };
@@ -89,7 +89,7 @@ export class AppUseCase {
                     },
                     data: {
                         type: 'recruit',
-                        postTitle: post.title,
+                        title: post.title,
                         userId: userId
                     },
                 };
@@ -153,7 +153,7 @@ export class AppUseCase {
                 },
                 data: {
                     type: 'application',
-                    postTitle: post.title,
+                    title: post.title,
                     userId: userId
                 }
             }
@@ -201,7 +201,7 @@ export class AppUseCase {
             },
             data: {
                 type: 'application',
-                postTitle: post.title,
+                title: post.title,
                 userId: userId
             }
         }

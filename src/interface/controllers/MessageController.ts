@@ -29,6 +29,16 @@ export class MessageController {
         }
     }
 
+    async resetUnreadCount(req: Request, res: Response): Promise<void> {
+        try {
+            const { roomId, userId } = req.body;
+            await this.messageUseCase.resetUnreadCount(roomId, userId);
+            res.status(200).json({ status: 200 });
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+
     // Message
     async getMessageByRoomId(req: Request, res: Response): Promise<void> {
         try {

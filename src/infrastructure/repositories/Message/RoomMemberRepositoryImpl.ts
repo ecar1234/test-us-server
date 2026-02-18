@@ -81,6 +81,14 @@ export class RoomMemberRepositoryImpl implements IRoomMemberRepository {
         }
     }
 
+    // 안읽은 메시지 수 초기화 (0으로 설정)
+    async resetUnreadCount(roomId: number, userId: string): Promise<void> {
+        await this.memberData.update(
+            { room: { id: roomId }, userId: userId },
+            { unreadCount: 0 }
+        );
+    }
+
     // 메시지 전송 시: 보낸 사람을 제외한 나머지 멤버들의 unreadCount + 1
     async incrementUnreadCount(roomId: number, senderId: string, manager?: EntityManager): Promise<void> {
         const repo = manager ? manager.getRepository(RoomMemberEntity) : this.memberData;
