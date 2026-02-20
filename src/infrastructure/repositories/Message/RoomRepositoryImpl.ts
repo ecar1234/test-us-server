@@ -93,16 +93,14 @@ export class RoomRepositoryImpl implements IRoomRepository {
         });
         return rooms.map(room => this.toDomain(room));
     }
-    async getMessagesByPostId(postId: string, targetId: string): Promise<MessageModel[]> {
+    async getRoomInfoByPostId(postId: string, targetId: string): Promise<RoomModel> {
         const room = await this.roomData.findOne({
             where: { post: { postId: postId }, targetUserId: targetId },
-            relations: ['messages', 'messages.sender', 'messages.room']
+            relations: ['post', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
         });
         if (!room) {
-            return [];
+            return null;
         }
-        const messages = room.messages;
-        return messages.map(message => this.messageRepo.toDomainModelMessage(message));
+        return this.toDomain(room);
     }
-
 }

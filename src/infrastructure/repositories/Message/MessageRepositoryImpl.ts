@@ -66,6 +66,9 @@ export class MessageRepositoryImpl implements IMessageRepository {
             where: { room: {id: roomId} },
             relations: ['room', 'sender', 'room.members']
         });
+        if(!messages){
+            return [];
+        }
         return messages.map(message => this.toDomainModelMessage(message));
     }
 }

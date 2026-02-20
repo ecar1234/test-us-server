@@ -21,11 +21,11 @@ router.get('/getRoomById/:roomId', authMiddleware, messageController.getRoomById
 router.post('/resetUnreadCount', authMiddleware, messageController.resetUnreadCount.bind(messageController));
 
 // room roomMember
+router.post('/deleteRoomMember', authMiddleware, messageController.deleteRoomMember.bind(messageController));
+
 // message
-// router.post('/sendMessage', messageController.sendMessage.bind(messageController));
-// router.post('/markAsRead', messageController.markAsRead.bind(messageController));
-router.post('/getMessageByRoomId/', messageController.getMessageByRoomId.bind(messageController));
-router.post('/getMessageByPostId/', messageController.getMessageByPostId.bind(messageController));
+router.post('/getMessageByRoomId/', authMiddleware, messageController.getMessageByRoomId.bind(messageController));
+router.post('/getMessageByPostId/', authMiddleware, messageController.getMessageByPostId.bind(messageController));
 
 
 export default router;

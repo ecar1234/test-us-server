@@ -52,7 +52,7 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
         }
         return;
     }
-    async getMessingToken(userId: string): Promise<FirebaseDeviceTokenEntity> {
+    async getMessingToken(userId: string): Promise<FirebaseDeviceTokenEntity | null> {
         const findToken = await this.tokenRepo.findOne({
             where: {
                 user: { userId }
@@ -60,7 +60,7 @@ export class FirebaseRepositoryImpl implements FirebaseRepository {
             relations: ['user']
         });
         if (!findToken) {
-            return new FirebaseDeviceTokenEntity();
+            return null;
         }
         return findToken;
     }

@@ -11,16 +11,21 @@ export class MessageUseCase {
         private roomRepo: RoomRepositoryImpl,
         private roomMemberRepo: RoomMemberRepositoryImpl,
         private unitOfWork: TypeOrmUnitOfWork
-    ){}
+    ) { }
 
     // room 
     async getRoomList(userId: string): Promise<RoomModel[]> {
         const rooms = await this.roomRepo.getRoomsByUserId(userId);
-        if(!rooms){
+        if (!rooms) {
             return [];
         }
 
-        return rooms;
+        const validRooms = rooms.filter(room => {
+            const isMember = room.members.some(member => member.userId === userId);
+            return isMember;
+        });
+
+        return validRooms;
     }
 
     async getRoomById(roomId: number): Promise<RoomModel> {
@@ -29,21 +34,26 @@ export class MessageUseCase {
     }
 
 
-    async getMessageByPostId(postId: string, targetId: string): Promise<MessageModel[]> {
-        const messages = await this.roomRepo.getMessagesByPostId(postId, targetId);
-        if(messages && messages.length !== 0){
-            const room = await this.getRoomById(messages[0].roomId);
-            if(room){
-                const anotherUser = room.members.find(member => member.userId !== targetId);
-                if(anotherUser){
-                    await this.markAsRead(room.id, anotherUser.userId);
-                    await this.roomMemberRepo.updateLastRead(room.id, anotherUser.userId, messages[messages.length -1].id);
-                }else {
-                    console.log('[MessageUseCase] getMessageByPostId: not found anotherUser');
-                }
+    async getMessageByPostId(postId: string, targetId: string): Promise<MessageModel[] | null> {
+        try {
+            const room = await this.roomRepo.getRoomInfoByPostId(postId, targetId);
+            if (!room) {
+                return [];
             }
+            const messages = await this.messageRepo.getMessagesByRoomId(room.id);
+            const sender = room.members.filter((member) => member.user.userId !== targetId);
+            if (sender.length > 0) {
+                await this.markAsRead(room.id, sender[0].userId);
+                await this.roomMemberRepo.updateLastRead(room.id, sender[0].userId, messages[messages.length - 1].id);
+            }else {
+                return null;
+            }
+
+            return messages;
+        } catch (error) {
+            console.log('[MessageUseCase] getMessageByPostId: ', error);
+            throw error;
         }
-        return messages;
     }
 
     // member
@@ -54,46 +64,64 @@ export class MessageUseCase {
         // 2. 업데이트된 방 정보를 조회하여 리턴
         return await this.getRoomById(roomId);
     }
+    async removeMemberOnRoom(roomId: number, userId: string): Promise<RoomModel | null> {
+        try {
+            const res = await this.roomMemberRepo.removeMemberOnRoom(roomId, userId);
+            if (!res) {
+                throw new Error('Failed to remove member from room');
+            }
+            const room = await this.getRoomById(roomId);
+            if (room.members.length === 0) {
+                await this.roomRepo.deleteRoom(roomId);
+                return null;
+            }
+            return room;
+        } catch (error) {
+            console.log('[MessageUseCase] removeMemberOnRoom: ', error);
+            throw new Error('Failed to remove member from room');
+        }
+
+    }
 
 
     // message
 
     async sendMessage(roomId: number | null, postId: string, senderId: string, targetId: string, content: string): Promise<MessageModel> {
         return this.unitOfWork.runInTransaction(async (manager) => {
-           let room;
-           try {
-               if(roomId){
-                room = await this.roomRepo.getRoomById(roomId);
-               }
-               if(!room){
-                room = await this.roomRepo.createRoom(postId, targetId, manager);
-                await this.roomMemberRepo.upsertMembers(room.id, [senderId, targetId], manager);
-               }
-           } catch (error) {
-               console.error('[MessageUseCase] Failed to find or create room:', error);
-               throw error;
-           }
+            let room;
+            try {
+                if (roomId) {
+                    room = await this.roomRepo.getRoomById(roomId);
+                }
+                if (!room) {
+                    room = await this.roomRepo.createRoom(postId, targetId, manager);
+                    await this.roomMemberRepo.upsertMembers(room.id, [senderId, targetId], manager);
+                }
+            } catch (error) {
+                console.error('[MessageUseCase] Failed to find or create room:', error);
+                throw error;
+            }
 
-           let message: MessageModel;
-           try {
-               message = await this.messageRepo.saveMessage(room.id, senderId, content, manager);
-           } catch (error) {
-               // 주로 여기서 messageId AUTO_INCREMENT 누락으로 인한 에러가 발생합니다.
-               console.error('[MessageUseCase] Failed to save message (Check DB AUTO_INCREMENT):', error);
-               throw error;
-           }
+            let message: MessageModel;
+            try {
+                message = await this.messageRepo.saveMessage(room.id, senderId, content, manager);
+            } catch (error) {
+                // 주로 여기서 messageId AUTO_INCREMENT 누락으로 인한 에러가 발생합니다.
+                console.error('[MessageUseCase] Failed to save message (Check DB AUTO_INCREMENT):', error);
+                throw error;
+            }
 
-           try {
-               await this.roomRepo.updateLastMessage(room.id, message, manager);
-               
-               // 3. 나를 제외한 모든 멤버의 unreadCount + 1 증가
-               await this.roomMemberRepo.incrementUnreadCount(room.id, senderId, manager);
-           } catch (error) {
-               console.error('[MessageUseCase] Failed to update room stats:', error);
-               throw error;
-           }
+            try {
+                await this.roomRepo.updateLastMessage(room.id, message, manager);
 
-           return message;
+                // 3. 나를 제외한 모든 멤버의 unreadCount + 1 증가
+                await this.roomMemberRepo.incrementUnreadCount(room.id, senderId, manager);
+            } catch (error) {
+                console.error('[MessageUseCase] Failed to update room stats:', error);
+                throw error;
+            }
+
+            return message;
         });
 
     }
@@ -108,11 +136,11 @@ export class MessageUseCase {
     async getMessageByRoomId(roomId: number, userId: string): Promise<MessageModel[]> {
         const messages = await this.messageRepo.getMessagesByRoomId(roomId);
         const room = await this.getRoomById(roomId);
-        if(room){
-            await this.roomMemberRepo.updateLastRead(room.id, userId, messages[messages.length -1].id);
+        if (room) {
+            await this.roomMemberRepo.updateLastRead(room.id, userId, messages[messages.length - 1].id);
             await this.markAsRead(room.id, userId);
         }
-        
+
         return messages;
     }
 }

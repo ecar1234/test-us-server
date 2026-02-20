@@ -8,6 +8,5 @@ export interface IRoomRepository {
     deleteRoom(roomId: number): Promise<void>;
     getRoomById(roomId: number): Promise<RoomModel>;
     getRoomsByUserId(userId: string): Promise<RoomModel[]>;
-    getMessagesByPostId(postId: string, targetId: string): Promise<MessageModel[]>;
-
+    getRoomInfoByPostId(postId: string, targetId: string): Promise<RoomModel>;
 } 

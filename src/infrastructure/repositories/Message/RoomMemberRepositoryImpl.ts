@@ -11,6 +11,7 @@ import { UserModel } from "../../../domain/entities/UserModel";
 import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel";
 
 export class RoomMemberRepositoryImpl implements IRoomMemberRepository {
+    
     private memberData = AppDataSource.getRepository(RoomMemberEntity);
 
     public toDomain(entity: RoomMemberEntity): RoomMemberModel {
@@ -87,6 +88,12 @@ export class RoomMemberRepositoryImpl implements IRoomMemberRepository {
             { room: { id: roomId }, userId: userId },
             { unreadCount: 0 }
         );
+    }
+    async removeMemberOnRoom(roomId: number, userId: string): Promise<boolean> {
+        const result = await this.memberData.delete(
+            { room: { id: roomId }, userId: userId }
+        );
+        return result.affected > 0;
     }
 
     // 메시지 전송 시: 보낸 사람을 제외한 나머지 멤버들의 unreadCount + 1
