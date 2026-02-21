@@ -142,7 +142,7 @@ export class AppUseCase {
         if (post == null) {
             throw new Error("post not found");
         }
-        const token = await this.fireRepository.getMessingToken(application.applicantId);
+        const token = await this.fireRepository.getMessingToken(userId);
 
         if (token) {
             const message: FCMPayload = {
@@ -190,7 +190,7 @@ export class AppUseCase {
             throw new Error("post not found");
         }
 
-        const token = await this.fireRepository.getMessingToken(application.applicantId);
+        const token = await this.fireRepository.getMessingToken(userId);
 
         if(token){
              const message: FCMPayload = {

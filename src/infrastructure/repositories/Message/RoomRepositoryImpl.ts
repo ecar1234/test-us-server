@@ -76,7 +76,7 @@ export class RoomRepositoryImpl implements IRoomRepository {
     async getRoomById(roomId: number): Promise<RoomModel> {
         const room = await this.roomData.findOne({
             where: { id: roomId },
-            relations: ['post', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
+            relations: ['post', 'post.author', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
         });
         if (!room) {
             return null;
@@ -89,14 +89,14 @@ export class RoomRepositoryImpl implements IRoomRepository {
                 { post: { author: { userId: userId } } },
                 { targetUserId: userId }
             ],
-            relations: ['post', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
+            relations: ['post', 'post.author', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
         });
         return rooms.map(room => this.toDomain(room));
     }
     async getRoomInfoByPostId(postId: string, targetId: string): Promise<RoomModel> {
         const room = await this.roomData.findOne({
             where: { post: { postId: postId }, targetUserId: targetId },
-            relations: ['post', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
+            relations: ['post', 'post.author', 'members', 'members.user', 'members.room', 'messages', 'messages.sender', 'messages.room']
         });
         if (!room) {
             return null;
