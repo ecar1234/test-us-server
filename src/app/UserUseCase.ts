@@ -35,16 +35,18 @@ export class UserUseCase {
     }
     async updateUserInfoWithImg(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date, image: UploadedImageInfo, oldImage?: UploadedImageInfo, method: string = "EMAIL"): Promise<UserModel> {
         const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, image, method);
+        
+        const isProd = process.env.NODE_ENV === "prod";
+        const uploadPath = isProd ? process.env.MAIN_UPLOAD_USER_URL : process.env.UPLOAD_USER_URL;
+
         if (oldImage && oldImage.url) {
             try {
                 // 이전 이미지의 URL에서 파일명을 추출하여 삭제합니다.
                 const filename = path.basename(new URL(oldImage.url).pathname);
-                const imagePath = path.join(Env.UPLOAD_USER_URL, filename);
+                const imagePath = path.join(uploadPath, filename);
                 await fs.promises.unlink(imagePath);
             } catch (error) {
-                if (error.code !== 'ENOENT') {
-                    console.error(`Failed to delete image file: ${error.message}`);
-                }
+                console.error(`Failed to delete image file: ${error.message}`);
             }
         }
 

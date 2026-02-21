@@ -131,24 +131,20 @@ export class UserRepositoryImpl implements IUserRepository {
         return true;
     }
     async updateUserInfo(user: UserModel): Promise<UserModel> {
-        const newUserEntity = this.toEntityUser(user);
-
-        const findUser = await this.userRepository.findOne({ where: { userId: newUserEntity.userId } });
+        
+        const findUser = await this.userRepository.findOne({ where: { userId: user.userId } });
         if (!findUser) {
             throw new Error("User not found");
         }
+        const userEntity = this.toEntityUser(user);
 
-        // DB에서 조회한 엔티티의 속성을 직접 수정합니다.
-        findUser.nickname = newUserEntity.nickname;
-        findUser.type = newUserEntity.type,
-            findUser.role = newUserEntity.role;
-        findUser.userName = newUserEntity.userName;
-        findUser.birth = newUserEntity.birth;
-        if (newUserEntity.image) {
-            findUser.image = newUserEntity.image;
-        }
-
-        // 수정된 엔티티를 저장합니다.
+        findUser.nickname = userEntity.nickname;
+        findUser.type = userEntity.type,
+        findUser.role = userEntity.role;
+        findUser.userName = userEntity.userName;
+        findUser.birth = userEntity.birth;
+        findUser.method = userEntity.method;
+        findUser.image = userEntity.image;
 
         const savedUser = await this.userRepository.save(findUser);
         return this.toDomainUser(savedUser);

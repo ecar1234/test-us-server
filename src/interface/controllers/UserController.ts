@@ -25,9 +25,16 @@ export class UserController {
 
     async updateUserInfoWithImg(req: Request, res: Response): Promise<void> {
         try {
-            const { userId, nickname, userType, role, userName, birth, method } = JSON.parse(req.body.user);
-            // const { filename, originalname, mimetype, size, url } = JSON.parse(req.body.newImage);
-            const oldImage = JSON.parse(req.body.oldImage);
+            console.log(`[DEBUG] updateUserInfoWithImg req.body:`, req.body);
+
+            // req.body.user가 문자열이면 파싱하고, 객체면 그대로 사용
+            const userBody = typeof req.body.user === 'string' ? JSON.parse(req.body.user) : req.body.user;
+            const { userId, nickname, userType, role, userName, birth, method } = userBody;
+
+            let oldImage = null;
+            if (req.body.oldImage) {
+                oldImage = typeof req.body.oldImage === 'string' ? JSON.parse(req.body.oldImage) : req.body.oldImage;
+            }
 
             const file = req.file;
             if (!file) {
@@ -47,6 +54,7 @@ export class UserController {
             res.status(200).json({ status: 200, user: user });
 
         } catch (error) {
+            console.error('[UserController] updateUserInfoWithImg Error:', error);
             res.status(500).json({ error: error.message });
         }
     }
