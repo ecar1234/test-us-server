@@ -34,7 +34,7 @@ export class PostController {
             const job = await getInitPostsQueue.add('getInitUserPosts', { userId: req.params.userId });
             res.status(202).json({ status: 202, state: 'pending', jobId: job.id });
             return;
-        }catch (error) {
+        } catch (error) {
             res.status(501).json({ error: error.message });
         }
     }
@@ -107,7 +107,7 @@ export class PostController {
             const { id } = req.body;
             const updatedPost = await this.postUseCase.endRecruitPost(id);
             // console.log("updatedPost : ", updatedPost);
-            res.status(200).json({status: 200, post: updatedPost});
+            res.status(200).json({ status: 200, post: updatedPost });
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
@@ -167,17 +167,17 @@ export class PostController {
 
     async getRecruitPostPagination(req: Request, res: Response): Promise<void> {
         try {
-            const {page, size} = req.body;
+            const { page, size } = req.body;
 
             if (!page || !size) {
                 res.status(400).json({ status: 400, message: 'page and size are required.' });
                 return;
             }
 
-            const posts = await this.postUseCase.getRecruitPostPagination(parseInt(page as string), parseInt(size as string));
+            const result = await this.postUseCase.getRecruitPostPagination(parseInt(page as string), parseInt(size as string));
             // console.log(posts);
 
-            res.status(200).json({ status: 200, posts: posts });
+            res.status(200).json({ status: 200, posts: result[0], page: result[1], isLast: result[2] });
             // console.log(posts);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -202,7 +202,7 @@ export class PostController {
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
-    
+
     }
 
     async getRecruitApplicationsByPostId(req: Request, res: Response): Promise<void> {
@@ -273,11 +273,11 @@ export class PostController {
         }
     }
 
-    async getPromotionPostById(req: Request, res: Response): Promise<void> { 
+    async getPromotionPostById(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
             const post = await this.postUseCase.getPromotionPostById(id);
-            if(!post) {
+            if (!post) {
                 res.status(404).json({ status: 404, error: "Post not found" });
                 return;
             }
@@ -293,7 +293,7 @@ export class PostController {
         try {
             const { userId } = req.params;
             const posts = await this.postUseCase.getUserPromotionPosts(userId);
-            if(!posts) {
+            if (!posts) {
                 res.status(404).json({ status: 404, error: "Post not found" });
                 return;
             }
@@ -303,20 +303,20 @@ export class PostController {
             res.status(500).json({ error: error.message });
         }
 
-     }
+    }
 
     async getPromotionPostByTitle(req: Request, res: Response): Promise<void> { }
 
     async getPromotionPostPagination(req: Request, res: Response): Promise<void> {
         try {
-            const {page, size} = req.body;
-            const posts = await this.postUseCase.getPromotionPostPagination(parseInt(page as string), parseInt(size as string));
-            res.status(200).json({ status: 200, posts: posts });
+            const { page, size } = req.body;
+            const result = await this.postUseCase.getPromotionPostPagination(parseInt(page as string), parseInt(size as string));
+            res.status(200).json({ status: 200, posts: result[0], page: result[1], isLast: result[2] });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
 
-     }
+    }
 
     async getPromotionPostsByAuthor(req: Request, res: Response): Promise<void> { }
 

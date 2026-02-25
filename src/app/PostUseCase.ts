@@ -160,11 +160,15 @@ export class PostUseCase {
     async getRecruitPostByTitle(title: string): Promise<RecruitmentPostModel> {
         return this.recruitRepo.getPostByTitle(title);
     }
-    async getRecruitPostPagination(page: number, size: number): Promise<RecruitmentPostModel[]> {
+    async getRecruitPostPagination(page: number, size: number): Promise<[RecruitmentPostModel[], number, boolean]> {
 
         const posts = await this.recruitRepo.getPostsPaginations(page, size);
-        // console.log(posts);
-        return posts;
+        if (!posts) {
+            return [[] as RecruitmentPostModel[], page, true];
+        }
+        const isLast = page * size >= posts.length;
+
+        return [posts, page, isLast];
     }
     async getRecruitPostsByAuthor(authorId: string): Promise<RecruitmentPostModel[]> {
         return this.recruitRepo.getPostsByAuthor(authorId);
@@ -287,12 +291,14 @@ export class PostUseCase {
     async getPromotionPostByTitle(title: string): Promise<PromotionPostModel> {
         return this.promotionRepo.getPostByTitle(title);
     }
-    async getPromotionPostPagination(page: number, size: number): Promise<PromotionPostModel[]> {
+    async getPromotionPostPagination(page: number, size: number): Promise<[PromotionPostModel[], number, boolean]> {
         const posts = await this.promotionRepo.getPostsPaginations(page, size);
         if (!posts) {
-            return [];
+            return [[] as PromotionPostModel[], page, true];
         }
-        return this.promotionRepo.getPostsPaginations(page, size);
+        const isLast = page * size >= posts.length;
+
+        return [posts, page, isLast];
     }
     async getPromotionPostsByAuthor(authorId: string): Promise<PromotionPostModel[]> {
         return this.promotionRepo.getPostsByAuthor(authorId);
