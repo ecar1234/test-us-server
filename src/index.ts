@@ -21,7 +21,7 @@ import JobStateRoute from './interface/routes/JobStateRoute';
 import FirebaseRoute from './interface/routes/FirebaseRoute';
 import PostRoute from './interface/routes/PostRoute';
 import { Env } from './config/env';
-import { DbBackupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
+import { DbBackupScheduledJob, ExpiredPostNotificationScheduledJob, ImageCleanupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
 import { randomUUID } from 'crypto';
 import { initSocket } from './service/socket.io';
 
@@ -82,6 +82,8 @@ AppDataSource.initialize()
     console.log(`Current Environment: ${process.env.NODE_ENV}`);
     PostUpdateScheduledJob();
     DbBackupScheduledJob();
+    ExpiredPostNotificationScheduledJob();
+    ImageCleanupScheduledJob();
 
     await initSocket(httpServer);
 

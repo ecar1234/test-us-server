@@ -15,6 +15,28 @@ export const PostUpdateScheduledJob = () => {
     });
 };
 
+export const ExpiredPostNotificationScheduledJob = () => {
+    cron.schedule('0 0 9 * * *', async () => {
+        try {
+            await DailyTaskService.expiredPostsFcmToSend();
+            await DailyTaskService.expiredPostsFcmToSend2();
+        }catch (e) {
+            console.error('Scheduled job error:', e);
+        }
+    });
+}
+
+export const ImageCleanupScheduledJob = () => {
+    cron.schedule('0 0 3 * * *', async () => {
+        try {
+            await DailyTaskService.cleanupOrphanedPostImages();
+            await DailyTaskService.cleanupOrphanedUserImages();
+        } catch (e) {
+            console.error('Scheduled job error:', e);
+        }
+    });
+}
+
 export const DbBackupScheduledJob = () => {
     cron.schedule('0 0 4 * * *', async () => {
         try {

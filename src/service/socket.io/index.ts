@@ -2,7 +2,7 @@ import { Server } from "socket.io";
 import { Server as httpServer } from "http";
 import { chatHandler } from "./handlers/chatHandler";
 import { createAdapter } from "@socket.io/redis-adapter";
-import Redis, { ClusterOptions } from "ioredis";
+import Redis from "ioredis";
 import { MessageUseCase } from "../../app/MessageUseCase";
 import { MessageRepositoryImpl } from "../../infrastructure/repositories/Message/MessageRepositoryImpl";
 import { RoomRepositoryImpl } from "../../infrastructure/repositories/Message/RoomRepositoryImpl";
@@ -10,10 +10,6 @@ import { RoomMemberRepositoryImpl } from "../../infrastructure/repositories/Mess
 import { TypeOrmUnitOfWork } from "../../infrastructure/repositories/Message/UnitOfWorkImpl";
 import { AppDataSource } from "../../config/DataSource";
 import { verifyToken } from "../../utils/jwt";
-import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
-import { notificationHandler } from "./handlers/notificationHandler";
-import { redisClient } from "../../config/RedisConfig";
-import { MessageControlService } from "./messageControlService";
 
 export const initSocket = async (server: httpServer) => {
     const messageRepo = new MessageRepositoryImpl();

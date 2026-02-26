@@ -1,6 +1,3 @@
-import { AuthUseCase } from "../../app/AuthUseCase";
-import { FirebaseUseCase } from "../../app/FirebaseUseCase";
-import { UserUseCase } from "../../app/UserUseCase";
 import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
 import { FCMPayload } from "../../interface/interfaces/types";
 import { messaging } from "../../service/firebase/Firebase";
