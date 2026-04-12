@@ -1,6 +1,6 @@
-import { IOtpRepository } from "../domain/interface_repositories/IOtpRepository";
-import { MailService } from "../service/otp/MailService";
-import { OtpSevice } from "../service/otp/OtpService";
+import { IOtpRepository } from "../domain/interface_repositories/IOtpRepository.js";
+import { MailService } from "../service/otp/MailService.js";
+import { OtpSevice } from "../service/otp/OtpService.js";
 
 export class OtpUseCase {
     constructor(

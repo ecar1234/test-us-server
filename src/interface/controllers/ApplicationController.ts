@@ -1,8 +1,8 @@
-import { AppUseCase } from "../../app/AppUseCase";
 import { Request, Response } from "express";
-import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
-import { getApplicationsByIdQueue } from "../../config/RedisConfig";
+import { AppUseCase } from "../../app/AppUseCase.js";
+import { ApplicationModel } from "../../domain/entities/ApplicationModel.js";
+import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
+import { getApplicationsByIdQueue } from "../../config/RedisConfig.js";
 
 export class ApplicationController {
     constructor(private appUseCase: AppUseCase) { }

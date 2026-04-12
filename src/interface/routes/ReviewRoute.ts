@@ -1,12 +1,11 @@
 
 import { Router } from 'express';
-import { ReviewUseCase } from '../../app/ReviewUseCase';
-
-import { ReviewController } from '../controllers/ReviewController';
-import { authMiddleware } from '../middlewares/AuthMiddleware';
-import { PostReviewRepositoryImpl } from '../../infrastructure/repositories/PostReviewRepositoryImpl';
-import { UserReviewRepositoryImpl } from '../../infrastructure/repositories/UserReviewRepositoryImpl';
-import { RecruitmentPostRepositoryImpl } from '../../infrastructure/repositories/RecruitmentPostRepositoryImpl';
+import { ReviewUseCase } from '../../app/ReviewUseCase.js';
+import { ReviewController } from '../controllers/ReviewController.js';
+import { authMiddleware } from '../middlewares/AuthMiddleware.js';
+import { PostReviewRepositoryImpl } from '../../infrastructure/repositories/PostReviewRepositoryImpl.js';
+import { UserReviewRepositoryImpl } from '../../infrastructure/repositories/UserReviewRepositoryImpl.js';
+import { RecruitmentPostRepositoryImpl } from '../../infrastructure/repositories/RecruitmentPostRepositoryImpl.js';
 
 const route: Router = Router();
 

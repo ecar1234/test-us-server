@@ -1,15 +1,15 @@
 import express, { Router } from 'express';
-import { UserUseCase } from '../../app/UserUseCase';
-import { UserRepositoryImpl } from '../../infrastructure/repositories/UserRepositoryImpl';
-import { RecruitmentPostRepositoryImpl } from '../../infrastructure/repositories/RecruitmentPostRepositoryImpl';
-import { OtpSevice } from '../../service/otp/OtpService';
-import { MailService } from '../../service/otp/MailService';
-import { OtpRepositoryImpl } from '../../infrastructure/repositories/Otp/OtpRedisRepositoryImpl';
-import { OtpUseCase } from '../../app/OtpUseCase';
-import { AuthConroller } from '../controllers/AuthController';
-import { authMiddleware } from '../middlewares/AuthMiddleware';
-import { UserReviewRepositoryImpl } from '../../infrastructure/repositories/UserReviewRepositoryImpl';
-import { AuthUseCase } from '../../app/AuthUseCase';
+import { UserUseCase } from '../../app/UserUseCase.js';
+import { UserRepositoryImpl } from '../../infrastructure/repositories/UserRepositoryImpl.js';
+import { RecruitmentPostRepositoryImpl } from '../../infrastructure/repositories/RecruitmentPostRepositoryImpl.js';
+import { OtpSevice } from '../../service/otp/OtpService.js';
+import { MailService } from '../../service/otp/MailService.js';
+import { OtpRepositoryImpl } from '../../infrastructure/repositories/Otp/OtpRedisRepositoryImpl.js';
+import { OtpUseCase } from '../../app/OtpUseCase.js';
+import { AuthConroller } from '../controllers/AuthController.js';
+import { authMiddleware } from '../middlewares/AuthMiddleware.js';
+import { UserReviewRepositoryImpl } from '../../infrastructure/repositories/UserReviewRepositoryImpl.js';
+import { AuthUseCase } from '../../app/AuthUseCase.js';
 
 
 const route: Router = express.Router();

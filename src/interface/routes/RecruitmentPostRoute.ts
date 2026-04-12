@@ -1,12 +1,4 @@
 import { Router } from "express";
-import { RecruitmentPostController } from "../controllers/RecruitmentPostController";
-import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { RecruitmentPostUseCase } from "../../app/RecruitmentPostUseCase";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
-import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
-import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
-import { PostUseCase } from "../../app/PostUseCase";
-import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
 
 const route = Router();
 

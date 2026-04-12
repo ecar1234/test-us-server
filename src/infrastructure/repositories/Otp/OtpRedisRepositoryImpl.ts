@@ -1,5 +1,5 @@
-import { redisOtp } from "../../../config/RedisConfig";
-import { IOtpRepository } from "../../../domain/interface_repositories/IOtpRepository";
+import { redisOtp } from "../../../config/RedisConfig.js";
+import { IOtpRepository } from "../../../domain/interface_repositories/IOtpRepository.js";
 
 export class OtpRepositoryImpl implements IOtpRepository {
     private redis = redisOtp;

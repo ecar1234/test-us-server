@@ -1,4 +1,4 @@
-import { ImagesModel } from "../entities/ImagesModel";
+import { ImagesModel } from "../entities/ImagesModel.js";
 
 export interface IImagesRepository {
     imagesRegister(images: ImagesModel[], postId: string, postType: string): Promise<ImagesModel[]>;

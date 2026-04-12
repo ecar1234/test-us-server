@@ -1,6 +1,6 @@
-import { MessageUseCase } from "../../app/MessageUseCase";
+import { MessageUseCase } from "../../app/MessageUseCase.js";
 import { Request, Response } from "express";
-import { MessageModel } from "../../domain/entities/MessagesModels/MessageModel";
+import { MessageModel } from "../../domain/entities/MessagesModels/MessageModel.js";
 
 export class MessageController {
     constructor(

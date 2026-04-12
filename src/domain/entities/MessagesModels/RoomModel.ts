@@ -1,6 +1,6 @@
-import { RoomType } from "../../../infrastructure/entities/MessagesEntities/RoomEntity";
-import { MessageModel } from "./MessageModel";
-import { RoomMemberModel } from "./RoomMenberModel";
+import { RoomType } from "../../../infrastructure/entities/MessagesEntities/RoomEntity.js";
+import { MessageModel } from "./MessageModel.js";
+import { RoomMemberModel } from "./RoomMenberModel.js";
 
 export class RoomModel {
     constructor(

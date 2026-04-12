@@ -1,12 +1,11 @@
-import { AppDataSource } from "../../config/DataSource";
-import { PromotionPostModel } from "../../domain/entities/PromotionPostModel";
-import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository";
-import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity";
-import { PromotionPostEntity } from "../entities/PromotionPostEntity";
-import { redisClient } from "../../config/RedisConfig";
-import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl";
+import { AppDataSource } from "../../config/DataSource.js";
+import { PromotionPostModel } from "../../domain/entities/PromotionPostModel.js";
+import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository.js";
+import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity.js";
+import { PromotionPostEntity } from "../entities/PromotionPostEntity.js";
+import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
+import { UserStatus } from "../entities/UserEntity.js";
 import { Like } from "typeorm";
-import { UserStatus } from "../entities/UserEntity";
 
 
 

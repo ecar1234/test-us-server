@@ -1,5 +1,5 @@
 import { Column, ChildEntity } from "typeorm";
-import { BasePostEntity } from "./BasePostEntity";
+import { BasePostEntity } from "./BasePostEntity.js";
 
 
 @ChildEntity()

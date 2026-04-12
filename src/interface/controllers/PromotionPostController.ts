@@ -1,6 +1,7 @@
 
 import { Response, Request } from "express";
-import { PromotionPostUseCase } from "../../app/PromotionPostUseCase";
+import { PromotionPostUseCase } from "../../app/PromotionPostUseCase.js";
+
 
 export class PromotionPostController {
     constructor(private useCase: PromotionPostUseCase) { }

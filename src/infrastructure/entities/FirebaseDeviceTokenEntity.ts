@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { UserEntity } from "./UserEntity";
+import { UserEntity } from "./UserEntity.js";
 
 @Entity('device_tokens')
 export class FirebaseDeviceTokenEntity {

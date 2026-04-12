@@ -1,4 +1,4 @@
-import { UserModel } from "../entities/UserModel";
+import { UserModel } from "../entities/UserModel.js";
 
 export interface IUserRepository {
     registerUser(user: UserModel): Promise<UserModel>;

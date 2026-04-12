@@ -1,9 +1,9 @@
-import { MessageModel } from "../domain/entities/MessagesModels/MessageModel";
-import { RoomModel } from "../domain/entities/MessagesModels/RoomModel";
-import { MessageRepositoryImpl } from "../infrastructure/repositories/Message/MessageRepositoryImpl";
-import { RoomMemberRepositoryImpl } from "../infrastructure/repositories/Message/RoomMemberRepositoryImpl";
-import { RoomRepositoryImpl } from "../infrastructure/repositories/Message/RoomRepositoryImpl";
-import { TypeOrmUnitOfWork } from "../infrastructure/repositories/Message/UnitOfWorkImpl";
+import { MessageModel } from "../domain/entities/MessagesModels/MessageModel.js";
+import { RoomModel } from "../domain/entities/MessagesModels/RoomModel.js";
+import { MessageRepositoryImpl } from "../infrastructure/repositories/Message/MessageRepositoryImpl.js";
+import { RoomMemberRepositoryImpl } from "../infrastructure/repositories/Message/RoomMemberRepositoryImpl.js";
+import { RoomRepositoryImpl } from "../infrastructure/repositories/Message/RoomRepositoryImpl.js";
+import { TypeOrmUnitOfWork } from "../infrastructure/repositories/Message/UnitOfWorkImpl.js";
 
 export class MessageUseCase {
     constructor(

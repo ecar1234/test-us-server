@@ -1,19 +1,19 @@
-import { PromotionPostModel } from "../domain/entities/PromotionPostModel";
-import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
-import { UserEntity } from "../infrastructure/entities/UserEntity";
-import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
-import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { Env } from "../config/env.js";
+import { PromotionPostModel } from "../domain/entities/PromotionPostModel.js";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel.js";
+import { UserEntity } from "../infrastructure/entities/UserEntity.js";
+import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl.js";
+import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { FCMPayload } from "../interface/interfaces/types.js";
+import { sendNotificationToMultiUser } from "../service/firebase/FcmService.js";
+import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl.js";
+import { TResRecruitApplicationUserInfo } from "../infrastructure/entities/package/RecruitPostPackage.js";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
 import fs from "fs";
 import path from "path";
 import { URL } from "url";
-import { Env } from "../config/env";
-import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
-import { FCMPayload } from "../interface/interfaces/types";
-import { sendNotificationToMultiUser } from "../service/firebase/FcmService";
-import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
-import { TResRecruitApplicationUserInfo } from "../infrastructure/entities/package/RecruitPostPackage";
-import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
 
 interface UploadedImageInfo {
     filename: string;

@@ -1,4 +1,4 @@
-import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
+import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl.js";
 
 
 export class PromotionPostUseCase {

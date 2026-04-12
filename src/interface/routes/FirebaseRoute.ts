@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { FirebaseController } from "../controllers/FirebaseController";
-import { FirebaseUseCase } from "../../app/FirebaseUseCase";
-import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
+import { FirebaseController } from "../controllers/FirebaseController.js";
+import { FirebaseUseCase } from "../../app/FirebaseUseCase.js";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { authMiddleware } from "../middlewares/AuthMiddleware.js";
 
 
 const route = Router();

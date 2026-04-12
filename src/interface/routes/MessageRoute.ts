@@ -1,13 +1,13 @@
 
 import { Router } from "express";
-import { MessageUseCase } from "../../app/MessageUseCase";
-import { MessageRepositoryImpl } from "../../infrastructure/repositories/Message/MessageRepositoryImpl";
-import { MessageController } from "../controllers/MessageController";
-import { RoomMemberRepositoryImpl } from "../../infrastructure/repositories/Message/RoomMemberRepositoryImpl";
-import { RoomRepositoryImpl } from "../../infrastructure/repositories/Message/RoomRepositoryImpl";
-import { TypeOrmUnitOfWork } from "../../infrastructure/repositories/Message/UnitOfWorkImpl"; 
-import { AppDataSource } from "../../config/DataSource";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
+import { MessageUseCase } from "../../app/MessageUseCase.js";
+import { MessageRepositoryImpl } from "../../infrastructure/repositories/Message/MessageRepositoryImpl.js";
+import { MessageController } from "../controllers/MessageController.js";
+import { RoomMemberRepositoryImpl } from "../../infrastructure/repositories/Message/RoomMemberRepositoryImpl.js";
+import { RoomRepositoryImpl } from "../../infrastructure/repositories/Message/RoomRepositoryImpl.js";
+import { TypeOrmUnitOfWork } from "../../infrastructure/repositories/Message/UnitOfWorkImpl.js"; 
+import { AppDataSource } from "../../config/DataSource.js";
+import { authMiddleware } from "../middlewares/AuthMiddleware.js";
 
 const router: Router = Router();
 

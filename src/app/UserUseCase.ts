@@ -1,12 +1,11 @@
-import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
-import { UserModel } from "../domain/entities/UserModel";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
-import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel.js";
+import { UserModel } from "../domain/entities/UserModel.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl.js";
 import bcrypt from "bcrypt";
 import fs from "fs";
 import path from "path";
-import { Env } from "../config/env";
 
 
 

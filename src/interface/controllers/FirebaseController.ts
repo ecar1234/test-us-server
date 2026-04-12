@@ -1,4 +1,4 @@
-import { FirebaseUseCase } from "../../app/FirebaseUseCase";
+import { FirebaseUseCase } from "../../app/FirebaseUseCase.js";
 import { Request, Response } from "express";
 
 export class FirebaseController {

@@ -1,14 +1,13 @@
 import { EntityManager } from "typeorm";
-import { AppDataSource } from "../../../config/DataSource";
-import { RoomModel } from "../../../domain/entities/MessagesModels/RoomModel";
-import { IRoomRepository } from "../../../domain/interface_repositories/MessageRepo/IRoomRepository";
-import { RoomEntity, RoomType } from "../../entities/MessagesEntities/RoomEntity";
-import { BasePostEntity } from "../../entities/BasePostEntity";
-import { ImagesModel } from "../../../domain/entities/ImagesModel";
-import { RoomMemberRepositoryImpl } from "./RoomMemberRepositoryImpl";
-import { MessageRepositoryImpl } from "./MessageRepositoryImpl";
-import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel";
-import { MessagesEntity } from "../../entities/MessagesEntities/MessageEntity";
+import { AppDataSource } from "../../../config/DataSource.js";
+import { RoomModel } from "../../../domain/entities/MessagesModels/RoomModel.js";
+import { IRoomRepository } from "../../../domain/interface_repositories/MessageRepo/IRoomRepository.js";
+import { RoomEntity, RoomType } from "../../entities/MessagesEntities/RoomEntity.js";
+import { BasePostEntity } from "../../entities/BasePostEntity.js";
+import { RoomMemberRepositoryImpl } from "./RoomMemberRepositoryImpl.js";
+import { MessageRepositoryImpl } from "./MessageRepositoryImpl.js";
+import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel.js";
+import { MessagesEntity } from "../../entities/MessagesEntities/MessageEntity.js";
 
 export class RoomRepositoryImpl implements IRoomRepository {
 

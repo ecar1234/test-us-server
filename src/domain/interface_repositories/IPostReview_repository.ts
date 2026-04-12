@@ -1,4 +1,4 @@
-import { PostReviewModel } from "../entities/PostReviewModel";
+import { PostReviewModel } from "../entities/PostReviewModel.js";
 
 export interface IPostReviewRepository {
     addPostReview(review: PostReviewModel): Promise<PostReviewModel>;

@@ -1,9 +1,7 @@
-import { AppDataSource } from "../../config/DataSource";
-import { ApplicationModel } from "../../domain/entities/ApplicationModel";
-import { UserModel } from "../../domain/entities/UserModel";
-import { IUserRepository } from "../../domain/interface_repositories/IUserRepository";
-import { ApplicationStatus } from "../entities/ApplicationEntity";
-import { UserEntity, UserMethod, UserRole, UserStatus, UserType } from "../entities/UserEntity";
+import { AppDataSource } from "../../config/DataSource.js";
+import { UserModel } from "../../domain/entities/UserModel.js";
+import { IUserRepository } from "../../domain/interface_repositories/IUserRepository.js";
+import { UserEntity, UserMethod, UserRole, UserStatus, UserType } from "../entities/UserEntity.js";
 import { In } from "typeorm";
 
 

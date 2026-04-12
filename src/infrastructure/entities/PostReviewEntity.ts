@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { UserEntity } from "./UserEntity";
-import { BasePostEntity } from "./BasePostEntity";
+import { UserEntity } from "./UserEntity.js";
+import { BasePostEntity } from "./BasePostEntity.js";
 
 export enum PostReviewType {
     PROMOTION_RATING = 'PROMOTION',

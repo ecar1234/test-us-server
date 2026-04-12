@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { decodeToken, generateToken, verifyToken } from "../../utils/jwt";
-import { AuthUseCase } from "../../app/AuthUseCase";
-import { UserUseCase } from "../../app/UserUseCase";
-import { OtpUseCase } from "../../app/OtpUseCase";
 import { JwtPayload } from "jsonwebtoken";
+import { decodeToken, generateToken, verifyToken } from "../../utils/jwt.js";
+import { AuthUseCase } from "../../app/AuthUseCase.js";
+import { UserUseCase } from "../../app/UserUseCase.js";
+import { OtpUseCase } from "../../app/OtpUseCase.js";
 
 export class AuthConroller {
     constructor(private userUseCase: UserUseCase, private authUseCase: AuthUseCase, private otpUseCase: OtpUseCase) { }

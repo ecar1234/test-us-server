@@ -1,17 +1,14 @@
-import { parse } from "path";
-import { ApplicationModel } from "../domain/entities/ApplicationModel";
-import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
-import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { redisClient } from "../config/RedisConfig";
-import { sendNotificationToUser } from "../service/firebase/FcmService";
-import { APNs, FCMPayload } from "../interface/interfaces/types";
-import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
-import { app } from "firebase-admin";
-import { TResRecruitTesterReviewInfo } from "../infrastructure/entities/package/UserReviewPackage";
-import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
-import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
-import { UserReviewModel } from "../domain/entities/UserReviewModel";
+import { ApplicationModel } from "../domain/entities/ApplicationModel.js";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel.js";
+import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { sendNotificationToUser } from "../service/firebase/FcmService.js";
+import { APNs, FCMPayload } from "../interface/interfaces/types.js";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { TResRecruitTesterReviewInfo } from "../infrastructure/entities/package/UserReviewPackage.js";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl.js";
+import { UserReviewModel } from "../domain/entities/UserReviewModel.js";
 
 export class AppUseCase {
     constructor(

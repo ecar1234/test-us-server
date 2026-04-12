@@ -1,13 +1,13 @@
-import { Env } from "../config/env";
-import { ImagesModel } from "../domain/entities/ImagesModel";
-import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
+import { Env } from "../config/env.js";
+import { ImagesModel } from "../domain/entities/ImagesModel.js";
+import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel.js";
+import { PromotionPostModel } from "../domain/entities/PromotionPostModel.js";
+import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl.js";
 import fs from "fs";
 import path from "path";
 import { URL } from "url";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { RecruitmentPostModel } from "../domain/entities/RecruitmentPostModel";
-import { PromotionPostModel } from "../domain/entities/PromotionPostModel";
-import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
 
 // 컨트롤러에서 전달되는 데이터의 타입을 명확하게 정의합니다.
 interface UploadedImageInfo {

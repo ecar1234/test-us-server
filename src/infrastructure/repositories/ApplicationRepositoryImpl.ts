@@ -1,11 +1,10 @@
-import { IApplicationRepository } from "../../domain/interface_repositories/IApplicationRepository";
-import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity";
-import { AppDataSource } from "../../config/DataSource";
-import { ApplicationModel } from "../../domain/entities/ApplicationModel";
+import { IApplicationRepository } from "../../domain/interface_repositories/IApplicationRepository.js";
+import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity.js";
+import { AppDataSource } from "../../config/DataSource.js";
+import { ApplicationModel } from "../../domain/entities/ApplicationModel.js";
+import { MobileOsType } from "../entities/BasePostEntity.js";
 import createError from "http-errors";
 import { In } from "typeorm";
-import { MobileOsType } from "../entities/BasePostEntity";
-import { app } from "firebase-admin";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);

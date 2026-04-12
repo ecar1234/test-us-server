@@ -1,15 +1,15 @@
 import { MoreThan } from "typeorm";
-import { AppDataSource } from "../../config/DataSource";
-import { redisClient } from "../../config/RedisConfig";
-import { PromotionPostModel } from "../../domain/entities/PromotionPostModel";
-import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel";
-import { BasePostEntity, BasePostStateType } from "../entities/BasePostEntity";
-import { PromotionPostEntity } from "../entities/PromotionPostEntity";
-import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity";
-import { PromotionPostRepositoryImpl } from "./PromotionPostRepositoryImpl";
-import { RecruitmentPostRepositoryImpl } from "./RecruitmentPostRepositoryImpl";
-import { IPostRepository } from "../../domain/interface_repositories/IPostRepository";
-import { UserStatus } from "../entities/UserEntity";
+import { AppDataSource } from "../../config/DataSource.js";
+import { redisClient } from "../../config/RedisConfig.js";
+import { PromotionPostModel } from "../../domain/entities/PromotionPostModel.js";
+import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
+import { BasePostEntity, BasePostStateType } from "../entities/BasePostEntity.js";
+import { PromotionPostEntity } from "../entities/PromotionPostEntity.js";
+import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity.js";
+import { PromotionPostRepositoryImpl } from "./PromotionPostRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "./RecruitmentPostRepositoryImpl.js";
+import { IPostRepository } from "../../domain/interface_repositories/IPostRepository.js";
+import { UserStatus } from "../entities/UserEntity.js";
 
 export class PostRepositoryImpl implements IPostRepository {
     private baseRepo = AppDataSource.getRepository(BasePostEntity);

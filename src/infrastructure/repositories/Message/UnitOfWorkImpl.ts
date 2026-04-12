@@ -1,5 +1,5 @@
 import { DataSource, EntityManager } from "typeorm";
-import { IUnitOfWork } from "../../../domain/interface_repositories/MessageRepo/IUnitOfWork";
+import { IUnitOfWork } from "../../../domain/interface_repositories/MessageRepo/IUnitOfWork.js";
 
 
 // @Injectable() // 의존성 주입 프레임워크 사용 시

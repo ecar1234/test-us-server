@@ -1,18 +1,3 @@
-import { ApplicationModel } from "./ApplicationModel";
-import { UserModel } from "./UserModel";
-
-
-// export interface ReviewModelProps {
-//     reviewId: string;
-//     rating: number;
-//     comment?: string; // Optional
-//     reviewType: ReviewTypeString;
-//     createdAt?: Date; // Optional, can default
-//     applicationId: string;
-//     reviewerUserId: string;
-//     reviewedUserId: string;
-//     postId?: string; // Optional
-// }
 
 export class UserReviewModel {
     public reviewId: string | null;

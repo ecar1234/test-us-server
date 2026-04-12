@@ -1,4 +1,4 @@
-import { UserReviewModel } from '../entities/UserReviewModel';
+import { UserReviewModel } from '../entities/UserReviewModel.js';
 
 export interface IUserReviewRepository {
     // addPromotionReview(review: ReviewModel):Promise<ReviewModel> 

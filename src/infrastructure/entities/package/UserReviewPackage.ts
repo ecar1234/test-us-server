@@ -1,4 +1,4 @@
-import { UserReviewModel } from "../../../domain/entities/UserReviewModel";
+import { UserReviewModel } from "../../../domain/entities/UserReviewModel.js";
 
 
 export interface TResRecruitTesterReviewInfo {

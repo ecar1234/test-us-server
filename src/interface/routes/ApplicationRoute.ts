@@ -1,13 +1,13 @@
 
 import { Router } from "express";
-import { AppUseCase } from "../../app/AppUseCase";
-import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
-import { ApplicationController } from "../controllers/ApplicationController";
-import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
-import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
-import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
-import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
+import { AppUseCase } from "../../app/AppUseCase.js";
+import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl.js";
+import { ApplicationController } from "../controllers/ApplicationController.js";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { authMiddleware } from "../middlewares/AuthMiddleware.js";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl.js";
+import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl.js";
 
 const router = Router();
 

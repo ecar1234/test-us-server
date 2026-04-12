@@ -1,7 +1,7 @@
 
-import IORedis from 'ioredis';
+import { Redis as IORedis } from 'ioredis';
 import { Queue } from 'bullmq';
-import { RedisEnv } from './env';
+import { RedisEnv } from './env.js';
 
 const isProd = process.env.NODE_ENV === "prod";
 

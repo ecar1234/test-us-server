@@ -10,9 +10,9 @@ import {
     OneToMany,
     AfterLoad,
 } from "typeorm";
-import { UserEntity } from "./UserEntity";
-import { PostReviewEntity } from "./PostReviewEntity";
-import { RoomEntity } from "./MessagesEntities/RoomEntity";
+import { UserEntity } from "./UserEntity.js";
+import { PostReviewEntity } from "./PostReviewEntity.js";
+import { RoomEntity } from "./MessagesEntities/RoomEntity.js";
 
 
 

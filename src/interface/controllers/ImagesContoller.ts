@@ -1,4 +1,4 @@
-import { ImagesUseCase } from "../../app/ImagesUseCase";
+import { ImagesUseCase } from "../../app/ImagesUseCase.js";
 import { Request, Response } from "express";
 
 

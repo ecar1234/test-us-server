@@ -4,23 +4,27 @@
     "target": "es2020", /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */
     "experimentalDecorators": true, /* Enable experimental support for legacy experimental decorators. */
     "emitDecoratorMetadata": true, /* Emit design-type metadata for decorated declarations in source files. */
-    "module": "commonjs", /* Specify what module code is generated. */
-    "moduleResolution": "node", /*,
-    "rootDir": "./src", /* Specify the root folder within your source files. */
+    "module": "node16", /* Specify what module code is generated. */
+    "moduleResolution": "node16",
     "typeRoots": ["./node_modules/@types", "./src/types"],                                  /* Specify multiple folders that act like './node_modules/@types'. */
-    "outDir": "dist", /* Specify an output folder for all emitted files. */
+    "rootDir": "./src", /* Specify the root folder within your source files. */
+    "outDir": "./dist", /* Specify an output folder for all emitted files. */
     "esModuleInterop": true, /* Emit additional JavaScript to ease support for importing CommonJS modules. This enables 'allowSyntheticDefaultImports' for type compatibility. */
     "forceConsistentCasingInFileNames": true, /* Ensure that casing is correct in imports. */
     "strict": false, /* Enable all strict type-checking options. */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "ts-node": {
-    "files": true
+    "files": true,
+    "esm": true
   },
   "include": [
     "src/**/*.ts"
   ], // 컴파일할 파일 지정
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",      // 빌드된 결과물이 다시 컴파일 대상에 포함되는 것을 방지
+    "**/*.spec.ts", // 테스트 파일이 빌드에 포함되어 구조를 깨뜨리는 것 방지
+    "**/*.test.ts"
   ]
 }

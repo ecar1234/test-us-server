@@ -1,10 +1,10 @@
-import { UserUseCase } from "../../app/UserUseCase";
 import { Router } from 'express';
-import { UserController } from "../controllers/UserController";
-import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
-import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
-import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
+import { UserUseCase } from "../../app/UserUseCase.js";
+import { UserController } from "../controllers/UserController.js";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl.js";
+import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { authMiddleware } from "../middlewares/AuthMiddleware.js";
 // import { Env } from "../../config/env";
 import fs from "fs";
 import multer from "multer";

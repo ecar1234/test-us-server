@@ -1,9 +1,9 @@
-import { AppDataSource } from "../../config/DataSource";
-import { PostReviewModel } from "../../domain/entities/PostReviewModel";
-import { IPostReviewRepository } from "../../domain/interface_repositories/IPostReview_repository";
-import { PostReviewEntity, PostReviewType } from "../entities/PostReviewEntity";
-import { BasePostEntity } from "../entities/BasePostEntity";
-import { UserEntity } from "../entities/UserEntity";
+import { AppDataSource } from "../../config/DataSource.js";
+import { PostReviewModel } from "../../domain/entities/PostReviewModel.js";
+import { IPostReviewRepository } from "../../domain/interface_repositories/IPostReview_repository.js";
+import { PostReviewEntity, PostReviewType } from "../entities/PostReviewEntity.js";
+import { BasePostEntity } from "../entities/BasePostEntity.js";
+import { UserEntity } from "../entities/UserEntity.js";
 
 export class PostReviewRepositoryImpl implements IPostReviewRepository {
   

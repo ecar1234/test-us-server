@@ -1,4 +1,4 @@
-import { ReviewUseCase } from "../../app/ReviewUseCase";
+import { ReviewUseCase } from "../../app/ReviewUseCase.js";
 
 import { Request, Response } from 'express';
 

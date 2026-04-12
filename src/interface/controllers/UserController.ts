@@ -1,6 +1,5 @@
-import { UserUseCase } from "../../app/UserUseCase";
 import { Request, Response } from "express";
-import { decodeToken, generateToken, verifyToken } from "../../utils/jwt";
+import { UserUseCase } from "../../app/UserUseCase.js";
 
 export class UserController {
     constructor(private userUseCase: UserUseCase) { }

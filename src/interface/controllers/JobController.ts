@@ -1,6 +1,5 @@
 import { Application, application, Request, Response } from "express";
-import { getInitPostsQueue, getApplicationsByIdQueue } from "../../config/RedisConfig";
-import { ApplicationModel } from "../../domain/entities/ApplicationModel";
+import { getInitPostsQueue, getApplicationsByIdQueue } from "../../config/RedisConfig.js";
 
 
 export class JobController {

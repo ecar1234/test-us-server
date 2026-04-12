@@ -1,10 +1,11 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { ApplicationEntity } from "./ApplicationEntity";
-import { MessagesEntity } from "./MessagesEntities/MessageEntity";
-import { UserReviewEntity } from "./UserReviewEntiry";
-import { BasePostEntity } from "./BasePostEntity";
-import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity";
-import { RoomMemberEntity } from "./MessagesEntities/RoomMemberEntity";
+import { ApplicationEntity } from "./ApplicationEntity.js";
+import { MessagesEntity } from "./MessagesEntities/MessageEntity.js";
+import { UserReviewEntity } from "./UserReviewEntiry.js";
+import { BasePostEntity } from "./BasePostEntity.js";
+import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity.js";
+import { RoomMemberEntity } from "./MessagesEntities/RoomMemberEntity.js";
+import { PurchaseEntity } from "./PurchaseEntity.js";
 
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',
@@ -98,4 +99,8 @@ export class UserEntity {
 
     @OneToMany(() => FirebaseDeviceTokenEntity, token => token.user)
     deviceTokens: FirebaseDeviceTokenEntity[];
+
+    @OneToMany(() => PurchaseEntity, purchase => purchase.user)
+    purchases: PurchaseEntity[];
+
 }

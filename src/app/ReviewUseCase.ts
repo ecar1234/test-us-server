@@ -1,10 +1,9 @@
-import { PostReviewModel } from "../domain/entities/PostReviewModel";
-import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
-import { PostReviewRepositoryImpl } from "../infrastructure/repositories/PostReviewRepositoryImpl";
-import { UserReviewModel } from "../domain/entities/UserReviewModel";
-
-import { redisClient } from "../config/RedisConfig";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
+import { PostReviewModel } from "../domain/entities/PostReviewModel.js";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl.js";
+import { PostReviewRepositoryImpl } from "../infrastructure/repositories/PostReviewRepositoryImpl.js";
+import { UserReviewModel } from "../domain/entities/UserReviewModel.js";
+import { redisClient } from "../config/RedisConfig.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
 
 
 export class ReviewUseCase {

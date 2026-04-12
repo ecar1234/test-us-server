@@ -24,6 +24,7 @@ import { Env } from './config/env';
 import { DbBackupScheduledJob, ExpiredPostNotificationScheduledJob, ImageCleanupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
 import { randomUUID } from 'crypto';
 import { initSocket } from './service/socket.io';
+import PurchaseRoute from './interface/routes/PurchaseRoute';
 
 const app = express();
 const httpServer = createServer(app);
@@ -53,14 +54,13 @@ app.use('/api/v1/review', ReviewRoute);
 app.use('/api/v1/message', MessageRoute);
 app.use('/api/v1/jobState', JobStateRoute);
 app.use('/api/v1/firebase', FirebaseRoute);
-
+app.use('/api/v1/purchase', PurchaseRoute);
 
 //
 app.use((req, res, next) => {
   req.id = randomUUID();
   console.log(`[REQ:${req.id}] ${req.method} ${req.url}`)
   next();
-
 });
 // error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

@@ -1,6 +1,4 @@
-import { UserModel } from "../UserModel";
-import { RoomModel } from "./RoomModel";
-
+import { UserModel } from "../UserModel.js";
 
 export class RoomMemberModel {
     constructor(

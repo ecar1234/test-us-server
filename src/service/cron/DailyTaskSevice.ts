@@ -65,11 +65,8 @@ export class DailyTaskService {
                 .where('entity.status = :status', { status: BasePostStateType.EXPIRED })
                 .andWhere('entity.updatedAt >= :start', { start })
                 .andWhere('entity.updatedAt < :end', { end })
+                .leftJoinAndSelect('entity.author', 'author')
                 .getMany();
-
-
-
-
 
             const recruitUsers = expiredRecruitPosts.map(post => post.author.userId);
 
@@ -88,8 +85,6 @@ export class DailyTaskService {
                     }
                 });
             }
-
-
         }
         catch (e) {
             console.log('[DailyTask] Error during daily send to expired recruit posts:', e);
@@ -149,11 +144,9 @@ export class DailyTaskService {
             if (filesOnDisk.length === 0) return console.log('정리할 파일이 없습니다.');
             // recruit post image rows
             const recruitPosts = await recruitData.find({
-                where: { status: Not(BasePostStateType.ACTIVE) },
-                select: ["images"] // 필요한 컬럼만 선택 (이미지 구조에 따라 조정)
+                select: ["images"]
             });
             const promotionPosts = await promotionData.find({
-                where: { status: Not(BasePostStateType.ACTIVE) },
                 select: ["images"]
             });
 
@@ -201,7 +194,6 @@ export class DailyTaskService {
             if (filesOnDisk.length === 0) return console.log('정리할 파일이 없습니다.');
 
             const users = await userData.find({
-                where: { status: Not(UserStatus.ACTIVE) },
                 select: ["image"]
             });
 

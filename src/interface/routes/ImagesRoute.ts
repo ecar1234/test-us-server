@@ -1,17 +1,17 @@
 
 
 import { Router } from "express";
-import { ImagesController } from "../controllers/ImagesContoller";
-import { ImagesUseCase } from "../../app/ImagesUseCase";
-import { ImagesRepositoryImpl } from "../../infrastructure/repositories/ImagesRepositoryImpl";
+import { Env } from "../../config/env.js";
+import { ImagesController } from "../controllers/ImagesContoller.js";
+import { ImagesUseCase } from "../../app/ImagesUseCase.js";
+import { ImagesRepositoryImpl } from "../../infrastructure/repositories/ImagesRepositoryImpl.js";
+import { authMiddleware } from "../middlewares/AuthMiddleware.js";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl.js";
 import multer from "multer";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
 import crypto from "crypto";
 import path from "path";
 import fs from "fs";
-import { Env } from "../../config/env";
-import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl";
 
 const route = Router();
 const imagesUseCase = new ImagesUseCase(new ImagesRepositoryImpl(), new RecruitmentPostRepositoryImpl(), new PromotionPostRepositoryImpl());

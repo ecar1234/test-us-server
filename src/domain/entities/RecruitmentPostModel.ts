@@ -1,4 +1,4 @@
-import { ApplicationModel } from "./ApplicationModel";
+import { ApplicationModel } from "./ApplicationModel.js";
 
 export class RecruitmentPostModel {
     constructor(

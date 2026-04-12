@@ -1,7 +1,7 @@
 import { In } from "typeorm";
-import { AppDataSource } from "../../config/DataSource";
-import { FirebaseRepository } from "../../domain/interface_repositories/IFirebaseRepository";
-import { FirebaseDeviceTokenEntity } from "../entities/FirebaseDeviceTokenEntity";
+import { AppDataSource } from "../../config/DataSource.js";
+import { FirebaseRepository } from "../../domain/interface_repositories/IFirebaseRepository.js";
+import { FirebaseDeviceTokenEntity } from "../entities/FirebaseDeviceTokenEntity.js";
 
 
 export class FirebaseRepositoryImpl implements FirebaseRepository {

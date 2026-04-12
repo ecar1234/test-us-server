@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { RoomMemberEntity } from "./RoomMemberEntity";
-import { MessagesEntity } from "./MessageEntity";
-import { BasePostEntity } from "../BasePostEntity";
+import { RoomMemberEntity } from "./RoomMemberEntity.js";
+import { MessagesEntity } from "./MessageEntity.js";
+import { BasePostEntity } from "../BasePostEntity.js";
 
 export enum RoomType {
     DM = 'DM',

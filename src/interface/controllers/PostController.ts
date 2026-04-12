@@ -1,6 +1,6 @@
-import { PostUseCase } from "../../app/PostUseCase";
+import { PostUseCase } from "../../app/PostUseCase.js";
 import { Request, Response } from "express";
-import { getInitPostsQueue } from "../../config/RedisConfig";
+import { getInitPostsQueue } from "../../config/RedisConfig.js";
 
 
 export class PostController {

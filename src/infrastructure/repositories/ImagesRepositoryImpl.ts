@@ -1,8 +1,7 @@
-import { In } from "typeorm";
-import { AppDataSource } from "../../config/DataSource";
-import { ImagesModel } from "../../domain/entities/ImagesModel";
-import { IImagesRepository } from "../../domain/interface_repositories/IImagesRepository";
-import { ImagesEntity } from "../entities/ImagesEntity";
+import { AppDataSource } from "../../config/DataSource.js";
+import { ImagesModel } from "../../domain/entities/ImagesModel.js";
+import { IImagesRepository } from "../../domain/interface_repositories/IImagesRepository.js";
+import { ImagesEntity } from "../entities/ImagesEntity.js";
 
 
 export class ImagesRepositoryImpl implements IImagesRepository {

@@ -1,4 +1,3 @@
-import { RoomModel } from "./RoomModel";
 
 export class MessageModel {
     constructor(

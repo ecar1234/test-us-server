@@ -1,5 +1,4 @@
-import { ApplicationModel } from "../entities/ApplicationModel";
-import { RecruitmentPostModel } from "../entities/RecruitmentPostModel";
+import { RecruitmentPostModel } from "../entities/RecruitmentPostModel.js";
 
 export interface IRecruitmentPostRepository {
     createPost(post: RecruitmentPostModel): Promise<RecruitmentPostModel>;

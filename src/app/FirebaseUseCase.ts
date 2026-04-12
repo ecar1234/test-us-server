@@ -1,4 +1,4 @@
-import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";
 
 
 export class FirebaseUseCase {

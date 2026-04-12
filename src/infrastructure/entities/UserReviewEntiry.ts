@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { ApplicationEntity } from "./ApplicationEntity";
-import { UserEntity } from "./UserEntity";
-import { BasePostEntity } from "./BasePostEntity";
+import { ApplicationEntity } from "./ApplicationEntity.js";
+import { UserEntity } from "./UserEntity.js";
+;
 
 
 // // 리뷰 유형을 정의하는 Enum

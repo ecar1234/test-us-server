@@ -1,4 +1,4 @@
-import { ApplicationModel } from "../entities/ApplicationModel";
+import { ApplicationModel } from "../entities/ApplicationModel.js";
 
 export interface IApplicationRepository {
     create(application: ApplicationModel): Promise<ApplicationModel>;

@@ -1,6 +1,6 @@
 import { Column, ChildEntity, OneToMany } from "typeorm";
-import { ApplicationEntity } from "./ApplicationEntity";
-import { BasePostEntity } from "./BasePostEntity";
+import { ApplicationEntity } from "./ApplicationEntity.js";
+import { BasePostEntity } from "./BasePostEntity.js";
 
 
 @ChildEntity()

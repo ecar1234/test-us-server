@@ -1,10 +1,10 @@
-import { UserModel } from "../domain/entities/UserModel";
+import { UserModel } from "../domain/entities/UserModel.js";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
+import { OtpRepositoryImpl } from "../infrastructure/repositories/Otp/OtpRedisRepositoryImpl.js";
+import { MailService } from "../service/otp/MailService.js";
+import { OtpSevice } from "../service/otp/OtpService.js";
+import { UserStatus } from "../infrastructure/entities/UserEntity.js";
 import bcrypt from "bcrypt";
-import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
-import { OtpRepositoryImpl } from "../infrastructure/repositories/Otp/OtpRedisRepositoryImpl";
-import { MailService } from "../service/otp/MailService";
-import { OtpSevice } from "../service/otp/OtpService";
-import { UserStatus } from "../infrastructure/entities/UserEntity";
 import { v4 as uuidV4 } from "uuid";
 
 interface UploadedImageInfo {

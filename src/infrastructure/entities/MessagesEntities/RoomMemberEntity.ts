@@ -1,6 +1,6 @@
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { RoomEntity } from "./RoomEntity";
-import { UserEntity } from "../UserEntity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { RoomEntity } from "./RoomEntity.js";
+import { UserEntity } from "../UserEntity.js";
 
 @Entity('room_members')
 @Unique(['room', 'userId'])

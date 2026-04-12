@@ -1,4 +1,4 @@
-import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/FirebaseDeviceTokenEntity";
+import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/FirebaseDeviceTokenEntity.js";
 
 
 export interface FirebaseRepository {

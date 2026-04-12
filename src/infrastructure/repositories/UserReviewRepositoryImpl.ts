@@ -1,8 +1,8 @@
-import { AppDataSource } from "../../config/DataSource";
 import { In, IsNull } from "typeorm";
-import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository";
-import { UserReviewModel } from "../../domain/entities/UserReviewModel";
-import { UserReviewEntity } from "../entities/UserReviewEntiry";
+import { AppDataSource } from "../../config/DataSource.js";
+import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository.js";
+import { UserReviewModel } from "../../domain/entities/UserReviewModel.js";
+import { UserReviewEntity } from "../entities/UserReviewEntiry.js";
 
 
 export class UserReviewRepositoryImpl implements IUserReviewRepository {

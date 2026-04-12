@@ -1,8 +1,7 @@
 import { Router } from "express";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
-import { PromotionPostUseCase } from "../../app/PromotionPostUseCase";
-import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl";
-import { PromotionPostController } from "../controllers/PromotionPostController";
+import { PromotionPostUseCase } from "../../app/PromotionPostUseCase.js";
+import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl.js";
+import { PromotionPostController } from "../controllers/PromotionPostController.js";
 
 
 

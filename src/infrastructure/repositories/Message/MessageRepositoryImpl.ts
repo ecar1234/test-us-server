@@ -1,12 +1,10 @@
 import { EntityManager } from "typeorm";
-import { AppDataSource } from "../../../config/DataSource";
-import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel";
-import { IMessageRepository } from "../../../domain/interface_repositories/MessageRepo/IMessageRepository";
-import { MessagesEntity } from "../../entities/MessagesEntities/MessageEntity";
-import { UserEntity, UserStatus } from "../../entities/UserEntity";
-import { RoomModel } from "../../../domain/entities/MessagesModels/RoomModel";
-import { RoomMemberModel } from "../../../domain/entities/MessagesModels/RoomMenberModel";
-import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity";
+import { AppDataSource } from "../../../config/DataSource.js";
+import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel.js";
+import { IMessageRepository } from "../../../domain/interface_repositories/MessageRepo/IMessageRepository.js";
+import { MessagesEntity } from "../../entities/MessagesEntities/MessageEntity.js";
+import { UserEntity, UserStatus } from "../../entities/UserEntity.js";
+import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity.js";
 
 
 export class MessageRepositoryImpl implements IMessageRepository {

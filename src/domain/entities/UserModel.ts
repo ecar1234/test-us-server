@@ -1,4 +1,3 @@
-import { ApplicationModel } from "./ApplicationModel";
 
 export class UserModel {
     constructor(

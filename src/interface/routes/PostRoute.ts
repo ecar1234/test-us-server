@@ -1,20 +1,18 @@
 import { Router } from "express";
-import { authMiddleware } from "../middlewares/AuthMiddleware";
-import { PostController } from "../controllers/PostController";
-import { PostUseCase } from "../../app/PostUseCase";
-import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl";
-import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl";
+import { authMiddleware } from "../middlewares/AuthMiddleware.js";
+import { PostController } from "../controllers/PostController.js";
+import { PostUseCase } from "../../app/PostUseCase.js";
+import { PostRepositoryImpl } from "../../infrastructure/repositories/PostRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "../../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { PromotionPostRepositoryImpl } from "../../infrastructure/repositories/PromotionPostRepositoryImpl.js";
+import { Env } from "../../config/env.js";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl.js";
+import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl.js";
 import multer from "multer";
 import crypto from "crypto";
 import path from "path";
 import fs from "fs";
-import { Env } from "../../config/env";
-import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
-import { ApplicationRepositoryImpl } from "../../infrastructure/repositories/ApplicationRepositoryImpl";
-import { UserRepositoryImpl } from "../../infrastructure/repositories/UserRepositoryImpl";
-import { UserReviewRepositoryImpl } from "../../infrastructure/repositories/UserReviewRepositoryImpl";
-// import { app } from "firebase-admin";
 
 
 const route = Router();

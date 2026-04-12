@@ -1,5 +1,5 @@
-import { PromotionPostModel } from "../entities/PromotionPostModel";
-import { RecruitmentPostModel } from "../entities/RecruitmentPostModel";
+import { PromotionPostModel } from "../entities/PromotionPostModel.js";
+import { RecruitmentPostModel } from "../entities/RecruitmentPostModel.js";
 
 
 export interface IPostRepository {

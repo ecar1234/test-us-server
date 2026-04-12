@@ -1,4 +1,4 @@
-import { PromotionPostModel } from "../entities/PromotionPostModel";
+import { PromotionPostModel } from "../entities/PromotionPostModel.js";
 
 export interface IPromotionPostRepository {
     createPost(post: PromotionPostModel): Promise<PromotionPostModel>;
