@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import { FirebaseEnv } from '../../config/env';
+import { FirebaseEnv } from '../../config/env.js';
 import path from 'path';
 
 

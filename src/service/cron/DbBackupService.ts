@@ -2,7 +2,7 @@ import fs from "fs";
 import dayjs from "dayjs";
 import path from "path";
 import { exec } from "child_process";
-import { Env } from "../../config/env";
+import { Env } from "../../config/env.js";
 
 
 

@@ -2,7 +2,7 @@ import { IApplicationRepository } from "../../domain/interface_repositories/IApp
 import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity.js";
 import { AppDataSource } from "../../config/DataSource.js";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel.js";
-import { MobileOsType } from "../entities/BasePostEntity.js";
+import { MobileOsType } from "..//entities/PostEntities/BasePostEntity.js";
 import createError from "http-errors";
 import { In } from "typeorm";
 

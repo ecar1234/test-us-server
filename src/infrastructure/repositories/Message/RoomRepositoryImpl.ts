@@ -3,7 +3,7 @@ import { AppDataSource } from "../../../config/DataSource.js";
 import { RoomModel } from "../../../domain/entities/MessagesModels/RoomModel.js";
 import { IRoomRepository } from "../../../domain/interface_repositories/MessageRepo/IRoomRepository.js";
 import { RoomEntity, RoomType } from "../../entities/MessagesEntities/RoomEntity.js";
-import { BasePostEntity } from "../../entities/BasePostEntity.js";
+import { BasePostEntity } from "../../entities/PostEntities/BasePostEntity.js";
 import { RoomMemberRepositoryImpl } from "./RoomMemberRepositoryImpl.js";
 import { MessageRepositoryImpl } from "./MessageRepositoryImpl.js";
 import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel.js";

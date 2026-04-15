@@ -1,6 +1,6 @@
-import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
-import { FCMPayload } from "../../interface/interfaces/types";
-import { messaging } from "../../service/firebase/Firebase";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { FCMPayload } from "../../interface/interfaces/types.js";
+import { messaging } from "../../service/firebase/Firebase.js";
 
 export async function sendNotificationToUser(payload: FCMPayload, targetId: string): Promise<object> {
     const message = {

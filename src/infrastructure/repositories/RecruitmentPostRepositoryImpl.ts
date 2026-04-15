@@ -2,10 +2,10 @@ import { In, Like, Not } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
 import { IRecruitmentPostRepository } from "../../domain/interface_repositories/IRecruitmentPostRepository.js";
-import { RecruitmentPostEntity } from "../entities/RecruitmentPostEntity.js";
+import { RecruitmentPostEntity } from "../entities/PostEntities/RecruitmentPostEntity.js";
 import { redisClient } from "../../config/RedisConfig.js";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl.js";
-import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity.js";
+import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/PostEntities/BasePostEntity.js";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
 import { UserStatus } from "../entities/UserEntity.js";
 

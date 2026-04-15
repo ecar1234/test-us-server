@@ -1,8 +1,8 @@
 import { AppDataSource } from "../../config/DataSource.js";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel.js";
 import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository.js";
-import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/BasePostEntity.js";
-import { PromotionPostEntity } from "../entities/PromotionPostEntity.js";
+import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/PostEntities/BasePostEntity.js";
+import { PromotionPostEntity } from "../entities/PostEntities/PromotionPostEntity.js";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
 import { UserStatus } from "../entities/UserEntity.js";
 import { Like } from "typeorm";

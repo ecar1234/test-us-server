@@ -1,13 +1,12 @@
-import { Not } from "typeorm";
-import { AppDataSource } from "../../config/DataSource";
-import { BasePostStateType } from "../../infrastructure/entities/BasePostEntity";
-import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/FirebaseDeviceTokenEntity";
-import { PromotionPostEntity } from "../../infrastructure/entities/PromotionPostEntity";
-import { RecruitmentPostEntity } from "../../infrastructure/entities/RecruitmentPostEntity";
-import { expiredPostNotificationHandler } from "../firebase/notificationHandler";
+import { AppDataSource } from "../../config/DataSource.js";
+import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/FirebaseDeviceTokenEntity.js";
+import { expiredPostNotificationHandler } from "../firebase/notificationHandler.js";
+import { UserEntity } from "../../infrastructure/entities/UserEntity.js";
+import { RecruitmentPostEntity } from "../../infrastructure/entities/PostEntities/RecruitmentPostEntity.js";
+import { BasePostStateType } from "../../infrastructure/entities/PostEntities/BasePostEntity.js";
+import { PromotionPostEntity } from "../../infrastructure/entities/PostEntities/PromotionPostEntity.js";
 import fs from 'fs/promises';
 import path from 'path';
-import { UserEntity, UserStatus } from "../../infrastructure/entities/UserEntity";
 
 
 export class DailyTaskService {

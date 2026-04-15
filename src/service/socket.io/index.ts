@@ -1,15 +1,15 @@
 import { Server } from "socket.io";
+import { Redis } from "ioredis";
 import { Server as httpServer } from "http";
-import { chatHandler } from "./handlers/chatHandler";
+import { chatHandler } from "./handlers/chatHandler.js";
 import { createAdapter } from "@socket.io/redis-adapter";
-import Redis from "ioredis";
-import { MessageUseCase } from "../../app/MessageUseCase";
-import { MessageRepositoryImpl } from "../../infrastructure/repositories/Message/MessageRepositoryImpl";
-import { RoomRepositoryImpl } from "../../infrastructure/repositories/Message/RoomRepositoryImpl";
-import { RoomMemberRepositoryImpl } from "../../infrastructure/repositories/Message/RoomMemberRepositoryImpl";
-import { TypeOrmUnitOfWork } from "../../infrastructure/repositories/Message/UnitOfWorkImpl";
-import { AppDataSource } from "../../config/DataSource";
-import { verifyToken } from "../../utils/jwt";
+import { MessageUseCase } from "../../app/MessageUseCase.js";
+import { MessageRepositoryImpl } from "../../infrastructure/repositories/Message/MessageRepositoryImpl.js";
+import { RoomRepositoryImpl } from "../../infrastructure/repositories/Message/RoomRepositoryImpl.js";
+import { RoomMemberRepositoryImpl } from "../../infrastructure/repositories/Message/RoomMemberRepositoryImpl.js";
+import { TypeOrmUnitOfWork } from "../../infrastructure/repositories/Message/UnitOfWorkImpl.js";
+import { AppDataSource } from "../../config/DataSource.js";
+import { verifyToken } from "../../utils/jwt.js";
 
 export const initSocket = async (server: httpServer) => {
     const messageRepo = new MessageRepositoryImpl();
@@ -87,5 +87,4 @@ export const initSocket = async (server: httpServer) => {
     });
 
     return io;
-
 };

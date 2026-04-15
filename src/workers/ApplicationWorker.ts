@@ -1,11 +1,11 @@
 import { Worker } from "bullmq";
-import { bullMqConnection, redisClient } from "../config/RedisConfig";
-import { AppUseCase } from "../app/AppUseCase";
-import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
-import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
-import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
+import { bullMqConnection } from "../config/RedisConfig.js";
+import { AppUseCase } from "../app/AppUseCase.js";
+import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl.js";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
 
 const isProd = process.env.NODE_ENV === "prod";
 

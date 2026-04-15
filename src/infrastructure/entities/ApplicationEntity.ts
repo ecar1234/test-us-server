@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
-import { RecruitmentPostEntity } from "./RecruitmentPostEntity.js";
+import { RecruitmentPostEntity } from "./PostEntities/RecruitmentPostEntity.js";
 import { UserEntity } from "./UserEntity.js";
 import { UserReviewEntity } from "./UserReviewEntiry.js";
-import { MobileOsType } from "./BasePostEntity.js";
+import { MobileOsType } from "./PostEntities/BasePostEntity.js";
 
 // 신청 상태를 정의하는 Enum
 export enum ApplicationStatus {

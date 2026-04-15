@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import { DailyTaskService } from './DailyTaskSevice';
-import { DbBackupService } from './DbBackupService';
+import { DailyTaskService } from './DailyTaskSevice.js';
+import { DbBackupService } from './DbBackupService.js';
 
 
 export const PostUpdateScheduledJob = () => {

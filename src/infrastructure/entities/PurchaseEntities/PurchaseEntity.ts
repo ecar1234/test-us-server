@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserEntity } from "./UserEntity.js";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Table, TableInheritance, UpdateDateColumn } from "typeorm";
+import { UserEntity } from "../UserEntity.js";
 
 export enum PurchaseState{
     PURCHASED = 'purchased',
@@ -10,7 +10,8 @@ export enum PurchaseState{
 }
 
 @Entity('purchases')
-export class PurchaseEntity {
+@TableInheritance({column: {type: 'varchar', name: 'store'}})
+export abstract class PurchaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -41,8 +42,8 @@ export class PurchaseEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @Column()
-    verificationData: string;
+    // @Column()
+    // verificationData: string;
 
     @ManyToOne(() => UserEntity, user => user.purchases)
     @JoinColumn({ name: 'userId' })

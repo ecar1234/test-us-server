@@ -1,8 +1,8 @@
-import Redis from "ioredis";
-import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl";
-import { MessageModel } from "../../domain/entities/MessagesModels/MessageModel";
+import { Redis } from "ioredis";
+import { FirebaseRepositoryImpl } from "../../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { MessageModel } from "../../domain/entities/MessagesModels/MessageModel.js";
 import { Server } from "socket.io";
-import { notificationHandler } from "../firebase/notificationHandler";
+import { notificationHandler } from "../firebase/notificationHandler.js";
 
 export class MessageControlService {
     constructor(

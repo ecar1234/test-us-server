@@ -1,4 +1,4 @@
-import { PurchaseUseCase } from "../../app/PurchaseUseCase";
+import { PurchaseUseCase } from "../../app/PurchaseUseCase.js";
 import { Request, Response } from "express";
 
 export class PurchaseController {
@@ -94,16 +94,10 @@ export class PurchaseController {
     }
     /// 구독 확인
     async purchaseAOS(req: Request, res: Response): Promise<void> {
-        const { userId, verificationData, prevToken } = req.body;
+        const { userId, verificationData } = req.body;
         try {
-            if(prevToken){
-                const updatePurchase = await this.purchaseUseCase.subscriptionPurchaseUpdateAOS(userId, verificationData, prevToken);
-                res.status(200).json({ status: 200, purchase: updatePurchase });
-                return;
-            }
-            const newPurchase = await this.purchaseUseCase.subscriptionPurchaseHandelerAOS(userId, verificationData);
-            res.status(200).json({ status: 200, purchase: newPurchase });
-            return;
+           const subscribe = await this.purchaseUseCase.subscriptionPurchaseHandelerAOS(userId, verificationData);
+           res.status(200).json({ status: 200, subscribe: subscribe });
         } catch (error) {
             console.log('[Purchase verification] Error', error);
             res.status(500).json({ status: 500, message: error.message });

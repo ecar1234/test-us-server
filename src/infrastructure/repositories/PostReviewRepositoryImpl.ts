@@ -2,7 +2,7 @@ import { AppDataSource } from "../../config/DataSource.js";
 import { PostReviewModel } from "../../domain/entities/PostReviewModel.js";
 import { IPostReviewRepository } from "../../domain/interface_repositories/IPostReview_repository.js";
 import { PostReviewEntity, PostReviewType } from "../entities/PostReviewEntity.js";
-import { BasePostEntity } from "../entities/BasePostEntity.js";
+import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
 import { UserEntity } from "../entities/UserEntity.js";
 
 export class PostReviewRepositoryImpl implements IPostReviewRepository {

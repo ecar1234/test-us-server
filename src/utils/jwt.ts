@@ -1,6 +1,6 @@
-import { Env } from "../config/env";
+import { Env } from "../config/env.js";
 import * as jwt from "jsonwebtoken";
-import { UserModel } from "../domain/entities/UserModel";
+import { UserModel } from "../domain/entities/UserModel.js";
 
 const JWT_SECRET = Env.JWT_SECRET;
 

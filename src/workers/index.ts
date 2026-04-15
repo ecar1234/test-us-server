@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config(); // Worker 프로세스를 위해 환경 변수를 로드합니다.
 
-import { AppDataSource } from '../config/DataSource';
+import { AppDataSource } from '../config/DataSource.js';
 
 AppDataSource.initialize().then(() => {
     console.log("Workers: Database connection initialized successfully.");

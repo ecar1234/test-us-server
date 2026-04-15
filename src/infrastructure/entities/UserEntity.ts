@@ -2,10 +2,10 @@ import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, Prim
 import { ApplicationEntity } from "./ApplicationEntity.js";
 import { MessagesEntity } from "./MessagesEntities/MessageEntity.js";
 import { UserReviewEntity } from "./UserReviewEntiry.js";
-import { BasePostEntity } from "./BasePostEntity.js";
+import { BasePostEntity } from "./PostEntities/BasePostEntity.js";
 import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity.js";
 import { RoomMemberEntity } from "./MessagesEntities/RoomMemberEntity.js";
-import { PurchaseEntity } from "./PurchaseEntity.js";
+import { PurchaseEntity } from "./PurchaseEntities/PurchaseEntity.js";
 
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',

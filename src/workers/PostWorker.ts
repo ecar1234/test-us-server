@@ -1,16 +1,12 @@
 import { Worker } from "bullmq";
-import { bullMqConnection, redisClient } from "../config/RedisConfig";
-import { RecruitmentPostUseCase } from "../app/RecruitmentPostUseCase";
-import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl";
-import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl";
-import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl";
-import { PostUseCase } from "../app/PostUseCase";
-import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl";
-import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl";
-import { ImagesRepositoryImpl } from "../infrastructure/repositories/ImagesRepositoryImpl";
-import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl";
-import { app } from "firebase-admin";
-import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl";
+import { bullMqConnection } from "../config/RedisConfig.js";
+import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
+import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
+import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl.js";
+import { PostUseCase } from "../app/PostUseCase.js";
+import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl.js";
+import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl.js";
+import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";
 
 const isProd = process.env.NODE_ENV === "prod";
 const postWorker = new Worker(

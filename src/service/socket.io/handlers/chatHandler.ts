@@ -1,9 +1,9 @@
 
 import { Server, Socket } from "socket.io";
-import { MessageUseCase } from "../../../app/MessageUseCase";
-import { MessageControlService } from "../messageControlService";
-import { FirebaseRepositoryImpl } from "../../../infrastructure/repositories/FirebaseRepositoryImpl";
-import Redis from "ioredis";
+import { MessageUseCase } from "../../../app/MessageUseCase.js";
+import { MessageControlService } from "../messageControlService.js";
+import { FirebaseRepositoryImpl } from "../../../infrastructure/repositories/FirebaseRepositoryImpl.js";
+import { Redis } from "ioredis";
 
 export const chatHandler = (socket: Socket, io: Server, messageUseCase: MessageUseCase, cacheClient: Redis) => {
 

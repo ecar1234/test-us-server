@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 import { createServer } from 'http';
 
 const isProd = process.env.NODE_ENV === 'prod';
@@ -11,20 +12,21 @@ dotenv.config({
 });
 
 import express, { Request, Response, NextFunction } from 'express';
-import { AppDataSource } from './config/DataSource';
-import AuthRoute from './interface/routes/AuthRoute';
-import UserRoute from './interface/routes/UserRoute';
-import ApplicationRoute from './interface/routes/ApplicationRoute';
-import ReviewRoute from './interface/routes/ReviewRoute';
-import MessageRoute from './interface/routes/MessageRoute';
-import JobStateRoute from './interface/routes/JobStateRoute';
-import FirebaseRoute from './interface/routes/FirebaseRoute';
-import PostRoute from './interface/routes/PostRoute';
-import { Env } from './config/env';
-import { DbBackupScheduledJob, ExpiredPostNotificationScheduledJob, ImageCleanupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob';
+import { AppDataSource } from './config/DataSource.js';
+import AuthRoute from './interface/routes/AuthRoute.js';
+import UserRoute from './interface/routes/UserRoute.js';
+import ApplicationRoute from './interface/routes/ApplicationRoute.js';
+import ReviewRoute from './interface/routes/ReviewRoute.js';
+import MessageRoute from './interface/routes/MessageRoute.js';
+import JobStateRoute from './interface/routes/JobStateRoute.js';
+import FirebaseRoute from './interface/routes/FirebaseRoute.js';
+import PostRoute from './interface/routes/PostRoute.js';
+import { DbBackupScheduledJob, ExpiredPostNotificationScheduledJob, ImageCleanupScheduledJob, PostUpdateScheduledJob } from './service/cron/ScheduledJob.js';
+import { CreatePurchaseRouter } from './interface/routes/PurchaseRoute.js';
+import { initSocket } from './service/socket.io/index.js';
 import { randomUUID } from 'crypto';
-import { initSocket } from './service/socket.io';
-import PurchaseRoute from './interface/routes/PurchaseRoute';
+import { AppStoreServerAPIClient, Environment } from '@apple/app-store-server-library';
+import { AppleClientInit } from './service/apple/AppleInit.js';
 
 const app = express();
 const httpServer = createServer(app);
@@ -45,6 +47,9 @@ app.use('/posts', express.static(isProd ? path.resolve(process.env.MAIN_UPLOAD_U
 app.use('/profile', express.static(isProd ? path.resolve(process.env.MAIN_UPLOAD_USER_URL) : path.resolve(process.env.UPLOAD_USER_URL)));
 app.use('/backup', express.static(isProd ? path.resolve(process.env.MAIN_BACKUP_DB) : path.resolve(process.env.BACKUP_DB)));
 
+// apple verify client
+const { client, verifer } = AppleClientInit(isProd);
+
 // routes
 app.use('/api/v1/auth', AuthRoute);
 app.use('/api/v1/user', UserRoute);
@@ -54,7 +59,7 @@ app.use('/api/v1/review', ReviewRoute);
 app.use('/api/v1/message', MessageRoute);
 app.use('/api/v1/jobState', JobStateRoute);
 app.use('/api/v1/firebase', FirebaseRoute);
-app.use('/api/v1/purchase', PurchaseRoute);
+app.use('/api/v1/purchase', CreatePurchaseRouter(client, verifer));
 
 //
 app.use((req, res, next) => {

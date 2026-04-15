@@ -1,7 +1,7 @@
-import { MessageModel } from "../../domain/entities/MessagesModels/MessageModel";
-import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/FirebaseDeviceTokenEntity";
-import { FCMPayload } from "../../interface/interfaces/types";
-import { sendNotificationToUser } from "./FcmService";
+import { MessageModel } from "../../domain/entities/MessagesModels/MessageModel.js";
+import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/FirebaseDeviceTokenEntity.js";
+import { FCMPayload } from "../../interface/interfaces/types.js";
+import { sendNotificationToUser } from "./FcmService.js";
 
 
 export const notificationHandler = async (token: FirebaseDeviceTokenEntity, message: MessageModel): Promise<void> => {

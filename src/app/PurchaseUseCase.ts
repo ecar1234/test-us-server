@@ -1,27 +1,56 @@
-import axios from "axios";
 import { PurchaseModel } from "../domain/entities/PurchaseModel.js";
-import { PurchaseRepositoryImpl } from "../infrastructure/repositories/PurchaseRepositoryImpl.js";
+import { PurchaseRepositoryImpl } from "../infrastructure/repositories/Purchase/CommomPurchaseRepositoryImpl.js";
 import { getAndroidPublisher } from "../service/googleapis/googleClient.js";
-import { IResIosVerifyReceipt } from "../domain/entities/interface/applePackage.js";
 import { IIosWebhookPayload } from "../domain/entities/interface/appleTypes.js";
+import { PurchaseAosRepositoryImpl } from "../infrastructure/repositories/Purchase/PurchaseAosRepositoryImpl.js";
+import { PurchaseIosRepositoryImpl } from "../infrastructure/repositories/Purchase/PurchaseIosRepositoryImpl.js";
+import { AppStoreServerAPIClient, JWSTransactionDecodedPayload, SignedDataVerifier } from "@apple/app-store-server-library";
+import { androidpublisher_v3 } from "googleapis";
 import { decodeJwt } from "jose";
 
 
 export class PurchaseUseCase {
-    constructor(private purchaseRepository: PurchaseRepositoryImpl) { }
+    constructor(
+        private purchaseRepository: PurchaseRepositoryImpl,
+        private aosRepository: PurchaseAosRepositoryImpl,
+        private iosRepository: PurchaseIosRepositoryImpl,
+        private appStoreClient: AppStoreServerAPIClient,
+        private verifer: SignedDataVerifier
+    ) { }
+    private getPlan(plan: string): string {
+        switch (plan) {
+            case 'std':
+                return 'standard';
 
-    // 직접 실행 되지 않는 저장과 업데이트..
-    async saveSubscribe(subscribe: PurchaseModel, tokenOrReceipt: string): Promise<PurchaseModel> {
-        const newSubscribe = await this.purchaseRepository.saveSubscribe(subscribe, tokenOrReceipt);
-        return newSubscribe;
+            case 'pre':
+                return 'premium';
+
+            default:
+                return 'standard';
+        }
     }
-    async updateSubcribe(subscribe: PurchaseModel, tokenOrReceipt: string): Promise<PurchaseModel> {
-        const newSubscribe = await this.purchaseRepository.updateSubcribe(subscribe, tokenOrReceipt);
-        return newSubscribe;
-    }
+
+    // async saveAosSubscribe(subscribe: PurchaseModel, token: string, linkedToken?: string): Promise<PurchaseModel> {
+    //     const newSubscribe = await this.aosRepository.saveSubscribe(subscribe);
+    //     return newSubscribe;
+    // }
+    // async updateAosSubcribe(subscribe: PurchaseModel): Promise<PurchaseModel> {
+    //     const newSubscribe = await this.aosRepository.updateSubcribe(subscribe);
+    //     return newSubscribe;
+    // }
+
+    // async saveIosSubscribe(subscribe: PurchaseModel): Promise<PurchaseModel> {
+    //     const newSubscribe = await this.iosRepository.saveSubscribe(subscribe);
+    //     return newSubscribe;
+    // }
+    // async updateIosSubcribe(subscribe: PurchaseModel): Promise<PurchaseModel> {
+    //     const newSubscribe = await this.iosRepository.updateSubcribe(subscribe);
+    //     return newSubscribe;
+    // }
+
     /// Token값으로 purchase정보 가져오기
     async getSubscribeByToken(token: string): Promise<PurchaseModel> {
-        const subscribe = await this.purchaseRepository.getSubscribeByToken(token);
+        const subscribe = await this.aosRepository.getSubscribeByToken(token);
         return subscribe;
     }
     /// 유져의 모든 구독정보 가져오기
@@ -31,7 +60,7 @@ export class PurchaseUseCase {
     }
     /// Play store 구매 검증
     /// 영수 검증 후 purchaseModel 리턴
-    async verifyPurchaseAOS(purchaseToken: string): Promise<PurchaseModel> {
+    async verifyPurchaseAOS(purchaseToken: string): Promise<androidpublisher_v3.Schema$SubscriptionPurchaseV2> {
         const purblisher = await getAndroidPublisher();
 
         const product = await purblisher.purchases.subscriptionsv2.get({
@@ -43,133 +72,113 @@ export class PurchaseUseCase {
         }
         console.log('[Purchase] AOS verify success');
 
-        // 데이터 가공
-        const productId = product.data.lineItems[0].offerDetails.basePlanId;
-        const expiresAt = product.data.lineItems[0].expiryTime;
-        const planInfo = productId.split('-');
-        let plan: string = '';
-        switch (planInfo[0]) {
-            case 'std':
-                plan = 'standard';
-                break;
-            case 'pre':
-                plan = 'premium';
-                break;
-            default:
-                plan = 'standard';
-                break;
+        return product.data;
+    }
+    /// App store 구매 검증
+    /// 영수 검증 후 purchaseModel 리턴
+    async verifyPurchaseIOS(transactionId: string): Promise<JWSTransactionDecodedPayload> {
+        const verified = await this.appStoreClient.getTransactionInfo(transactionId);
+        if(!verified){
+            throw new Error('[Purchase IOS] verify failed');
         }
-        const newPurchase = new PurchaseModel({
+        console.log('[Purchase] IOS verify success');
+        const res = await this.verifer.verifyAndDecodeTransaction(verified.signedTransactionInfo);
+
+        return res;
+    }
+
+    // front 정보 transactions
+    async subscriptionPurchaseHandelerAOS(useId: string, token: string): Promise<PurchaseModel> {
+        const verified = await this.verifyPurchaseAOS(token);
+        if (!verified) {
+            throw new Error('[Purchase] Subscribe verify failed.');
+        }
+
+        const linkedToken = verified.linkedPurchaseToken;
+        
+        const productId = verified.lineItems[0].offerDetails.basePlanId;
+        const itemInfo = productId.split('-');
+        const plan = this.getPlan(itemInfo[0]);
+        const expiredDate = new Date(verified.lineItems[0].expiryTime);
+
+        const productModel = new PurchaseModel({
             plan: plan,
             productId: productId,
             store: 'play-store',
             isActive: true,
             willRenew: true,
             state: 'purchased',
-            expiresAt: new Date(expiresAt),
-            userId: ''
+            expiresAt: expiredDate,
+            userId: useId
         });
-        return newPurchase;
-    }
-    /// App store 구매 검증
-    /// 영수 검증 후 purchaseModel 리턴
-    async verifyPurchaseIOS(receipt: string): Promise<[PurchaseModel, string]> {
-        const isProd = process.env.NODE_ENV === 'prod';
-        const url = isProd ? 'https://buy.itunes.apple.com/verifyReceipt' : 'https://sandbox.itunes.apple.com/verifyReceipt';
-        const verifiedItem = await axios.post(url, {
-            "receipt-data": receipt,
-            "password": process.env.APPLE_PASSWORD,
-            "exclude-old-transactions": true,
-        }, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const verifiedData: IResIosVerifyReceipt = verifiedItem.data;
-        if (verifiedItem.status !== 0) {
-            if (verifiedItem.status === 21007) {
+        // 기존 활성화 데이터 비활성화
+        if (linkedToken) {
+            const prevProduct = await this.getSubscribeByToken(linkedToken);
+            if (!prevProduct) {
+                const isActived = await this.purchaseRepository.getIsActiveSubscription(useId);
+                if (!isActived) {
+                    console.log('[Purchase] prevProduct & isActived not found.');
+                    console.log('[Purchase] changes to new purchase.');
+                    const newPurchase = await this.aosRepository.saveSubscribe(productModel, token, linkedToken);
+                    return newPurchase;
+                } else {
+                    isActived.isActive = false;
+                    isActived.willRenew = false;
+                    isActived.state = 'canceled';
 
+                    await this.aosRepository.updateSubcribe(isActived, linkedToken);
+                    console.log('[Purchase] prevProduct disabled success');
+                }
             } else {
-                throw new Error('[Purchase] IOS verify failed :' + verifiedItem.data.errorMessage);
+                prevProduct.isActive = false;
+                prevProduct.willRenew = false;
+                prevProduct.state = 'canceled';
+
+                await this.aosRepository.updateSubcribe(prevProduct);
+                console.log('[Purchase] prevProduct disabled success');
             }
         }
-        const latest = verifiedData.leatest_receipt_info.sort((a, b) => {
-            return Number(b.expires_date_ms) - Number(a.expires_date_ms);
-        })[0];
-        console.log('[Purchase] IOS verify success');
 
-        const itemInfo = latest.product_id.split('_');
-        const expiredAt = new Date(latest.expires_date_ms);
-        let plan: string = '';
-        switch (itemInfo[0]) {
-            case 'std':
-                plan = 'standard';
-                break;
-            case 'pre':
-                plan = 'premium';
-                break;
-            default:
-                plan = 'standard';
-                break;
-        }
-        const originalId = latest.original_transaction_id;
-        const newPurchase = new PurchaseModel({
-                plan: 'standard',
-                productId: latest.product_id,
-                store: 'app-store',
-                isActive: true,
-                willRenew: true,
-                state: 'purchased',
-                expiresAt: expiredAt,
-                userId: '',
-            });
-        return [newPurchase, originalId];
+        const savePurchase = await this.aosRepository.saveSubscribe(productModel, token, linkedToken);
+        return savePurchase;
     }
 
-    // front 정보 transactions
-    async subscriptionPurchaseHandelerAOS(useId: string, verificationData: string): Promise<PurchaseModel> {
-        const verified = await this.verifyPurchaseAOS(verificationData);
-        if(!verified){
-            throw new Error('[Purchase] Subscribe verify failed.');
-        }
-        verified.userId = useId;
-        const newPurchase = await this.saveSubscribe(verified, verificationData);
-        return newPurchase;
-    }
-    async subscriptionPurchaseUpdateAOS(useId: string, verificationData: string, prevToken: string): Promise<PurchaseModel> {
-        const prevProduct = await this.getSubscribeByToken(prevToken);
-        if(!prevProduct){
-            const isActived = await this.purchaseRepository.getIsActiveSubscription(useId);
-            if(!isActived){
-                console.log('[Purchase] prevProduct & isActived not found.');
-                console.log('[Purchase] changes to new purchase.');
-                const newPurchase = await this.subscriptionPurchaseHandelerAOS(useId, verificationData);
-                return newPurchase;
-            }else {
-                isActived.isActive = false;
-                isActived.willRenew = false;
-                await this.updateSubcribe(isActived, prevToken);
-            }
-        }
-        const verified = await this.verifyPurchaseAOS(verificationData);
-        if(!verified){
-            throw new Error('[Purchase] Subscribe verify failed.');
-        }
-        verified.id = prevProduct.id;
-        verified.createdAt = prevProduct.createdAt;
-        verified.userId = useId;
-        
-        const updatePurchase = await this.updateSubcribe(verified, verificationData);
-        console.log('[Purchase] update success');
-        return updatePurchase;
-    }
-    async subscriptionHandelerIOS(useId: string, verificationData: string): Promise<PurchaseModel> {
-        const [model, originalId] = await this.verifyPurchaseIOS(verificationData);
-        model.userId = useId;
-        const newPurchase = await this.saveSubscribe(model, originalId);
-        return newPurchase;
+    async subscriptionHandelerIOS(useId: string, transactionId: string): Promise<PurchaseModel> {
         // TODO확인 요망
+        const verified = await this.verifyPurchaseIOS(transactionId);
+        const productId: string = verified.productId;
+        const expiredAt: Date = new Date(verified.expiresDate);
+        const itemInfo = productId.split('_');
+        const plan = this.getPlan(itemInfo[0]);
+
+        const originalId = verified.originalTransactionId;
+
+        const productModel = new PurchaseModel({
+            plan: plan,
+            productId: productId,
+            store: 'app-store',
+            isActive: true,
+            willRenew: true,
+            state: 'purchased',
+            expiresAt: expiredAt,
+            userId: useId
+        });       
+
+        const prevProdect = await this.iosRepository.getSubscriptionByTransactionId(transactionId);
+        
+        if(prevProdect && prevProdect.isActive){
+            prevProdect.isActive = false;
+            prevProdect.willRenew = false;
+            prevProdect.state = 'canceled';
+
+            await this.iosRepository.updateSubcribe(prevProdect, transactionId);
+            console.log('[Purchase] prevProduct disabled success');
+        } else {
+            const savePurchase = await this.iosRepository.saveSubscribe(productModel, transactionId, originalId);
+            return savePurchase;
+        }
     }
+
     // store 별 webHook 실행
     // webHook에서 받은 데이터는 영수검증이 필요 없음
     // 바로 서버 조회 후 신규 or 업데이트 
@@ -200,7 +209,7 @@ export class PurchaseUseCase {
         }
         if (findProduct) {
             const verified = await this.verifyPurchaseAOS(purchaseToken);
-            findProduct.expiresAt = verified.expiresAt;
+            findProduct.expiresAt = new Date(verified.lineItems[0].expiryTime);
             findProduct.state = type;
             if (type !== 'renew') {
                 if (type === 'cancel') {
@@ -210,7 +219,7 @@ export class PurchaseUseCase {
                     findProduct.willRenew = false;
                 }
             }
-            await this.updateSubcribe(findProduct, purchaseToken);
+            await this.iosRepository.updateSubcribe(findProduct, purchaseToken);
             //TODO: FCM service 연동 필요. 변경 알림.
         } else {
             // 기존 데이터가 없다면 업데이트 진행 안함/ 신규 구매는 전적으로 front에서 전담.
@@ -267,8 +276,10 @@ export class PurchaseUseCase {
         updateItem.plan = plan;
         updateItem.productId = productId;
         updateItem.expiresAt = expiredAt;
-        await this.saveSubscribe(updateItem, transactions.originalTransactionId);
+        await this.iosRepository.updateSubcribe(updateItem, transactions.originalTransactionId);
         console.log('[Purchase Webhook] IOS update success');
         return;
     }
+
+
 }
