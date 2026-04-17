@@ -3,12 +3,12 @@ import { PurchaseEntity } from "./PurchaseEntity.js";
 
 @ChildEntity()
 export class PurchaseAosEntity extends PurchaseEntity {
-    @Column()
+    @Column('varchar')
     rootId: string;
 
-    @Column()
+    @Column('varchar')
     purchaseToken: string;
     
-    @Column()
+    @Column('varchar', { nullable: true })
     linkedPurchaseToken?: string;
 }

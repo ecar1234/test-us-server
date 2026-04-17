@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation, Unique, UpdateDateColumn } from "typeorm";
 import { RecruitmentPostEntity } from "./PostEntities/RecruitmentPostEntity.js";
 import { UserEntity } from "./UserEntity.js";
 import { UserReviewEntity } from "./UserReviewEntiry.js";
@@ -48,8 +48,8 @@ export class ApplicationEntity {
     // 신청 유저의 승인 상테
     @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'appUserId' })
-    applicant: UserEntity
+    applicant: Relation<UserEntity>
 
-    @OneToMany(() => UserReviewEntity, review => review.application)
-    reviews: UserReviewEntity[];
+    // @OneToMany(() => UserReviewEntity, review => review.application)
+    // reviews: UserReviewEntity[];
 }

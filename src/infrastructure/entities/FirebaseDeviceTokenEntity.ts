@@ -19,7 +19,7 @@ export class FirebaseDeviceTokenEntity {
     createdAt!: Date;
     
     @Index()
-    @ManyToOne(() => UserEntity, user => user.deviceTokens)
+    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user!: UserEntity; // 사용자 엔티티와의 관계 설정 (선택 사항이지만 권장됨)
 }

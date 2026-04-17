@@ -7,13 +7,13 @@ export class PurchaseEventLogs {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column('varchar')
   eventType: string;
 
-  @Column()
+  @Column('varchar')
   appUserId: string;
 
-  @Column()
+  @Column('varchar')
   platform: string;
 
   @Column("json")

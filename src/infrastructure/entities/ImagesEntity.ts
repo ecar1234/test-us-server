@@ -5,19 +5,19 @@ export class ImagesEntity {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column()
+    @Column('varchar')
     filename!: string
 
-    @Column()
+    @Column('varchar')
     originalname!: string
 
-    @Column()
+    @Column('varchar')
     mimetype!: string
 
-    @Column()
+    @Column('int')
     size: number
 
-    @Column()
+    @Column('varchar')
     url!: string
 
     @CreateDateColumn()
@@ -26,9 +26,9 @@ export class ImagesEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @Column()
+    @Column('varchar')
     postId: string;
 
-    @Column()
+    @Column('varchar')
     postType: string;
 }

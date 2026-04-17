@@ -163,7 +163,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             postEntity.views,
             postEntity.images ?? [],
             postEntity.postType,
-            postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
+            // postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
             postEntity.createdAt,
             postEntity.updatedAt,
             postEntity.applications ? postEntity.applications.map(app => app.appId) : []
@@ -326,7 +326,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getUserRecuritmentPosts(userId: string): Promise<RecruitmentPostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { author: { userId }, status: Not(BasePostStateType.DELETE) },
-            relations: ['author', 'applications', 'applications.applicant', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post'],
+            relations: ['author', 'applications', 'applications.applicant'],
         });
 
         const domainPosts = postEntities.map(postEntity => this.toDomainPost(postEntity));

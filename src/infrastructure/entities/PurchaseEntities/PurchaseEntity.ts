@@ -15,25 +15,25 @@ export abstract class PurchaseEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column('varchar')
     plan: string;
 
-    @Column()
+    @Column('varchar')
     productId: string;
 
-    @Column()
+    @Column('varchar')
     store: string; // ios / android
 
-    @Column()
+    @Column('boolean')
     isActive: boolean;
 
-    @Column()
+    @Column('boolean')
     willRenew: boolean;
 
     @Column({ type: 'enum', enum: PurchaseState, default: PurchaseState.PURCHASED })
     state: PurchaseState;
 
-    @Column({ nullable: true })
+    @Column('timestamp', { nullable: true })
     expiresAt: Date;
     
     @CreateDateColumn()
@@ -45,7 +45,7 @@ export abstract class PurchaseEntity {
     // @Column()
     // verificationData: string;
 
-    @ManyToOne(() => UserEntity, user => user.purchases)
+    @ManyToOne(() => UserEntity)
     @JoinColumn({ name: 'userId' })
     user: UserEntity;
 }

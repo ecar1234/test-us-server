@@ -16,7 +16,7 @@ export class PromotionPostModel {
         public images: object[] = [],
         public domain: string,
         public postType: string = 'PromotionPostEntity',
-        public reviews: object[] = [],
+        // public reviews: object[] = [],
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null
     ){}

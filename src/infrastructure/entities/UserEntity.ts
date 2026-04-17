@@ -85,22 +85,22 @@ export class UserEntity {
     @OneToMany(() => ApplicationEntity, app => app.applicant)
     applications: ApplicationEntity[]
 
-    @OneToMany(() => UserReviewEntity, review => review.reviewer)
-    givenReviews: UserReviewEntity[]
+    // @OneToMany(() => UserReviewEntity, review => review.reviewer)
+    // givenReviews: UserReviewEntity[]
 
-    @OneToMany(() => UserReviewEntity, review => review.reviewed)
-    receivedReviews: UserReviewEntity[]
+    // @OneToMany(() => UserReviewEntity, review => review.reviewed)
+    // receivedReviews: UserReviewEntity[]
 
-    @OneToMany(() => RoomMemberEntity, room => room.user)
-    members: RoomMemberEntity[];
+    // @OneToMany(() => RoomMemberEntity, room => room.user)
+    // members: RoomMemberEntity[];
 
-    @OneToMany(() => MessagesEntity, message => message.sender)
-    sentMessages: MessagesEntity[];
+    // @OneToMany(() => MessagesEntity, message => message.sender)
+    // sentMessages: MessagesEntity[];
 
-    @OneToMany(() => FirebaseDeviceTokenEntity, token => token.user)
-    deviceTokens: FirebaseDeviceTokenEntity[];
+    // @OneToMany(() => FirebaseDeviceTokenEntity, token => token.user)
+    // deviceTokens: FirebaseDeviceTokenEntity[];
 
-    @OneToMany(() => PurchaseEntity, purchase => purchase.user)
-    purchases: PurchaseEntity[];
+    // @OneToMany(() => PurchaseEntity, purchase => purchase.user)
+    // purchases: PurchaseEntity[];
 
 }

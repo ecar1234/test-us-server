@@ -15,7 +15,7 @@ export class RecruitmentPostModel {
         public views: number = 0,
         public images: object[] = [],
         public postType: string = 'RecruitmentPostEntity',
-        public reviews: object[] = [],
+        // public reviews: object[] = [],
         public createdAt: Date | null = new Date(),
         public updatedAt: Date | null = null,
         public applications: ApplicationModel[] | number[] = []

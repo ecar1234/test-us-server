@@ -9,6 +9,7 @@ import {
     Entity,
     OneToMany,
     AfterLoad,
+    Relation,
 } from "typeorm";
 import { UserEntity } from "../UserEntity.js";
 import { PostReviewEntity } from "../PostReviewEntity.js";
@@ -57,12 +58,12 @@ export abstract class BasePostEntity {
     @PrimaryGeneratedColumn('uuid')
     postId: string;
 
-    @Column()
+    @Column('varchar')
     postType: string;
 
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
-    author: UserEntity;
+    author: Relation<UserEntity>;
 
     @Column('varchar', { length: 30 })
     title: string;
@@ -100,11 +101,11 @@ export abstract class BasePostEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @OneToMany(() => PostReviewEntity, review => review.post)
-    receivedReviews: PostReviewEntity[]
+    // @OneToMany(() => PostReviewEntity, review => review.post)
+    // receivedReviews: PostReviewEntity[]
 
-    @OneToMany(() => RoomEntity, room => room.id)
-    rooms: RoomEntity[]
+    // @OneToMany(() => RoomEntity, room => room.id)
+    // rooms: RoomEntity[]
 
     @AfterLoad()
     setDefaults() {

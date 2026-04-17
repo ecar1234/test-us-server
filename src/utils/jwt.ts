@@ -1,9 +1,9 @@
 import { Env } from "../config/env.js";
-import * as jwt from "jsonwebtoken";
+import jwt  from "jsonwebtoken";
 import { UserModel } from "../domain/entities/UserModel.js";
 
 const JWT_SECRET = Env.JWT_SECRET;
-
+const { sign, verify, decode } = jwt;
 
 export function generateToken (user: UserModel): string {
     const payload = {
@@ -11,12 +11,12 @@ export function generateToken (user: UserModel): string {
         email: user.email,
     };
 
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: '30d' });
+    return sign(payload, JWT_SECRET, { expiresIn: '30d' });
 }
 
 export function verifyToken(token: string): any {
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = verify(token, JWT_SECRET);
         return decoded;
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {
@@ -28,7 +28,7 @@ export function verifyToken(token: string): any {
 
 export function decodeToken(token: string): any {
     try {
-        const decoded = jwt.decode(token);
+        const decoded = decode(token);
         return decoded;
     } catch (error) {
         throw new Error('Invalid or expired token');

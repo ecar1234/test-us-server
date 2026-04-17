@@ -16,7 +16,8 @@
   },
   "ts-node": {
     "files": true,
-    "esm": true
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   },
   "include": [
     "src/**/*.ts"

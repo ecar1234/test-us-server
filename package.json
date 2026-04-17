@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev:server": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/index.ts",
-    "dev:workers": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/workers/index.ts",
+    "dev:server": "NODE_ENV=development tsx watch src/index.ts",
+    "dev:workers": "NODE_ENV=development tsx watch src/workers/index.ts",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:workers\"",
     "build": "tsc",
     "start": "NODE_ENV=prod pm2 start ecosystem.config.js --env prod",
-    "migration:dev:run": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
+    "migration:dev:run": "NODE_ENV=development node --loader ts-node/esm --no-warnings ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
     "migration:prod:run": "NODE_ENV=prod node ./node_modules/typeorm/cli.js migration:run -d dist/config/DataSource.js",
-    "migration:gen": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:generate -d src/config/DataSource.ts src/migration/AutoGen",
+    "migration:gen": "NODE_ENV=development node --loader ts-node/esm --no-warnings ./node_modules/typeorm/cli.js migration:generate src/migration/AutoGen -d src/config/DataSource.ts",
     "migration:dev:revert": "NODE_ENV=development ts-node ./node_modules/typeorm/cli.js migration:revert -d src/config/DataSource.ts",
     "migration:prod:revert": "NODE_ENV=prod node ./node_modules/typeorm/cli.js migration:revert -d dist/config/DataSource.js"
   },
@@ -60,6 +60,7 @@
     "concurrently": "^9.2.1",
     "dotenv-cli": "^10.0.0",
     "ts-node-dev": "^2.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.8.3"
   }
 }

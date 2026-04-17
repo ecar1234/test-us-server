@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { RoomEntity } from "./RoomEntity.js";
 import { UserEntity } from "../UserEntity.js";
 
@@ -13,22 +13,19 @@ export class RoomMemberEntity {
     @JoinColumn({ name: 'userId' }) // 기존 userId 컬럼을 외래 키로 사용하도록 매핑
     user: UserEntity;
 
-    @Column()
+    @Column({type: 'varchar', length: 255})
     userId: string; // ID만 따로 쓸 수 있도록 노출
 
     @ManyToOne(() => RoomEntity, (chatRoom) => chatRoom.members, { onDelete: 'CASCADE' })
-    room: RoomEntity;
+    room: Relation<RoomEntity>;
 
-    /**
-     * [성능] 안 읽은 메시지 수 관리
-     */
-    @Column({ default: 0 })
+    @Column({ type: 'int', default: 0 })
     unreadCount: number; // 새 메시지 시 +1, 방 입장 시 0으로 초기화
 
-    @Column({ nullable: true })
+    @Column({ type: 'int', nullable: true })
     lastReadMessageId: number; // 유저가 마지막으로 읽은 메시지 추적
 
-    @Column({ default: true })
+    @Column({ type: 'boolean', default: true })
     isActive: boolean; // 방 나감 여부 혹은 차단 여부
 
     @CreateDateColumn()

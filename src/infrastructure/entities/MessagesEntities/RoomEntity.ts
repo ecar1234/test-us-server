@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { RoomMemberEntity } from "./RoomMemberEntity.js";
 import { MessagesEntity } from "./MessageEntity.js";
 import { BasePostEntity } from "../PostEntities/BasePostEntity.js";
@@ -17,11 +17,11 @@ export class RoomEntity {
     type: RoomType;
 
     // 어떤 게시글에서 파생된 채팅방인지
-    @ManyToOne(() => BasePostEntity, (post) => post.rooms)
+    @ManyToOne(() => BasePostEntity)
     post: BasePostEntity;
 
     // 1:1 채팅의 경우 상대방(신청자) ID를 기록하여 구분
-    @Column({ nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     targetUserId: string;
 
     /**
@@ -29,19 +29,19 @@ export class RoomEntity {
      */
     @OneToOne(() => MessagesEntity, { nullable: true, onDelete: 'SET NULL' })
     @JoinColumn({ name: 'last_message_id' }) // 컬럼명을 snake_case로 변경하여 일관성 유지
-    lastMessage: MessagesEntity;
+    lastMessage: Relation<MessagesEntity>;
 
-    @Column({ nullable: true })
+    @Column({ type: 'varchar', nullable: true })
     lastMessageContent: string; // "안녕하세요" 등 마지막 내용 캐싱
 
-    @Column({ nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
     lastMessageAt: Date; // 목록 정렬용 시간 캐싱
 
     @OneToMany(() => RoomMemberEntity, (member) => member.room)
-    members: RoomMemberEntity[];
+    members: Relation<RoomMemberEntity>[];
 
     @OneToMany(() => MessagesEntity, (message) => message.room)
-    messages: MessagesEntity[];
+    messages: Relation<MessagesEntity>[];
 
     @CreateDateColumn()
     createdAt: Date;

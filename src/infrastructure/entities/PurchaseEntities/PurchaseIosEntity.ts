@@ -4,9 +4,9 @@ import { PurchaseEntity } from "./PurchaseEntity.js";
 
 @ChildEntity()
 export class PurchaseIosEntity extends PurchaseEntity {
-    @Column()
+    @Column('varchar')
     transactionId: string;
 
-    @Column()
+    @Column('varchar')
     originalTransactionsId: string;
 }

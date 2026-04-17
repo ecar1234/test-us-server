@@ -87,7 +87,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
                 applicant: { userId },
                 post: { postId },
             },
-            relations: ['applicant', 'post', 'reviews']
+            relations: ['applicant', 'post']
         });
 
         if(!application){
@@ -107,7 +107,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
                 applicant: { userId },
                 post: { postId },
             },
-            relations: ['applicant', 'post', 'reviews']
+            relations: ['applicant', 'post']
         });
 
         if(!application){
@@ -122,7 +122,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     public async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
         const applicationEntities = await this.applicationRepository.find({
             where: { applicant: { userId: userId} },
-            relations: ['applicant', 'post', 'reviews']
+            relations: ['applicant', 'post']
         });
         if(!applicationEntities){
             throw new Error("Application not found");
@@ -135,7 +135,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     public async getPostApplicantsInfo(applicationIds: number[]): Promise<ApplicationModel[]> {
         const applicants = await this.applicationRepository.find({
             where: { appId: In(applicationIds) },
-            relations: ['applicant', 'post', 'reviews']
+            relations: ['applicant', 'post']
         });
         return applicants.map(entity => this.toDomainApplication(entity));
     }
