@@ -49,7 +49,7 @@ export class PurchaseUseCase {
     // }
 
     /// Token값으로 purchase정보 가져오기
-    async getSubscribeByToken(token: string): Promise<PurchaseModel> {
+    async getSubscribeByToken(token: string): Promise<PurchaseModel | null> {
         const subscribe = await this.aosRepository.getSubscribeByToken(token);
         return subscribe;
     }
@@ -78,7 +78,7 @@ export class PurchaseUseCase {
     /// 영수 검증 후 purchaseModel 리턴
     async verifyPurchaseIOS(transactionId: string): Promise<JWSTransactionDecodedPayload> {
         const verified = await this.appStoreClient.getTransactionInfo(transactionId);
-        if(!verified){
+        if (!verified) {
             throw new Error('[Purchase IOS] verify failed');
         }
         console.log('[Purchase] IOS verify success');
@@ -95,7 +95,7 @@ export class PurchaseUseCase {
         }
 
         const linkedToken = verified.linkedPurchaseToken;
-        
+
         const productId = verified.lineItems[0].offerDetails.basePlanId;
         const itemInfo = productId.split('-');
         const plan = this.getPlan(itemInfo[0]);
@@ -162,11 +162,11 @@ export class PurchaseUseCase {
             state: 'purchased',
             expiresAt: expiredAt,
             userId: useId
-        });       
+        });
 
         const prevProdect = await this.iosRepository.getSubscriptionByTransactionId(transactionId);
-        
-        if(prevProdect && prevProdect.isActive){
+
+        if (prevProdect && prevProdect.isActive) {
             prevProdect.isActive = false;
             prevProdect.willRenew = false;
             prevProdect.state = 'canceled';
@@ -185,11 +185,7 @@ export class PurchaseUseCase {
     async webhookAOS(purchaseToken: string, subscriptionId: string, notificationType: number): Promise<void> {
         //DB조회
         const findProduct = await this.getSubscribeByToken(purchaseToken);
-        // 신규 구매 시 이미 데이터 존재 하면 멈춤
-        if (notificationType === 4 && findProduct.state !== 'purchased') {
-            console.log('[Webhook AOS] purchaseToken data already exsist.');
-            return;
-        }
+
         let type: string;
         switch (notificationType) {
             case 2:
@@ -200,6 +196,7 @@ export class PurchaseUseCase {
                 break;
             case 4:
                 type = 'purchased';
+                break;
             case 12:
                 type = 'revoke';
                 break;
@@ -208,9 +205,15 @@ export class PurchaseUseCase {
                 break;
         }
         if (findProduct) {
+            // 신규 구매 시 이미 데이터 존재 하면 멈춤
+            if (notificationType === 4) {
+                console.log('[Webhook AOS] purchaseToken already exists. Skipping...');
+                return;
+            }
             const verified = await this.verifyPurchaseAOS(purchaseToken);
             findProduct.expiresAt = new Date(verified.lineItems[0].expiryTime);
             findProduct.state = type;
+            console.log('[Purchase webhook] current state : ' + type);
             if (type !== 'renew') {
                 if (type === 'cancel') {
                     findProduct.willRenew = false;
@@ -219,10 +222,15 @@ export class PurchaseUseCase {
                     findProduct.willRenew = false;
                 }
             }
-            await this.iosRepository.updateSubcribe(findProduct, purchaseToken);
-            //TODO: FCM service 연동 필요. 변경 알림.
+           try {
+             await this.aosRepository.updateSubcribe(findProduct, purchaseToken);
+             //TODO: FCM service 연동 필요. 변경 알림.
+           } catch (error) {
+            throw new Error('[Purchase Webhook] Error : ' + error.message);
+           }
         } else {
             // 기존 데이터가 없다면 업데이트 진행 안함/ 신규 구매는 전적으로 front에서 전담.
+            console.log(`[Webhook AOS] No local data for token: ${purchaseToken}`);
             return;
         }
     }

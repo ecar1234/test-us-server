@@ -359,7 +359,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     async getAppRecruitPosts(ids: string[]): Promise<RecruitmentPostModel[]> {
         const postEntities = await this.postRepository.find({
             where: { postId: In(ids) },
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
         return postEntities.map(entity => this.toDomainPost(entity));
     }
@@ -371,7 +371,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
                 { subtitle: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE },
                 { contents: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE }
             ],
-            relations: ['author', 'applications', 'applications.applicant', 'applications.post', 'receivedReviews', 'receivedReviews.reviewer', 'receivedReviews.post']
+            relations: ['author', 'applications', 'applications.applicant', 'applications.post']
         });
         if (!postEntities) {
             return [];

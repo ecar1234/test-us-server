@@ -94,9 +94,9 @@ export class PurchaseController {
     }
     /// 구독 확인
     async purchaseAOS(req: Request, res: Response): Promise<void> {
-        const { userId, verificationData } = req.body;
+        const { userId, token } = req.body;
         try {
-           const subscribe = await this.purchaseUseCase.subscriptionPurchaseHandelerAOS(userId, verificationData);
+           const subscribe = await this.purchaseUseCase.subscriptionPurchaseHandelerAOS(userId, token);
            res.status(200).json({ status: 200, subscribe: subscribe });
         } catch (error) {
             console.log('[Purchase verification] Error', error);

@@ -6,18 +6,24 @@
             "request": "launch",
             "name": "Debug API Server", 
             "args": ["${workspaceFolder}/src/index.ts"], 
-            "runtimeArgs": ["-r", "ts-node/register"],
+            "runtimeExecutable": "tsx",
+            // "runtimeArgs": ["-r", "ts-node/register"],
             "skipFiles": ["<node_internals>/**"],
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "sourceMaps": true
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Debug Worker", 
-            "args": ["${workspaceFolder}/src/workers/index.ts"], 
-            "runtimeArgs": ["-r", "ts-node/register"],
+            "args": ["${workspaceFolder}/src/workers/index.ts"],
+            "runtimeExecutable": "tsx",
+            // "runtimeArgs": ["-r", "ts-node/register"],
             "skipFiles": ["<node_internals>/**"],
             "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "sourceMaps": true
         }
     ],
     "compounds": [
