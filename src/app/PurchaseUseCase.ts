@@ -88,7 +88,7 @@ export class PurchaseUseCase {
     }
 
     // front 정보 transactions
-    async subscriptionPurchaseHandelerAOS(useId: string, token: string): Promise<PurchaseModel> {
+    async subscriptionPurchaseHandelerAOS(userId: string, token: string): Promise<PurchaseModel> {
         const verified = await this.verifyPurchaseAOS(token);
         if (!verified) {
             throw new Error('[Purchase] Subscribe verify failed.');
@@ -109,34 +109,26 @@ export class PurchaseUseCase {
             willRenew: true,
             state: 'purchased',
             expiresAt: expiredDate,
-            userId: useId
+            userId: userId
         });
         // 기존 활성화 데이터 비활성화
         if (linkedToken) {
             const prevProduct = await this.getSubscribeByToken(linkedToken);
             if (!prevProduct) {
-                const isActived = await this.purchaseRepository.getIsActiveSubscription(useId);
+                const isActived = await this.purchaseRepository.getIsActiveSubscription(userId);
                 if (!isActived) {
                     console.log('[Purchase] prevProduct & isActived not found.');
                     console.log('[Purchase] changes to new purchase.');
-                    const newPurchase = await this.aosRepository.saveSubscribe(productModel, token, linkedToken);
+                    const newPurchase = await this.aosRepository.saveSubscribe(productModel, token);
                     return newPurchase;
-                } else {
-                    isActived.isActive = false;
-                    isActived.willRenew = false;
-                    isActived.state = 'canceled';
-
-                    await this.aosRepository.updateSubcribe(isActived, linkedToken);
-                    console.log('[Purchase] prevProduct disabled success');
                 }
-            } else {
-                prevProduct.isActive = false;
-                prevProduct.willRenew = false;
-                prevProduct.state = 'canceled';
-
-                await this.aosRepository.updateSubcribe(prevProduct);
-                console.log('[Purchase] prevProduct disabled success');
             }
+            prevProduct.isActive = false;
+            prevProduct.willRenew = false;
+            prevProduct.state = 'canceled';
+
+            await this.aosRepository.updateSubcribe(prevProduct, token, linkedToken);
+            console.log('[Purchase] prevProduct disabled success');
         }
 
         const savePurchase = await this.aosRepository.saveSubscribe(productModel, token, linkedToken);
@@ -171,7 +163,7 @@ export class PurchaseUseCase {
             prevProdect.willRenew = false;
             prevProdect.state = 'canceled';
 
-            await this.iosRepository.updateSubcribe(prevProdect, transactionId);
+            await this.iosRepository.updateSubcribe(prevProdect, transactionId, originalId);
             console.log('[Purchase] prevProduct disabled success');
         } else {
             const savePurchase = await this.iosRepository.saveSubscribe(productModel, transactionId, originalId);
@@ -192,7 +184,7 @@ export class PurchaseUseCase {
                 type = 'renew';
                 break;
             case 3:
-                type = 'cancel';
+                type = 'canceled';
                 break;
             case 4:
                 type = 'purchased';
@@ -201,7 +193,7 @@ export class PurchaseUseCase {
                 type = 'revoke';
                 break;
             case 13:
-                type = 'expried';
+                type = 'expired';
                 break;
         }
         if (findProduct) {
@@ -211,6 +203,10 @@ export class PurchaseUseCase {
                 return;
             }
             const verified = await this.verifyPurchaseAOS(purchaseToken);
+            const linkedToken = verified.linkedPurchaseToken;
+            if (!linkedToken) {
+                throw new Error('[Purchase Webhook] linkedToken not found');
+            }
             findProduct.expiresAt = new Date(verified.lineItems[0].expiryTime);
             findProduct.state = type;
             console.log('[Purchase webhook] current state : ' + type);
@@ -222,12 +218,12 @@ export class PurchaseUseCase {
                     findProduct.willRenew = false;
                 }
             }
-           try {
-             await this.aosRepository.updateSubcribe(findProduct, purchaseToken);
-             //TODO: FCM service 연동 필요. 변경 알림.
-           } catch (error) {
-            throw new Error('[Purchase Webhook] Error : ' + error.message);
-           }
+            try {
+                await this.aosRepository.updateSubcribe(findProduct, purchaseToken, linkedToken);
+                //TODO: FCM service 연동 필요. 변경 알림.
+            } catch (error) {
+                throw new Error('[Purchase Webhook] Error : ' + error.message);
+            }
         } else {
             // 기존 데이터가 없다면 업데이트 진행 안함/ 신규 구매는 전적으로 front에서 전담.
             console.log(`[Webhook AOS] No local data for token: ${purchaseToken}`);
@@ -284,7 +280,7 @@ export class PurchaseUseCase {
         updateItem.plan = plan;
         updateItem.productId = productId;
         updateItem.expiresAt = expiredAt;
-        await this.iosRepository.updateSubcribe(updateItem, transactions.originalTransactionId);
+        await this.iosRepository.updateSubcribe(updateItem, transactions.originalTransactionId, transactions.transactionId);
         console.log('[Purchase Webhook] IOS update success');
         return;
     }

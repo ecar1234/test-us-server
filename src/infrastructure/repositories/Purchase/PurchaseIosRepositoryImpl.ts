@@ -81,8 +81,8 @@ export class PurchaseIosRepositoryImpl implements IPurchaseIosRepository {
         const newSubscribes = await this.repo.save(entity);
         return this.toModel(newSubscribes);
     }
-    async updateSubcribe(subscribe: PurchaseModel, transactionId: string): Promise<PurchaseModel> {
-        const entity = await this.toEntity(subscribe, transactionId);
+    async updateSubcribe(subscribe: PurchaseModel, transactionId: string, originalId: string):Promise<PurchaseModel> {
+        const entity = await this.toEntity(subscribe, originalId, transactionId);
         const updateSubscribe = await this.repo.save(entity);
         return this.toModel(updateSubscribe);
     }

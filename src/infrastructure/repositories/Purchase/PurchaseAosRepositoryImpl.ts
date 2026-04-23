@@ -23,7 +23,7 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
             userId: entity.user.userId
         });
     }
-    private toEntity(model: PurchaseModel, token: string, rootId?: string): PurchaseAosEntity {
+    private toEntity(model: PurchaseModel, token: string, rootId?: string, prevToken?: string): PurchaseAosEntity {
         const state = this.convertState(model.state);
 
         const entity = this.repo.create({
@@ -37,7 +37,7 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
             expiresAt: model.expiresAt,
             rootId: rootId ? rootId : token,
             purchaseToken: token,
-            linkedPurchaseToken: '',
+            linkedPurchaseToken: prevToken ? prevToken : null,
             user: model.userId && { userId: model.userId } as UserEntity
         });
 
@@ -51,7 +51,7 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
                 return PurchaseState.CANCELED;
             case 'expired':
                 return PurchaseState.EXPIRED;
-            case 'renewe':
+            case 'renew':
                 return PurchaseState.RENEW;
             case 'refund':
                 return PurchaseState.REFUND;
@@ -64,38 +64,40 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
     async saveSubscribe(subscribe: PurchaseModel, token: string, linkedToken?: string): Promise<PurchaseModel> {
         if (linkedToken) {
             const prev = await this.repo.findOne({
-                where: { linkedPurchaseToken: linkedToken }
+                where: { purchaseToken: linkedToken }
             });
-            const entity = this.toEntity(subscribe, token, prev.rootId);
+            
+            const entity = this.toEntity(subscribe, token, prev.rootId, prev.purchaseToken);
             const newSubscribes = await this.repo.save(entity);
             return this.toModel(newSubscribes);
         }
-        const entity = this.toEntity(subscribe, token, null);
+        const entity = this.toEntity(subscribe, token);
         const newSubscribe = await this.repo.save(entity);
         return this.toModel(newSubscribe);
     }
-    async updateSubcribe(subscribe: PurchaseModel, linkedToken?: string): Promise<PurchaseModel> {
-        const product = await this.repo.findOne({
-            where: { purchaseToken: linkedToken },
-            relations: ['user']
-        });
-        if (!product) {
-            throw new Error('Product not found');
+    async updateSubcribe(subscribe: PurchaseModel, purchaseToken: string, linkedToken: string): Promise<PurchaseModel> {
+        if (linkedToken) {
+            const prev = await this.repo.findOne({
+                where: { purchaseToken: linkedToken }
+            });
+            
+            if (prev) {
+                const entity = this.toEntity(subscribe, purchaseToken, prev.rootId, prev.purchaseToken);
+                const saved = await this.repo.save(entity);
+                return this.toModel(saved);
+            }
         }
-
-        product.isActive = subscribe.isActive;
-        product.willRenew = subscribe.willRenew;
-        product.state = this.convertState(subscribe.state);
-
-        const updateSubscribe = await this.repo.save(product);
-        return this.toModel(updateSubscribe);
+        const entity = this.toEntity(subscribe, purchaseToken);
+        const update = await this.repo.save(entity);
+        return this.toModel(update);
     }
 
     async getSubscribeByToken(token: string): Promise<PurchaseModel | null> {
-        const subscribe = await this.repo.findOne({
+        let subscribe: PurchaseAosEntity = await this.repo.findOne({
             where: { purchaseToken: token },
             relations: ['user']
         });
+
         if (!subscribe) {
             return null;
         }
