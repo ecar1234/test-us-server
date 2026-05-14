@@ -66,12 +66,13 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
             const prev = await this.repo.findOne({
                 where: { purchaseToken: linkedToken }
             });
-            
-            const entity = this.toEntity(subscribe, token, prev.rootId, prev.purchaseToken);
-            const newSubscribes = await this.repo.save(entity);
-            return this.toModel(newSubscribes);
+            if(prev){
+                const entity = this.toEntity(subscribe, token, prev.rootId, prev.purchaseToken);
+                const newSubscribes = await this.repo.save(entity);
+                return this.toModel(newSubscribes);
+            }
         }
-        const entity = this.toEntity(subscribe, token);
+        const entity = this.toEntity(subscribe, token, null, linkedToken);
         const newSubscribe = await this.repo.save(entity);
         return this.toModel(newSubscribe);
     }

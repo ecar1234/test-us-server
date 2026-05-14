@@ -49,7 +49,7 @@ app.use('/profile', express.static(isProd ? path.resolve(process.env.MAIN_UPLOAD
 app.use('/backup', express.static(isProd ? path.resolve(process.env.MAIN_BACKUP_DB) : path.resolve(process.env.BACKUP_DB)));
 
 // apple verify client
-const { client, verifer } = AppleClientInit(isProd);
+const { client, verifier } = AppleClientInit(isProd);
 
 // routes
 app.use('/api/v1/auth', AuthRoute);
@@ -60,7 +60,7 @@ app.use('/api/v1/review', ReviewRoute);
 app.use('/api/v1/message', MessageRoute);
 app.use('/api/v1/jobState', JobStateRoute);
 app.use('/api/v1/firebase', FirebaseRoute);
-app.use('/api/v1/purchase', CreatePurchaseRouter(client, verifer));
+app.use('/api/v1/purchase', CreatePurchaseRouter(client, verifier));
 
 //
 app.use((req, res, next) => {

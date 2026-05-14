@@ -1,3 +1,4 @@
+import { subscribe } from "diagnostics_channel";
 import { PurchaseUseCase } from "../../app/PurchaseUseCase.js";
 import { Request, Response } from "express";
 
@@ -95,8 +96,13 @@ export class PurchaseController {
     /// 구독 확인
     async purchaseAOS(req: Request, res: Response): Promise<void> {
         const { userId, token } = req.body;
+        console.log(`[Purchase AOS] Controller received data => userId: ${userId} / token: ${token}`);
         try {
            const subscribe = await this.purchaseUseCase.subscriptionPurchaseHandelerAOS(userId, token);
+           if(!subscribe){
+            res.status(200).json({ status: 204, subscribe: null });
+            return;
+           }
            res.status(200).json({ status: 200, subscribe: subscribe });
         } catch (error) {
             console.log('[Purchase verification] Error', error);
@@ -105,8 +111,25 @@ export class PurchaseController {
         }
     }
     async purchaseIOS(req: Request, res: Response): Promise<void> {
-        const { userId, verificationData } = req.body;
-        try {} catch (error) {}
+        const { userId, transactionId } = req.body;
+        console.log(`[Purchase IOS] Controller received data => userId: ${userId} / transactionId: ${transactionId}`);
+        
+        try {
+            if(!transactionId){
+                res.status(400).json({ status: 400, message: 'transactionId is required.' });
+                return;
+            }
+            const subscribe = await this.purchaseUseCase.subscriptionHandelerIOS(userId, transactionId);
+            if(!subscribe){
+                res.status(200).json({ status: 204, subscribe: null });
+                return;
+            }
+            res.status(200).json({ status: 200, subscribe: subscribe });
+        } catch (error) {
+            console.log('[Purchase verification] Error', error);
+            res.status(500).json({ status: 500, message: error.message });
+            return;
+        }
     }
     
 }

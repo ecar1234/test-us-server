@@ -86,13 +86,13 @@ export class PurchaseIosRepositoryImpl implements IPurchaseIosRepository {
         const updateSubscribe = await this.repo.save(entity);
         return this.toModel(updateSubscribe);
     }
-    async getSubscriptionByTransactionId(transactionId: string): Promise<PurchaseModel> {
+    async getSubscriptionByTransactionId(transactionId: string): Promise<PurchaseModel | null> {
         const product = await this.repo.findOne({
             where: { transactionId: transactionId },
             relations: ['user']
         });
         if (!product) {
-            throw new Error('Product not found');
+            return null;
         }
         return this.toModel(product);
     }
