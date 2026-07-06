@@ -1,3 +1,4 @@
+import { EntityManager } from "typeorm";
 import { AppDataSource } from "../../../config/DataSource.js";
 import { PurchaseModel } from "../../../domain/entities/PurchaseModel.js";
 import { IPurchaseAosRepository } from "../../../domain/interface_repositories/Purchase/IPurchaseAosRepository.js";
@@ -61,35 +62,37 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
     }
 
 
-    async saveSubscribe(subscribe: PurchaseModel, token: string, linkedToken?: string): Promise<PurchaseModel> {
+    async saveSubscribe(subscribe: PurchaseModel, token: string, linkedToken?: string, manager?: EntityManager): Promise<PurchaseModel> {
+        const purchaseRepo = manager ? manager.getRepository(PurchaseAosEntity) : this.repo;
         if (linkedToken) {
             const prev = await this.repo.findOne({
                 where: { purchaseToken: linkedToken }
             });
             if(prev){
                 const entity = this.toEntity(subscribe, token, prev.rootId, prev.purchaseToken);
-                const newSubscribes = await this.repo.save(entity);
+                const newSubscribes = await purchaseRepo.save(entity);
                 return this.toModel(newSubscribes);
             }
         }
         const entity = this.toEntity(subscribe, token, null, linkedToken);
-        const newSubscribe = await this.repo.save(entity);
+        const newSubscribe = await purchaseRepo.save(entity);
         return this.toModel(newSubscribe);
     }
-    async updateSubcribe(subscribe: PurchaseModel, purchaseToken: string, linkedToken: string): Promise<PurchaseModel> {
+    async updateSubcribe(subscribe: PurchaseModel, purchaseToken: string, linkedToken?: string, manager?: EntityManager): Promise<PurchaseModel> {
+        const purchaseRepo = manager ? manager.getRepository(PurchaseAosEntity) : this.repo;
         if (linkedToken) {
-            const prev = await this.repo.findOne({
+            const prev = await purchaseRepo.findOne({
                 where: { purchaseToken: linkedToken }
             });
             
             if (prev) {
                 const entity = this.toEntity(subscribe, purchaseToken, prev.rootId, prev.purchaseToken);
-                const saved = await this.repo.save(entity);
+                const saved = await purchaseRepo.save(entity);
                 return this.toModel(saved);
             }
         }
         const entity = this.toEntity(subscribe, purchaseToken);
-        const update = await this.repo.save(entity);
+        const update = await purchaseRepo.save(entity);
         return this.toModel(update);
     }
 

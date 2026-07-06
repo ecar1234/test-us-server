@@ -6,7 +6,7 @@ export class PurchaseAosEntity extends PurchaseEntity {
     @Column('varchar')
     rootId: string;
 
-    @Column('varchar')
+    @Column({ type: 'varchar', unique: true })
     purchaseToken: string;
     
     @Column('varchar', { nullable: true })

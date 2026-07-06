@@ -5,6 +5,7 @@ import { PurchaseState } from "../../entities/PurchaseEntities/PurchaseEntity.js
 import { PurchaseIosEntity } from "../../entities/PurchaseEntities/PurchaseIosEntity.js";
 
 export class PurchaseIosRepositoryImpl implements IPurchaseIosRepository {
+
     private repo = AppDataSource.getRepository(PurchaseIosEntity);
 
     private toEntity(model: PurchaseModel, transactionId: string, originalId?: string): PurchaseIosEntity {
@@ -95,5 +96,15 @@ export class PurchaseIosRepositoryImpl implements IPurchaseIosRepository {
             return null;
         }
         return this.toModel(product);
+    }
+    async getCurrentActiveSubscriptionByOriginalId(originalId: string): Promise<PurchaseModel | null> {
+       const product = await this.repo.findOne({
+        where: { originalTransactionsId: originalId, isActive: true },
+        relations: ['user']
+       });
+       if(!product){
+        return null;
+       }
+       return this.toModel(product);
     }
 }

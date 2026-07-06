@@ -7,6 +7,8 @@ import { PurchaseIosRepositoryImpl } from '../../infrastructure/repositories/Pur
 import { PurchaseRepositoryImpl } from '../../infrastructure/repositories/Purchase/CommomPurchaseRepositoryImpl.js';
 import { PurchaseAosRepositoryImpl } from '../../infrastructure/repositories/Purchase/PurchaseAosRepositoryImpl.js';
 import { AppStoreServerAPIClient, SignedDataVerifier } from '@apple/app-store-server-library';
+import { TypeOrmUnitOfWork } from '../../infrastructure/repositories/Message/UnitOfWorkImpl.js';
+import { AppDataSource } from '../../config/DataSource.js';
 
 
 export const CreatePurchaseRouter = (appStoreClient: AppStoreServerAPIClient, verifer: SignedDataVerifier) => {
@@ -14,8 +16,9 @@ export const CreatePurchaseRouter = (appStoreClient: AppStoreServerAPIClient, ve
     const purchaseRepo = new PurchaseRepositoryImpl();
     const purchaseIOSRepo = new PurchaseIosRepositoryImpl();
     const puechaseAosRepo = new PurchaseAosRepositoryImpl();
+    const unitOfWork = new TypeOrmUnitOfWork(AppDataSource);
 
-    const purchaseUseCase = new PurchaseUseCase(purchaseRepo, puechaseAosRepo, purchaseIOSRepo, appStoreClient, verifer);
+    const purchaseUseCase = new PurchaseUseCase(purchaseRepo, puechaseAosRepo, purchaseIOSRepo, appStoreClient, verifer, unitOfWork);
     const purchaseController = new PurchaseController(purchaseUseCase);
     // web hook
     // web hook middleware jwt 만들기(google만)
