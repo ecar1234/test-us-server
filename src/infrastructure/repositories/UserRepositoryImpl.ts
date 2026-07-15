@@ -136,13 +136,12 @@ export class UserRepositoryImpl implements IUserRepository {
         }
         const userEntity = this.toEntityUser(user);
 
-        findUser.nickname = userEntity.nickname;
+        findUser.nickname = user.nickname;
         findUser.type = userEntity.type,
         findUser.role = userEntity.role;
         findUser.userName = userEntity.userName;
         findUser.birth = userEntity.birth;
         findUser.method = userEntity.method;
-        findUser.image = userEntity.image;
 
         const savedUser = await this.userRepository.save(findUser);
         return this.toDomainUser(savedUser);

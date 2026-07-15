@@ -10,6 +10,7 @@
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:workers\"",
     "build": "tsc",
     "start": "NODE_ENV=prod pm2 start ecosystem.config.cjs --env prod",
+    "stop": "pm2 stop all",
     "migration:dev:run": "NODE_ENV=development node --loader ts-node/esm --no-warnings ./node_modules/typeorm/cli.js migration:run -d src/config/DataSource.ts",
     "migration:prod:run": "NODE_ENV=prod node --loader ts-node/esm --no-warnings ./node_modules/typeorm/cli.js migration:run -d dist/config/DataSource.js",
     "migration:gen": "NODE_ENV=development node --loader ts-node/esm --no-warnings ./node_modules/typeorm/cli.js migration:generate src/migration/AutoGen -d src/config/DataSource.ts",
