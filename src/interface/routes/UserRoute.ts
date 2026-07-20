@@ -34,6 +34,8 @@ const storage = multer.diskStorage({
 const uploadWithFile = multer({ storage: storage, limits: { fileSize: 1024 * 1024 * 5 } });
 
 route.post('/update', authMiddleware, userController.update.bind(userController));
+route.put('/updateUserInfo', authMiddleware, userController.update.bind(userController));
+route.post('/updateUserInfoWithImg', authMiddleware, uploadWithFile.single('image'), userController.updateUserInfoWithImg.bind(userController));
 route.get('/getUserById/:id', authMiddleware, userController.getUserById.bind(userController));
 route.post('/getUsersByIds', authMiddleware, userController.getUsersByIds.bind(userController));
 route.get('/getUserByEmail/:email', userController.getUserByEmail.bind(userController));
@@ -43,7 +45,5 @@ route.get('/getAllUsers', authMiddleware, userController.getAllUsers.bind(userCo
 route.get('/isNicknameAvailable/:nickname', userController.isNicknameAvailable.bind(userController));
 route.get('/isEmailAvailable/:email', userController.isEmailAvailable.bind(userController));
 route.post('/isPasswordValid', authMiddleware, userController.isPasswordValid.bind(userController));
-route.put('/updateUserInfo', authMiddleware, userController.update.bind(userController));
-route.post('/updateUserInfoWithImg', authMiddleware, uploadWithFile.single('image'), userController.updateUserInfoWithImg.bind(userController));
 
 export default route;

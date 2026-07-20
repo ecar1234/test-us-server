@@ -90,7 +90,7 @@ DevOn Studio
             return console.log('[Resend] email send error : ', error);
         }
         if(data) {
-            return console.log('[Resend] email send success : ', data);
+            return console.log(`[Resend] email send success :  ${data} / ${code}`);
         }
     }
 }

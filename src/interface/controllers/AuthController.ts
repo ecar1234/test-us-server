@@ -153,9 +153,9 @@ export class AuthConroller {
 
     async findEmail(req: Request, res: Response): Promise<void> {
         try {
-            const { nickname } = req.body;
-            const email = await this.authUseCase.findEmail(nickname);
-            res.status(200).json({ status: 200, email: email });
+            const { email } = req.body;
+            const retult = await this.authUseCase.findEmail(email);
+            res.status(200).json({ status: 200, result: retult });
         } catch (error) {
             res.status(500).json({ status: 400, error: error.message });
         }

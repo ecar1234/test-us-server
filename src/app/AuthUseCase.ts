@@ -86,12 +86,9 @@ export class AuthUseCase {
         }
     }
 
-    async findEmail(nickname: string): Promise<string> {
-        const user = await this.userRepo.findUserByNickname(nickname);
-        if (!user) {
-            throw new Error("User not found");
-        }
-        return user.email;
+    async findEmail(email: string): Promise<boolean> {
+        const result = await this.userRepo.findUserByEmail(email);
+        return result !== null;
     }
     async findPassword(email: string, ip: string): Promise<string> {
 
