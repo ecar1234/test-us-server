@@ -10,7 +10,8 @@ import { PurchaseEntity } from "./PurchaseEntities/PurchaseEntity.js";
 export enum UserType {
     INDIVIDUALS = 'INDIVIDUALS',
     COMPANIES = 'COMPANIES',
-    NORMAL = 'NORMAL'
+    NORMAL = 'NORMAL',
+    MASTER = 'MASTER'
 }
 export enum UserStatus {
     ACTIVE = 'ACTIVE',
