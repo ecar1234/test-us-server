@@ -2,44 +2,61 @@ import { IApplicationRepository } from "../../domain/interface_repositories/IApp
 import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity.js";
 import { AppDataSource } from "../../config/DataSource.js";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel.js";
-import { MobileOsType } from "..//entities/PostEntities/BasePostEntity.js";
+import { BasePostStateType, MobileOsType } from "..//entities/PostEntities/BasePostEntity.js";
 import createError from "http-errors";
 import { In } from "typeorm";
+import { PostInfo } from "../../domain/entities/interface/applicationPackage.js";
+import { convertCategoryToString } from "../../utils/convertUtil.js";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
 
+    private isExpired (status: BasePostStateType): boolean {
+        if(status === BasePostStateType.ACTIVE){
+            return false;
+        }
+        return true;
+    }
     public toDomainApplication(applicationEntity: ApplicationEntity): ApplicationModel {
         // applicant 객체가 존재하고 userId가 있는지 확인하는 방어 코드 추가
+        const postInfo: PostInfo = {
+            postId: applicationEntity.post?.postId,
+            title: applicationEntity.post?.title,
+            thumbnailUrl: applicationEntity.post?.images[0].url,
+            isExpired: this.isExpired(applicationEntity.post?.status),
+            category: convertCategoryToString(applicationEntity.post?.category)
+        }
         return new ApplicationModel(
-            applicationEntity.appId,
-            applicationEntity.platform === ApplicationsPlatform.WEB ? 'web' : 'mobile',
-            applicationEntity.platform === ApplicationsPlatform.MOBILE ? (applicationEntity.mobileOs === MobileOsType.ANDROID ? 'android' : 'ios') : null,
-            applicationEntity.status === ApplicationStatus.PENDING ? 'pending' :
-                (applicationEntity.status === ApplicationStatus.ACCEPTED ? 'accepted' :
-                    (applicationEntity.status === ApplicationStatus.REJECTED ? 'rejected' : 'cancel')),
-            applicationEntity.appliedAt,
-            applicationEntity.updatedAt,
-            applicationEntity.post?.postId,
-            applicationEntity.applicant?.userId
+            {
+                id: applicationEntity.appId,
+                platform: applicationEntity.platform === ApplicationsPlatform.WEB ? 'web' : 'mobile',
+                mobileOs: applicationEntity.platform === ApplicationsPlatform.MOBILE ? (applicationEntity.mobileOs === MobileOsType.ANDROID ? 'android' : 'ios') : null,
+                status: applicationEntity.status === ApplicationStatus.PENDING ? 'pending' :
+                    (applicationEntity.status === ApplicationStatus.ACCEPTED ? 'accepted' :
+                        (applicationEntity.status === ApplicationStatus.REJECTED ? 'rejected' : 'cancel')),
+                appliedAt: applicationEntity.appliedAt,
+                updatedAt: applicationEntity.updatedAt,
+                postInfo: postInfo,
+                applicantId: applicationEntity.applicant?.userId
+            }
         );
     }
     private toEntityApplication(application: ApplicationModel): ApplicationEntity {
         return this.applicationRepository.create({
             ...(application.id && { appId: application.id }),
             platform: application.platform === 'web' ? ApplicationsPlatform.WEB : ApplicationsPlatform.MOBILE,
-            mobileOs: application.platform === 'mobile' ? (application.mobileOs === 'android' ? MobileOsType.ANDROID : MobileOsType.IOS ) : null,
+            mobileOs: application.platform === 'mobile' ? (application.mobileOs === 'android' ? MobileOsType.ANDROID : MobileOsType.IOS) : null,
             status: application.status === 'pending' ? ApplicationStatus.PENDING :
                 (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
                     (ApplicationStatus.REJECTED ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL)),
-            post: { postId: application.postId },
+            post: { postId: application.postInfo.postId },
             applicant: { userId: application.applicantId },
         });
     }
 
 
     public async create(application: ApplicationModel): Promise<ApplicationModel> {
-        const entity = await this.applicationRepository.findOne({ where: { post: { postId: application.postId }, applicant: { userId: application.applicantId } }, relations: ['post', 'applicant'] });
+        const entity = await this.applicationRepository.findOne({ where: { post: { postId: application.postInfo.postId }, applicant: { userId: application.applicantId } }, relations: ['post', 'applicant'] });
         if (entity) {
             throw createError(409, "Application already exists");
         }
@@ -58,13 +75,13 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         // const status = application.status === 'pending' ? ApplicationStatus.PENDING :
         //     (application.status === 'accepted' ? ApplicationStatus.ACCEPTED :
         //         (application.status === 'rejected' ? ApplicationStatus.REJECTED : ApplicationStatus.CANCEL));
-        
+
         // await this.applicationRepository.update(application.id, {
         //     status: status
         // });
         const appEntity = this.toEntityApplication(application);
         await this.applicationRepository.save(appEntity);
-    
+
         const result = await this.applicationRepository.findOne({
             where: { appId: application.id },
             relations: ['post', 'applicant']
@@ -90,10 +107,10 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             relations: ['applicant', 'post']
         });
 
-        if(!application){
+        if (!application) {
             throw new Error('Application not found');
         }
-        if(application.status === ApplicationStatus.ACCEPTED){
+        if (application.status === ApplicationStatus.ACCEPTED) {
             return this.toDomainApplication(application);
             // throw new Error('Application already accepted');
         }
@@ -110,7 +127,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             relations: ['applicant', 'post']
         });
 
-        if(!application){
+        if (!application) {
             throw new Error(`Application not found for user ${userId} and post ${postId}`);
         }
 
@@ -121,10 +138,10 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
 
     public async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
         const applicationEntities = await this.applicationRepository.find({
-            where: { applicant: { userId: userId} },
+            where: { applicant: { userId: userId } },
             relations: ['applicant', 'post']
         });
-        if(!applicationEntities){
+        if (!applicationEntities) {
             throw new Error("Application not found");
         }
         // console.log(applicationEntities);

@@ -8,6 +8,7 @@ import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl.js";
 import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/PostEntities/BasePostEntity.js";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
 import { UserStatus } from "../entities/UserEntity.js";
+import { convertCategoryToString } from "../../utils/convertUtil.js";
 
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
@@ -19,56 +20,56 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         this.applicationRepository = new ApplicationRepositoryImpl();
         this.reviewRepository = new PostReviewRepositoryImpl();
     }
-    private transferCategoryToString(category: PostCategory): string {
-        switch (category) {
-            case PostCategory.GAME:
-                return 'game';
-            case PostCategory.TRAVEL:
-                return 'travel';
-            case PostCategory.DEVELOPER_TOOL:
-                return 'developerTool';
-            case PostCategory.HEALTH:
-                return 'health';
-            case PostCategory.EDUCATION:
-                return 'education';
-            case PostCategory.FINANCE:
-                return 'finance';
-            case PostCategory.WEATHER:
-                return 'weather';
-            case PostCategory.NEWS:
-                return 'news';
-            case PostCategory.BOOKS:
-                return 'books';
-            case PostCategory.LIFE:
-                return 'life';
-            case PostCategory.BUSINESS:
-                return 'business';
-            case PostCategory.PHOTOGRAPHY:
-                return 'photography';
-            case PostCategory.SOCIAL:
-                return 'social';
-            case PostCategory.SPORTS:
-                return 'sports';
-            case PostCategory.SHOPPING:
-                return 'shopping';
-            case PostCategory.FOOD:
-                return 'food';
-            case PostCategory.UTILITY:
-                return 'utility';
-            case PostCategory.MEDICAL:
-                return 'medical';
-            case PostCategory.MAGAZINE:
-                return 'magazine';
-            case PostCategory.MUSIC:
-                return 'music';
-            case PostCategory.ENTERTAINMENT:
-                return 'entertainment';
-            case PostCategory.ETC:
-                return 'etc';
-            default:
-                return 'etc';
-        }
-    }
+    // private transferCategoryToString(category: PostCategory): string {
+    //     switch (category) {
+    //         case PostCategory.GAME:
+    //             return 'game';
+    //         case PostCategory.TRAVEL:
+    //             return 'travel';
+    //         case PostCategory.DEVELOPER_TOOL:
+    //             return 'developerTool';
+    //         case PostCategory.HEALTH:
+    //             return 'health';
+    //         case PostCategory.EDUCATION:
+    //             return 'education';
+    //         case PostCategory.FINANCE:
+    //             return 'finance';
+    //         case PostCategory.WEATHER:
+    //             return 'weather';
+    //         case PostCategory.NEWS:
+    //             return 'news';
+    //         case PostCategory.BOOKS:
+    //             return 'books';
+    //         case PostCategory.LIFE:
+    //             return 'life';
+    //         case PostCategory.BUSINESS:
+    //             return 'business';
+    //         case PostCategory.PHOTOGRAPHY:
+    //             return 'photography';
+    //         case PostCategory.SOCIAL:
+    //             return 'social';
+    //         case PostCategory.SPORTS:
+    //             return 'sports';
+    //         case PostCategory.SHOPPING:
+    //             return 'shopping';
+    //         case PostCategory.FOOD:
+    //             return 'food';
+    //         case PostCategory.UTILITY:
+    //             return 'utility';
+    //         case PostCategory.MEDICAL:
+    //             return 'medical';
+    //         case PostCategory.MAGAZINE:
+    //             return 'magazine';
+    //         case PostCategory.MUSIC:
+    //             return 'music';
+    //         case PostCategory.ENTERTAINMENT:
+    //             return 'entertainment';
+    //         case PostCategory.ETC:
+    //             return 'etc';
+    //         default:
+    //             return 'etc';
+    //     }
+    // }
     private transferStringToCategory(category: string): PostCategory {
         switch (category) {
             case 'game':
@@ -147,7 +148,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             : null;
         const status = postEntity.status === BasePostStateType.ACTIVE ?
             'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
-        const category = this.transferCategoryToString(postEntity.category);
+        const category = convertCategoryToString(postEntity.category);
         const mobbileOs = this.transferOsToString(postEntity.mobileOs);
         return new RecruitmentPostModel(
             postEntity.postId,

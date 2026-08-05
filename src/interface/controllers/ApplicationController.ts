@@ -26,7 +26,7 @@ export class ApplicationController {
             // console.log(result);
             res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
         } catch (error) {
-            res.status(500).json({ status: 500, error: error.message })
+            res.status(500).json({ status: 500, error: error.message })  
         }
     }
     async cancelApplication(req: Request, res: Response): Promise<void> {
