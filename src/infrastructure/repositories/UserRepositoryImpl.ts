@@ -153,7 +153,7 @@ export class UserRepositoryImpl implements IUserRepository {
     }
     async findUsersByIds(ids: string[]): Promise<UserModel[]> {
         const users = await this.userRepository.find({
-            where: { userId: In(ids) }, relations: ['applications', 'applications.post', 'applications.applicant', 'applications.reviews']
+            where: { userId: In(ids) }, relations: ['applications', 'applications.post', 'applications.applicant']
         });
         if (!users) {
             return [];

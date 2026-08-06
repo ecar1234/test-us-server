@@ -202,7 +202,7 @@ export class PostUseCase {
                     },
                     application: {
                         id: app.id,
-                        postId: app.postId,
+                        postId: app.postInfo.postId,
                         status: app.status,
                         platform: app.platform,
                         mobileOs: app.mobileOs,

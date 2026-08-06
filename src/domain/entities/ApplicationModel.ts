@@ -18,6 +18,7 @@ export class ApplicationModel {
         this.mobileOs = props.mobileOs;
         this.status = props.status;
         this.appliedAt = props.appliedAt;
+        this.updatedAt = props.updatedAt;
         this.postInfo = props.postInfo;
         this.applicantId = props.applicantId;
      }
@@ -30,5 +31,4 @@ export class ApplicationModel {
     updatedAt: Date | null = null;
     postInfo: PostInfo;
     applicantId: string;
-
 }
