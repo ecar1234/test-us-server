@@ -9,6 +9,7 @@ import { TResRecruitTesterReviewInfo } from "../infrastructure/entities/package/
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
 import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl.js";
 import { UserReviewModel } from "../domain/entities/UserReviewModel.js";
+import { PostInfo } from "../domain/entities/interface/applicationPackage.js";
 
 export class AppUseCase {
     constructor(
@@ -20,13 +21,14 @@ export class AppUseCase {
     ) { }
 
     async createApplication(userId: string, postId: string, platform: string, mobileOs: string, status: string = 'pending'): Promise<[ApplicationModel, RecruitmentPostModel]> {
-        const application = new ApplicationModel(null, platform, mobileOs, status, null, null, postId, userId);
+
+        const application = new ApplicationModel({id: null ,platform: platform, mobileOs: mobileOs, status: status, postInfo: {postId: postId}, applicantId: userId, appliedAt: null, updatedAt: null});
         const appResult = await this.applicationRepository.create(application);
         if (appResult == null) {
             // console.log(appResult)
             throw new Error("application create failed");
         }
-        const post = await this.postRepository.getPostById(appResult.postId);
+        const post = await this.postRepository.getPostById(appResult.postInfo.postId);
         const token = await this.fireRepository.getMessingToken(post.author['userId']);
         if (token) {
             const message: FCMPayload = {
@@ -68,14 +70,14 @@ export class AppUseCase {
     }
 
     async updateApplication(id: string, postId: string, userId: string, platform: string, mobileOs: string, status: string): Promise<[ApplicationModel, RecruitmentPostModel]> {
-        const application = new ApplicationModel(parseInt(id), platform, mobileOs, status, null, null, postId, userId);
+        const application = new ApplicationModel({id: parseInt(id) ,platform: platform, mobileOs: mobileOs, status: status, postInfo: {postId: postId}, applicantId: userId, appliedAt: null, updatedAt: null});
         // console.log(application);
         const appResult = await this.applicationRepository.update(application);
         if (appResult == null) {
             throw new Error("application update failed");
         }
         if (appResult.status === 'pending') {
-            const post = await this.postRepository.getPostById(appResult.postId);
+            const post = await this.postRepository.getPostById(appResult.postInfo.postId);
             const token = await this.fireRepository.getMessingToken(post.author['userId']);
             if (token) {
                 const message: FCMPayload = {
@@ -111,7 +113,7 @@ export class AppUseCase {
             }
 
         }
-        const post = await this.postRepository.getPostById(appResult.postId);
+        const post = await this.postRepository.getPostById(appResult.postInfo.postId);
         // console.log('use case result', result);
         return [appResult, post];
     }
@@ -122,7 +124,7 @@ export class AppUseCase {
         if (application == null) {
             throw new Error("application cancel failed");
         }
-        const post = await this.postRepository.getPostById(application.postId);
+        const post = await this.postRepository.getPostById(application.postInfo.postId);
         if (post == null) {
             throw new Error("post not found");
         }
@@ -182,7 +184,7 @@ export class AppUseCase {
         if (application == null) {
             throw new Error("application reject failed");
         }
-        const post = await this.postRepository.getPostById(application.postId);
+        const post = await this.postRepository.getPostById(application.postInfo.postId);
         if (post == null) {
             throw new Error("post not found");
         }
