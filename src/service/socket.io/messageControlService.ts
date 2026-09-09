@@ -15,7 +15,7 @@ export class MessageControlService {
         try {
             // const socketId = await this.cacheClient.get(`online${targetId}`);
             this.io.to(`user_${targetId}`).emit("chat_message", message);
-            // this.io.to(`user_${message.sender.userId}`).emit("chat_mwssage", message);
+            this.io.to(`user_${message.sender.userId}`).emit("chat_mwssage", message);
             // console.log('[Socket] delivery to only users');
             // this.io.to(`user_${message.sender.userId}`).emit("chat_mwssage", message);
             console.log('[Socket] first delivery to sender');
@@ -36,7 +36,7 @@ export class MessageControlService {
             return;
         }
     }
-    async messageDeilvery(message: MessageModel, targetId: string): Promise<void> {
+    async messageDelivery(message: MessageModel, targetId: string): Promise<void> {
         const socketId = await this.cacheClient.get(`online${targetId}`);
 
         this.io.to(`user_${message.sender.userId}`).emit("chat_message", message);

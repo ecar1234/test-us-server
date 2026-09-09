@@ -39,7 +39,7 @@ export const chatHandler = (socket: Socket, io: Server, messageUseCase: MessageU
     if (!roomId) {
       await delivery.firstMessage(newMessage, targetId);
     } else {
-      await delivery.messageDeilvery(newMessage, targetId);
+      await delivery.messageDelivery(newMessage, targetId);
     }
   });
 

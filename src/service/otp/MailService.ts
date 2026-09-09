@@ -81,7 +81,7 @@ DevOn Studio
 </html>`
         console.log('[Resend] email send start');
         const {data, error} = await this.resend.emails.send({
-            from: 'no-reply@testusserver.xyz',
+            from: 'no-reply@testusserver.site',
             to: email,
             subject: 'TESTUS 인증번호',
             html: htmlContent

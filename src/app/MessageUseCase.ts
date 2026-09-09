@@ -88,7 +88,7 @@ export class MessageUseCase {
 
     async sendMessage(roomId: number | null, postId: string, senderId: string, targetId: string, content: string): Promise<MessageModel> {
         return this.unitOfWork.runInTransaction(async (manager) => {
-            let room;
+            let room: RoomModel;
             try {
                 if (roomId) {
                     room = await this.roomRepo.getRoomById(roomId);
