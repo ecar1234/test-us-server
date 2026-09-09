@@ -46,4 +46,9 @@ export class ReviewController {
         const reviews = await this.reviewUseCase.getUserReviewByTesterIds(ids, appId);
         res.status(200).json({ status: 200, reviews: reviews });
     }
+    async requestReviewInitData(req: Request, res: Response): Promise<void> {
+        const { userId, postIds } = req.body;
+        const initData = await this.reviewUseCase.getReviewInitData(userId, postIds);
+        res.status(200).json({ status: 200, userReviews: initData[0], applyPostReviews: initData[1]});
+    }
 }

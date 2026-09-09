@@ -4,6 +4,7 @@ import { IPostReviewRepository } from "../../domain/interface_repositories/IPost
 import { PostReviewEntity, PostReviewType } from "../entities/PostReviewEntity.js";
 import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
 import { UserEntity } from "../entities/UserEntity.js";
+import { EntityManager, In } from "typeorm";
 
 export class PostReviewRepositoryImpl implements IPostReviewRepository {
   
@@ -65,5 +66,16 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
         if (!review) throw new Error("Review not found");
 
         return this.toDomainPostReview(review);
+    }
+    async getApplyPostReviewsByPostIds(postIds: string[], manager?: EntityManager): Promise<PostReviewModel[]> {
+        const postReviewRepo = manager ? manager.getRepository(PostReviewEntity) : this.postReviewDataSource;
+        const reviews = await postReviewRepo.find({
+            where: { post: {postId: In(postIds)} },
+            relations: {
+                post: true,
+                reviewer: true
+            }
+        });
+        return reviews.map((review) => this.toDomainPostReview(review));
     }
 }

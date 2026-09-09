@@ -1,4 +1,4 @@
-import { In, IsNull } from "typeorm";
+import { EntityManager, In, IsNull } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
 import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReview_repository.js";
 import { UserReviewModel } from "../../domain/entities/UserReviewModel.js";
@@ -46,8 +46,9 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
         // console.log(newReview);
         return this.toDomainUserReview(newReview);
     }
-    async getUserReviewsByUserId(userId: string): Promise<UserReviewModel[]> {
-        const reviews = await this.userReviewDataSource.find({
+    async getUserReviewsByUserId(userId: string, manager: EntityManager ): Promise<UserReviewModel[]> {
+        const userReviewRepo = manager ? manager.getRepository(UserReviewEntity) : this.userReviewDataSource;
+        const reviews = await userReviewRepo.find({
             where: {reviewed: {userId: userId}},
             relations: ['application', 'application.post', 'reviewer', 'reviewed']
         });
