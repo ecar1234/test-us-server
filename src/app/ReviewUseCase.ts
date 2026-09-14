@@ -14,9 +14,9 @@ export class ReviewUseCase {
         private postReviewRepo: PostReviewRepositoryImpl,
         private recruitRepo: RecruitmentPostRepositoryImpl,
         private unitOfWork: TypeOrmUnitOfWork
-    ){}
+    ) { }
 
-    async addPromotionReview(rating: number, comments: string, type: string, reviewer: string, postId: string):Promise<PostReviewModel> {
+    async addPromotionReview(rating: number, comments: string, type: string, reviewer: string, postId: string): Promise<PostReviewModel> {
         const postReviewModel = new PostReviewModel({
             reviewId: null,
             rating: rating,
@@ -32,10 +32,10 @@ export class ReviewUseCase {
         if (authorId) {
             await redisClient.del(`userPosts:${authorId}`);
         }
-        return review;   
+        return review;
     }
 
-    async addRecruitReview(rating: number, comments: string, type: string, reviewer: string, postId: string):Promise<PostReviewModel> {
+    async addRecruitReview(rating: number, comments: string, type: string, reviewer: string, postId: string): Promise<PostReviewModel> {
         const postReviewModel = new PostReviewModel({
             reviewId: null,
             rating: rating,
@@ -51,10 +51,10 @@ export class ReviewUseCase {
         if (authorId) {
             await redisClient.del(`userPosts:${authorId}`);
         }
-        return review; 
+        return review;
     }
 
-    async addUserReview(rating: number, comments: string, reviewer: string, reviewed: string, applicationId: number, postId: string):Promise<UserReviewModel> {
+    async addUserReview(rating: number, comments: string, reviewer: string, reviewed: string, applicationId: number, postId: string): Promise<UserReviewModel> {
         const userReviewModel = new UserReviewModel({
             reviewId: null,
             rating: rating,
@@ -65,37 +65,38 @@ export class ReviewUseCase {
         });
         const review = await this.userReviewRepo.addUserReview(userReviewModel); // UserReviewRepo 사용
         // console.log(review);
-        return review; 
+        return review;
     }
 
-   
+
     // 게시물 ID로 리뷰를 조회하는 것은 이제 PostReviewRepository에서 담당
-    async getPostReviewByPostId(postId: string): Promise<PostReviewModel>{
+    async getPostReviewByPostId(postId: string): Promise<PostReviewModel[]> {
         const reviews = await this.postReviewRepo.getPostReviewByPostId(postId);
         return reviews;
     }
 
-    async getUserReviewByUserId(userId: string): Promise<UserReviewModel>{ // 메서드 이름 변경
+    async getUserReviewByUserId(userId: string): Promise<UserReviewModel> { // 메서드 이름 변경
         const reviews = await this.userReviewRepo.getReviewByUserId(userId); // UserReviewRepo 사용
         return reviews;
     }
-    async getReviewsByUserId(userId: string): Promise<UserReviewModel[]>{
+    async getReviewsByUserId(userId: string): Promise<UserReviewModel[]> {
         const reviews = await this.userReviewRepo.getUserReviewsByUserId(userId, null);
         return reviews;
     }
-    async getReviewByPostReviewId(reviewId: string): Promise<PostReviewModel>{
+    async getReviewByPostReviewId(reviewId: string): Promise<PostReviewModel> {
         const reviews = await this.postReviewRepo.getReviewByPostReviewId(reviewId);
         return reviews;
     }
 
-    async getUserReviewByTesterIds(ids: string[], appId: number): Promise<UserReviewModel[]>{ // 메서드 이름 변경
+    async getUserReviewByTesterIds(ids: string[], appId: number): Promise<UserReviewModel[]> { // 메서드 이름 변경
         const reviews = await this.userReviewRepo.getReviewByTesterIds(ids, appId); // UserReviewRepo 사용
         return reviews;
     }
-    async getReviewInitData(userId: string, postIds: string[]): Promise<[UserReviewModel[], PostReviewModel[]]> {
-        return this.unitOfWork.runInTransaction(async (manager:EntityManager) => {
+    async getReviewInitData(userId: string, userPosts?: string[], applyPosts?: string[]): Promise<[UserReviewModel[], PostReviewModel[], { 'postId': string, 'average': number }[]]> {
+        return this.unitOfWork.runInTransaction(async (manager: EntityManager) => {
             let userReviews: UserReviewModel[];
             let applyPostReviews: PostReviewModel[];
+            let recruitReviewAverages: { 'postId': string, 'average': number }[];
             try {
                 userReviews = await this.userReviewRepo.getUserReviewsByUserId(userId, manager);
             } catch (error) {
@@ -103,13 +104,39 @@ export class ReviewUseCase {
                 throw error;
             }
             try {
-                applyPostReviews = await this.postReviewRepo.getApplyPostReviewsByPostIds(postIds, manager);
+                if (applyPosts.length === 0) {
+                    applyPostReviews = [];
+                }
+                applyPostReviews = await this.postReviewRepo.getApplyPostReviewsByPostIds(applyPosts, manager);
             } catch (error) {
                 console.error('[ReviewUseCase] Failed to find apply post Reivews:', error);
                 throw error;
             }
+            try {
+                if (userPosts.length === 0) {
+                    recruitReviewAverages = [];
+                }
+                const reviews = await this.postReviewRepo.getPostReviewByPostIds(userPosts);
+                if (reviews.length === 0) {
+                    recruitReviewAverages = [];
+                }
+                let map = new Map();
+                reviews.forEach((review) => {
+                    const current = map.get(review.postId!) ?? { 'sum': 0, 'count': 0 };
+                    current.sum += review.rating;
+                    current.count++;
+                    map.set(review.postId, current);
+                });
+                recruitReviewAverages = [...map].map(([postId, { sum, count }]) => ({
+                    postId,
+                    average: sum / count,
+                }));
+            } catch (error) {
+                console.error('[ReviewUseCase] Failed to set post Reivews average:', error);
+                throw error;
+            }
 
-            return [userReviews, applyPostReviews];
+            return [userReviews, applyPostReviews, recruitReviewAverages];
         });
     }
 }

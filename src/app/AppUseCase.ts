@@ -245,14 +245,7 @@ export class AppUseCase {
             if (user) {
                 const review: UserReviewModel | null = reviews.find(r => r.applicationId === app.id);
                 result.push({
-                    user: {
-                        userId: user.userId,
-                        email: user.email,
-                        nickname: user.nickname,
-                        profileImg: user.profileImg,
-                        userType: user.userType,
-                        role: user.role
-                    },
+                    user: user,
                     review: review ? review : null,
                     appId: app.id
                 });

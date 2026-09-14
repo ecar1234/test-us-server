@@ -7,7 +7,7 @@ import { UserEntity } from "../entities/UserEntity.js";
 import { EntityManager, In } from "typeorm";
 
 export class PostReviewRepositoryImpl implements IPostReviewRepository {
-  
+
     private postReviewDataSource = AppDataSource.getRepository(PostReviewEntity);
 
     public toDomainPostReview(reviewEntity: PostReviewEntity): PostReviewModel {
@@ -44,19 +44,22 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
             reviewer: { userId: review.reviewerUserId }
         });
         const newReview = await this.postReviewDataSource.findOne({
-                where: { reviewId: savedEntity.reviewId },
-                relations: ['reviewer', 'post']
-            });
+            where: { reviewId: savedEntity.reviewId },
+            relations: ['reviewer', 'post']
+        });
         return this.toDomainPostReview(newReview);
     }
 
-    async getPostReviewByPostId(postId: string): Promise<PostReviewModel> {
-        const review = await this.postReviewDataSource.findOne({
+    async getPostReviewByPostId(postId: string): Promise<PostReviewModel[]> {
+        const reviews = await this.postReviewDataSource.find({
             where: { post: { postId: postId } },
-            relations: ['reviewer', 'post']
+            relations: {
+                post: true,
+                reviewer: true
+            }
         });
 
-        return review ? this.toDomainPostReview(review) : null;
+        return reviews ? reviews.map((review) => this.toDomainPostReview(review)) : null;
     }
     async getReviewByPostReviewId(reviewId: string): Promise<PostReviewModel> {
         const review = await this.postReviewDataSource.findOne({
@@ -70,12 +73,24 @@ export class PostReviewRepositoryImpl implements IPostReviewRepository {
     async getApplyPostReviewsByPostIds(postIds: string[], manager?: EntityManager): Promise<PostReviewModel[]> {
         const postReviewRepo = manager ? manager.getRepository(PostReviewEntity) : this.postReviewDataSource;
         const reviews = await postReviewRepo.find({
-            where: { post: {postId: In(postIds)} },
+            where: { post: { postId: In(postIds) } },
             relations: {
                 post: true,
                 reviewer: true
             }
         });
         return reviews.map((review) => this.toDomainPostReview(review));
+    }
+
+    async getPostReviewByPostIds(postIds: string[], manager?: EntityManager): Promise<PostReviewModel[]> {
+        const postReviewRepo = manager ? manager.getRepository(PostReviewEntity) : this.postReviewDataSource;
+        const reviews = await postReviewRepo.find({
+            where: { post: { postId: In(postIds) } },
+            relations: {
+                post: true,
+                reviewer: true
+            }
+        });
+        return reviews ? reviews.map((review) => this.toDomainPostReview(review)) : [];
     }
 }

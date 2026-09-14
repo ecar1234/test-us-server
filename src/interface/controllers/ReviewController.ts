@@ -17,7 +17,7 @@ export class ReviewController {
         res.status(200).json({ status: 200, review: review });
     }
     async addUserReview(req: Request, res: Response): Promise<void> {
-        const { rating, comment, reviewerUserId, reviewedUserId, applicationId, postId} = req.body;
+        const { rating, comment, reviewerUserId, reviewedUserId, applicationId, postId } = req.body;
         const review = await this.reviewUseCase.addUserReview(rating, comment, reviewerUserId, reviewedUserId, applicationId, postId);
         res.status(200).json({ status: 200, review: review });
     }
@@ -27,9 +27,9 @@ export class ReviewController {
         res.status(200).json({ status: 200, review: review });
     }
     async getReviewByPostId(req: Request, res: Response): Promise<void> {
-        const { postId } = req.body;
-        const review = await this.reviewUseCase.getPostReviewByPostId(postId);
-        res.status(200).json({ status: 200, review: review });
+        const postId = req.params.postId;
+        const reviews = await this.reviewUseCase.getPostReviewByPostId(postId);
+        res.status(200).json({ status: 200, reviews: reviews });
     }
     async getReviewByUserId(req: Request, res: Response): Promise<void> {
         const userId = req.params.userId;
@@ -47,8 +47,8 @@ export class ReviewController {
         res.status(200).json({ status: 200, reviews: reviews });
     }
     async requestReviewInitData(req: Request, res: Response): Promise<void> {
-        const { userId, postIds } = req.body;
-        const initData = await this.reviewUseCase.getReviewInitData(userId, postIds);
-        res.status(200).json({ status: 200, userReviews: initData[0], applyPostReviews: initData[1]});
+        const { userId, userPosts, applyPosts } = req.body;
+        const initData = await this.reviewUseCase.getReviewInitData(userId, userPosts, applyPosts);
+        res.status(200).json({ status: 200, initData: { userReviews: initData[0], applyPostReviews: initData[1], postReviewAverages: initData[2] } });
     }
 }

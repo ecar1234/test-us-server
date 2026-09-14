@@ -1,15 +1,9 @@
+import { UserModel } from "../../../domain/entities/UserModel.js";
 import { UserReviewModel } from "../../../domain/entities/UserReviewModel.js";
 
 
 export interface TResRecruitTesterReviewInfo {
-    user: {
-        userId: string;
-        email: string;
-        nickname: string;
-        profileImg: object | null;
-        userType: string;
-        role: string;
-    };
+    user: UserModel
     review: UserReviewModel | null;
     appId: number;
 
