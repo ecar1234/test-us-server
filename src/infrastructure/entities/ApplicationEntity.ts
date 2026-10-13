@@ -43,7 +43,7 @@ export class ApplicationEntity {
 
     @ManyToOne(() => RecruitmentPostEntity, post => post.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'postId' })
-    post: RecruitmentPostEntity
+    post: Relation<RecruitmentPostEntity>
 
     // 신청 유저의 승인 상테
     @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })

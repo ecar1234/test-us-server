@@ -9,8 +9,13 @@ export const AppleClientInit = (isProd: boolean): { client: AppStoreServerAPICli
     const keyId = process.env.APPLE_KEY_ID;
     const bundleId = process.env.APPLE_BUNDLE_ID;
     const privateKey = fs.readFileSync(process.env.APPLE_P8_PATH!, 'utf-8');
-    const environment = isProd ? Environment.PRODUCTION : Environment.SANDBOX;
+    
+
+    // 배포 후 무조건 sandbox 설정을 수정해야 한다.
+    // const environment = isProd ? Environment.PRODUCTION : Environment.SANDBOX;
+    const environment =  Environment.SANDBOX;
     // const environment = Environment.PRODUCTION;
+    
     const appId = Number(process.env.APPLE_APP_ID);
 
     // console.log(`[Apple Client] issUseId: ${issUseId}`);

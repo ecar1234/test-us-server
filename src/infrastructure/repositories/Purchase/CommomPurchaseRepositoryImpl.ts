@@ -9,18 +9,19 @@ export class PurchaseRepositoryImpl implements IPurchaseRepository {
     private purchaseRepo = AppDataSource.getRepository(PurchaseEntity);
 
     private toModel(entity: PurchaseEntity): PurchaseModel {
+        const store = entity instanceof PurchaseIosEntity ? 'app-store' : 'play-store';
         return new PurchaseModel({
             id: entity.id,
             plan: entity.plan,
             productId: entity.productId,
-            store: entity.store,
+            store: store,
             isActive: entity.isActive,
             willRenew: entity.willRenew,
             state: entity.state,
             expiresAt: entity.expiresAt,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
-            userId: entity.user.userId
+            userId: entity.user?.userId ?? (entity as any).userId
         });
     }
    

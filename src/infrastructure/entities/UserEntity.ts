@@ -80,11 +80,14 @@ export class UserEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @OneToMany(() => BasePostEntity, post => post.author)
+    @OneToMany(() => BasePostEntity, (post) => post.author)
     posts: BasePostEntity[];
 
-    @OneToMany(() => ApplicationEntity, app => app.applicant)
+    @OneToMany(() => ApplicationEntity, (app) => app.applicant)
     applications: ApplicationEntity[]
+
+    @OneToMany(() => PurchaseEntity, (purchase) => purchase.user)
+    purchases: PurchaseEntity[];
 
     // @OneToMany(() => UserReviewEntity, review => review.reviewer)
     // givenReviews: UserReviewEntity[]
@@ -100,8 +103,4 @@ export class UserEntity {
 
     // @OneToMany(() => FirebaseDeviceTokenEntity, token => token.user)
     // deviceTokens: FirebaseDeviceTokenEntity[];
-
-    // @OneToMany(() => PurchaseEntity, purchase => purchase.user)
-    // purchases: PurchaseEntity[];
-
 }

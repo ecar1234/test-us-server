@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, RelationId, Unique } from "typeorm";
 import { RoomEntity } from "./RoomEntity.js";
 import { UserEntity } from "../UserEntity.js";
 
 @Entity('room_members')
-@Unique(['room', 'userId'])
+@Unique(['room', 'user'])
 export class RoomMemberEntity {
     @PrimaryGeneratedColumn()
     id: number;
@@ -11,11 +11,12 @@ export class RoomMemberEntity {
     // 관계 유지: 유저 정보(닉네임, 프로필 등) 조회용
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' }) // 기존 userId 컬럼을 외래 키로 사용하도록 매핑
-    user: UserEntity;
+    user: Relation<UserEntity>;
 
-    @Column({type: 'varchar', length: 255})
-    userId: string; // ID만 따로 쓸 수 있도록 노출
+    @RelationId((member: RoomMemberEntity) => member.user)
+    userId: string
 
+    @Index()
     @ManyToOne(() => RoomEntity, (chatRoom) => chatRoom.members, { onDelete: 'CASCADE' })
     room: Relation<RoomEntity>;
 

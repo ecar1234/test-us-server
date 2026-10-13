@@ -84,7 +84,7 @@ export class PurchaseController {
     /// 구독 내역 가져오기
     async getSubscribes(req: Request, res: Response): Promise<void> {
         try {
-            const { userId } = req.params;
+            const userId  = req.user?.userId;
             const subscribes = await this.purchaseUseCase.getSubscriptions(userId);
             
             res.status(200).json({ status: 200, subscribes: subscribes });

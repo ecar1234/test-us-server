@@ -14,14 +14,14 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
             id: entity.id,
             plan: entity.plan,
             productId: entity.productId,
-            store: entity.store,
+            store: 'play-store',
             isActive: entity.isActive,
             willRenew: entity.willRenew,
             state: entity.state,
             expiresAt: entity.expiresAt,
             createdAt: entity.createdAt,
             updatedAt: entity.updatedAt,
-            userId: entity.user.userId
+            userId: entity.user?.userId ?? (entity as any).userId
         });
     }
     private toEntity(model: PurchaseModel, token: string, rootId?: string, prevToken?: string): PurchaseAosEntity {
@@ -31,7 +31,6 @@ export class PurchaseAosRepositoryImpl implements IPurchaseAosRepository {
             ...(model.id && { id: model.id }),
             plan: model.plan,
             productId: model.productId,
-            // store: model.store,
             isActive: model.isActive,
             willRenew: model.willRenew,
             state: state,

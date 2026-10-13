@@ -163,7 +163,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             postEntity.period,
             postEntity.views,
             postEntity.images ?? [],
-            postEntity.postType,
+            'recruitment',
             // postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
             postEntity.createdAt,
             postEntity.updatedAt,

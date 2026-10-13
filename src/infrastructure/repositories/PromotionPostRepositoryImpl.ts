@@ -190,7 +190,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             post.views,
             post.images || [],
             post.domain,
-            post.postType,
+            'promotion',
             // post.receivedReviews ? post.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
             post.createdAt,
             post.updatedAt

@@ -58,9 +58,6 @@ export abstract class BasePostEntity {
     @PrimaryGeneratedColumn('uuid')
     postId: string;
 
-    @Column('varchar')
-    postType: string;
-
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
     author: Relation<UserEntity>;
@@ -104,8 +101,8 @@ export abstract class BasePostEntity {
     // @OneToMany(() => PostReviewEntity, review => review.post)
     // receivedReviews: PostReviewEntity[]
 
-    // @OneToMany(() => RoomEntity, room => room.id)
-    // rooms: RoomEntity[]
+    @OneToMany(() => RoomEntity, room => room.post)
+    rooms: Relation<RoomEntity>[]
 
     @AfterLoad()
     setDefaults() {

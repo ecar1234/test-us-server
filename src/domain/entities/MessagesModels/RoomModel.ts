@@ -14,7 +14,7 @@ export class RoomModel {
                     title: string;
                 },
                 targetUserId: string,
-                lastMessage: MessageModel,
+                lastMessageId: number | null,
                 lastMessageContent: string,
                 lastMessageAt: Date,
                 members: RoomMemberModel[],
@@ -26,7 +26,7 @@ export class RoomModel {
         this.type = props.type;
         this.post = props.post;
         this.targetUserId = props.targetUserId;
-        this.lastMessage = props.lastMessage;
+        this.lastMessageId = props.lastMessageId;
         this.lastMessageContent = props.lastMessageContent;
         this.lastMessageAt = props.lastMessageAt;
         this.members = props.members;
@@ -42,7 +42,7 @@ export class RoomModel {
         title: string;
     }
     public targetUserId: string;
-    public lastMessage: MessageModel;
+    public lastMessageId: number | null;
     public lastMessageContent: string;
     public lastMessageAt: Date;
     public members: RoomMemberModel[];

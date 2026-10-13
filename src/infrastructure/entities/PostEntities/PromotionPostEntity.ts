@@ -5,6 +5,6 @@ import { BasePostEntity } from "./BasePostEntity.js";
 @ChildEntity()
 export class PromotionPostEntity extends BasePostEntity {
 
-    @Column({ type: 'text', nullable: false })
+    @Column({ type: 'text', nullable: true })
     domain: string
 }

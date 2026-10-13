@@ -4,10 +4,10 @@ import { PurchaseEntity } from "./PurchaseEntity.js";
 
 @ChildEntity()
 export class PurchaseIosEntity extends PurchaseEntity {
-    @Column({type: 'varchar', unique: true})
+    @Column({ type: 'varchar', unique: true, nullable: true })
     transactionId: string;
 
-    @Column('varchar')
+    @Column('varchar', { nullable: true })
     @Index()
-    originalTransactionsId: string;
+    originalTransactionId: string;
 }

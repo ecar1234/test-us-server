@@ -120,7 +120,9 @@ export class PurchaseUseCase {
     }
     private setNewIOSPurchaseModel(transaction: JWSTransactionDecodedPayload, userId?: string, type?: string): PurchaseModel {
         const productId: string = transaction.productId;
+        console.log(`[set IOS Model] expired : ${transaction.expiresDate}`);
         const expiredAt: Date = new Date(transaction.expiresDate);
+        console.log(`[set IOS Model] expiredAt : ${expiredAt}`);
         const isRenew = productId.split('_')[1] !== 'm1';
         const itemInfo = productId.split('_');
         const plan = this.getPlan(itemInfo[0]);
@@ -193,7 +195,7 @@ export class PurchaseUseCase {
         console.log(`[Purchase AOS] Use case start verify`);
         try {
             const product = await purblisher.purchases.subscriptionsv2.get({
-                packageName: 'com.testus.devon.studio.app',
+                packageName: process.env.AOS_PACKAGE_NAME,
                 token: purchaseToken
             });
             if (!product.data.lineItems) {
@@ -276,7 +278,7 @@ export class PurchaseUseCase {
                         prevProdect.isActive = false;
                         prevProdect.willRenew = false;
                         prevProdect.state = 'canceled';
-                        await this.iosRepository.updateSubcribe(prevProdect, verified.transactionId, verified.originalTransactionId);
+                        await this.iosRepository.updateSubcribe(prevProdect, verified.transactionId, verified.originalTransactionId, manager);
                         console.log(`[Purchase IOS] 기존 active 업데이트 false.`)
                     }
                 }
@@ -287,7 +289,7 @@ export class PurchaseUseCase {
 
             const productModel = this.setNewIOSPurchaseModel(verified, useId);
 
-            const savePurchase = await this.iosRepository.saveSubscribe(productModel, verified.transactionId, verified.originalTransactionId);
+            const savePurchase = await this.iosRepository.saveSubscribe(productModel, verified.transactionId, verified.originalTransactionId, manager);
             return savePurchase;
         }).catch(async (error) => {
             if (error.code === 'ER_DUP_ENTRY' || error.code === '23505') {
@@ -361,38 +363,108 @@ export class PurchaseUseCase {
                 }
             }
         } else {
+            // 1. 현재 요청으로 들어온 purchaseToken으로 기존 데이터 조회                                                                                                                                      
             let updateItem = await this.getSubscribeByToken(purchaseToken);
-            if (!updateItem) {
-                // 여기는 무조건 업데이트기 때문에 기존 데이터가 존재해야함.
-                // 기존 데이터가 없다면, 오류 보다는 webHook에서 오는 데이터를 신뢰해서 신규 데이터를 저장해야한다.
-                const isRenew = type === 'renew';
-                updateItem = this.setNewAOSPurchaseModel(verifer, verifer.externalAccountIdentifiers.obfuscatedExternalAccountId, type);
-            }
-
-            // renew 일때는 기존 상품 expired로 수정 업데이트 후 새로운 데이터로 저장해야한다.!!! (수정 필!!!!!!)
+            const lineItem = verifer.lineItems?.[0];
+            const newExpiryDate = lineItem?.expiryTime ? new Date(lineItem.expiryTime) : null;
             try {
                 if (type === 'renew') {
-                    // updateItem.isActive = true;
-                    // updateItem.willRenew = true;
-                    // updateItem.state = type;
-                    // updateItem.expiresAt = new Date(verifer.lineItems[0].expiryTime);
-                    // await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    // 케이스 A: 구글이 새 토큰을 발급하며 이전 토큰(linkedPurchaseToken)을 넘겨준 경우                                                                                                        
+                    if (verifer.linkedPurchaseToken && verifer.linkedPurchaseToken !== purchaseToken) {
+                        // 이전 구독 만료 처리                                                                                                                                                                 
+                        const prev = await this.getSubscribeByToken(verifer.linkedPurchaseToken);
+                        if (prev) {
+                            prev.isActive = false;
+                            prev.willRenew = false;
+                            prev.state = 'expired';
+                            await this.aosRepository.updateSubcribe(prev, verifer.linkedPurchaseToken, null);
+                        }
+                        // 새 토큰으로 신규 갱신 레코드 저장                                                                                                                                                   
+                        const newModel = this.setNewAOSPurchaseModel(
+                            verifer,
+                            prev?.userId || verifer.externalAccountIdentifiers?.obfuscatedExternalAccountId,
+                            'renew'
+                        );
+                        await this.aosRepository.saveSubscribe(newModel, purchaseToken, verifer.linkedPurchaseToken);
+                        console.log(`[Purchase Webhook] AOS renew (New Token) 처리 완료: ${purchaseToken}`);
+                        return true;
+                    }
+
+                    // 케이스 B: 동일한 토큰으로 기간만 갱신된 경우 (가장 흔함)                                                                                                                                
+                    if (!updateItem) {
+                        // DB에 기존 데이터가 없더라도 웹훅 데이터를 신뢰하여 신규 적재                                                                                                                        
+                        updateItem = this.setNewAOSPurchaseModel(
+                            verifer,
+                            verifer.externalAccountIdentifiers?.obfuscatedExternalAccountId,
+                            'renew'
+                        );
+                        await this.aosRepository.saveSubscribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    } else {
+                        // 기존 데이터의 상태 및 만료 기간 연장                                                                                                                                                
+                        updateItem.isActive = true;
+                        updateItem.willRenew = true;
+                        updateItem.state = 'renew';
+                        if (newExpiryDate) {
+                            updateItem.expiresAt = newExpiryDate;
+                        }
+                        await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    }
+                    console.log(`[Purchase Webhook] AOS renew (Updated Expiry) 완료: ${purchaseToken}`);
+                    return true;
+
                 } else if (type === 'canceled') {
-                    updateItem.willRenew = false;
-                    updateItem.state = type;
-                    await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    if (updateItem) {
+                        updateItem.willRenew = false;
+                        updateItem.state = 'canceled';
+                        await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    }
                 } else if (type === 'expired' || type === 'revoke') {
-                    updateItem.isActive = false;
-                    updateItem.willRenew = false;
-                    updateItem.state = type;
-                    await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    if (updateItem) {
+                        updateItem.isActive = false;
+                        updateItem.willRenew = false;
+                        updateItem.state = type;
+                        await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+                    }
                 }
+
                 console.log('[Purchase Webhook] AOS update success: ' + type);
                 return true;
             } catch (error) {
-                console.log(error);
+                console.error('[Purchase Webhook] AOS update failed:', error);
                 return false;
             }
+            // let updateItem = await this.getSubscribeByToken(purchaseToken);
+            // if (!updateItem) {
+            //     // 여기는 무조건 업데이트기 때문에 기존 데이터가 존재해야함.
+            //     // 기존 데이터가 없다면, 오류 보다는 webHook에서 오는 데이터를 신뢰해서 신규 데이터를 저장해야한다.
+            //     const isRenew = type === 'renew';
+            //     updateItem = this.setNewAOSPurchaseModel(verifer, verifer.externalAccountIdentifiers.obfuscatedExternalAccountId, type);
+            // }
+
+            // // renew 일때는 기존 상품 expired로 수정 업데이트 후 새로운 데이터로 저장해야한다.!!! (수정 필!!!!!!)
+            // try {
+            //     if (type === 'renew') {
+            //         // updateItem.isActive = true;
+            //         // updateItem.willRenew = true;
+            //         // updateItem.state = type;
+            //         // updateItem.expiresAt = new Date(verifer.lineItems[0].expiryTime);
+            //         // await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+            //     } else if (type === 'canceled') {
+            //         updateItem.willRenew = false;
+            //         updateItem.state = type;
+            //         await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+            //     } else if (type === 'expired' || type === 'revoke') {
+            //         updateItem.isActive = false;
+            //         updateItem.willRenew = false;
+            //         updateItem.state = type;
+            //         await this.aosRepository.updateSubcribe(updateItem, purchaseToken, verifer.linkedPurchaseToken);
+            //     }
+            //     console.log('[Purchase Webhook] AOS update success: ' + type);
+            //     return true;
+            // } catch (error) {
+            //     console.log(error);
+            //     return false;
+            // }
         }
     }
     async webhookIOS(payload: IIosWebhookPayload): Promise<boolean> {
@@ -496,20 +568,24 @@ export class PurchaseUseCase {
                 if (payload.subType === 'AUTO_RENEW_DISABLED') {
                     // 환불이 아니므로 서비스는 유지하되 상태만 canceled, 자동갱신 off 처리
                     let prev = await this.iosRepository.getSubscriptionByTransactionId(transactionId);
-                    if (!prev) {
+                    if (prev) {
                         prev.willRenew = false;
                         await this.iosRepository.updateSubcribe(prev, transactionId, originalTransactionId);
                         console.log(`[IOS Webhook] 상태 업데이트 완료 - SubType: ${payload.subType}`);
                         return true;
+                    } else {
+                        console.warn(`[IOS Webhook] 이전 구독 내역 없음: ${transactionId}`);
                     }
                 } else if (payload.subType === 'AUTO_RENEW_ENABLED') {
                     // 해지 예약 취소 -> 다시 자동 갱신 원복
                     let prev = await this.iosRepository.getSubscriptionByTransactionId(transactionId);
-                    if (!prev) {
+                    if (prev) {
                         prev.willRenew = true;
                         await this.iosRepository.updateSubcribe(prev, transactionId, originalTransactionId);
                         console.log(`[IOS Webhook] 상태 업데이트 완료 - SubType: ${payload.subType}`);
                         return true;
+                    } else {
+                        console.warn(`[IOS Webhook] 이전 구독 내역 없음: ${transactionId}`);
                     }
                 }
             }

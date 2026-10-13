@@ -1,7 +1,7 @@
 import express from 'express';
 import { PurchaseController } from '../controllers/PurchaseController.js';
 import { PurchaseUseCase } from '../../app/PurchaseUseCase.js';
-import { iosWebhookMiddleware } from '../middlewares/IosWebhookMiddleware.js';
+// import { iosWebhookMiddleware } from '../middlewares/IosWebhookMiddleware.js';
 import { authMiddleware } from '../middlewares/AuthMiddleware.js';
 import { PurchaseIosRepositoryImpl } from '../../infrastructure/repositories/Purchase/PurchaseIosRepositoryImpl.js';
 import { PurchaseRepositoryImpl } from '../../infrastructure/repositories/Purchase/CommomPurchaseRepositoryImpl.js';
@@ -25,7 +25,7 @@ export const CreatePurchaseRouter = (appStoreClient: AppStoreServerAPIClient, ve
     // web hook 설정 완성
     // 구매 인증 api 완성
     route.post('/webhook/google', purchaseController.handleWebhookGoogle.bind(purchaseController));
-    route.post('/webhook/apple', iosWebhookMiddleware, purchaseController.handleWebhookApple.bind(purchaseController));
+    route.post('/webhook/apple', purchaseController.handleWebhookApple.bind(purchaseController));
     // debug
     route.post('/debug/eventLog', purchaseController.logDebugEvent.bind(purchaseController));
     route.post('/debug/errorLog', purchaseController.errorlogEvent.bind(purchaseController));

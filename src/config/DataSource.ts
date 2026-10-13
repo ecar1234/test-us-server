@@ -68,6 +68,8 @@ const createDevDataSource = () => {
     entities: [
       path.join(__dirname, "..", "infrastructure/entities/**/*{.ts,.js}"),
       path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/**/*{.ts,.js}"),
+      path.join(__dirname, "..", "infrastructure/entities/PostEntities/**/*{.ts,.js}"),
+      path.join(__dirname, "..", "infrastructure/entities/PurchaseEntities/**/*{.ts,.js}"),
     ],
     migrations: [
       path.join(__dirname, "..", "migration/*.ts"),

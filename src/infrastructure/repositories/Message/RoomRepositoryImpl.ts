@@ -21,7 +21,6 @@ export class RoomRepositoryImpl implements IRoomRepository {
     private roomData = AppDataSource.getRepository(RoomEntity);
 
     private toDomain(entity: RoomEntity): RoomModel {
-        const lastMessage = entity.lastMessage ? this.messageRepo.toDomainModelMessage(entity.lastMessage) : null;
         const messages = entity.messages ? entity.messages.map(message => this.messageRepo.toDomainModelMessage(message)) : [];
         const members = entity.members ? entity.members.map(member => this.memberRepo.toDomain(member)) : [];
         return new RoomModel({
@@ -33,7 +32,7 @@ export class RoomRepositoryImpl implements IRoomRepository {
                 title: entity.post.title
             } : { id: '', images: [], title: '' },
             targetUserId: entity.targetUserId,
-            lastMessage: lastMessage,
+            lastMessageId: entity.lastMessageId,
             lastMessageContent: entity.lastMessageContent,
             lastMessageAt: entity.lastMessageAt,
             members: members,
@@ -61,7 +60,7 @@ export class RoomRepositoryImpl implements IRoomRepository {
             relations: ['messages']
         });
 
-        room.lastMessage = { id: message.id } as MessagesEntity;
+        room.lastMessageId = message.id;
         room.lastMessageContent = message.content;
         room.lastMessageAt = message.createdAt;
 

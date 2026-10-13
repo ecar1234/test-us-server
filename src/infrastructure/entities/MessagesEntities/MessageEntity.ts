@@ -16,7 +16,7 @@ export class MessagesEntity {
    room: Relation<RoomEntity>;
 
    // 보낸 사람
-   @ManyToOne(() => UserEntity)
+   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
    sender: Relation<UserEntity>;
 
    @CreateDateColumn()

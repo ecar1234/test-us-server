@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
 import { ApplicationEntity } from "./ApplicationEntity.js";
 import { UserEntity } from "./UserEntity.js";
 ;
@@ -34,15 +34,15 @@ export class UserReviewEntity {
     // Review는 하나의 Application에 연결됩니다.
     @ManyToOne(() => ApplicationEntity, { onDelete: 'CASCADE' }) // Application 삭제 시 관련 Review도 삭제 (옵션)
     @JoinColumn({ name: 'appId' }) // reviews 테이블에 'application_id' 컬럼 생성 및 외래 키로 사용
-    application: ApplicationEntity;
+    application: Relation<ApplicationEntity>;
 
     // Review는 하나의 User(평가자)에 의해 작성됩니다.
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' }) // User 삭제 시 관련 Review도 삭제 (옵션)
     @JoinColumn({ name: 'reviewerUserId' }) // reviews 테이블에 'reviewer_user_id' 컬럼 생성 및 외래 키로 사용
-    reviewer: UserEntity;
+    reviewer: Relation<UserEntity>;
 
     // Review는 하나의 User(평가 대상)에 대한 것입니다.
     @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' }) // User 삭제 시 관련 Review도 삭제 (옵션)
     @JoinColumn({ name: 'reviewedUserId' }) // reviews 테이블에 'reviewed_user_id' 컬럼 생성 및 외래 키로 사용
-    reviewed: UserEntity;
+    reviewed: Relation<UserEntity>;
 }
