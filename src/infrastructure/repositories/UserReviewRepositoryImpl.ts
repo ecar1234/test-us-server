@@ -18,7 +18,7 @@ export class UserReviewRepositoryImpl implements IUserReviewRepository {
             applicationId: reviewEntity.application.appId,
             reviewerUserId: reviewEntity.reviewer.userId,
             reviewedUserId: reviewEntity.reviewed.userId,
-            postId: reviewEntity.application.post?.postId
+            postId: reviewEntity.application.recruitPost?.postId
         });
     }
     public toEntityUserReview(userReviewModel: UserReviewModel): UserReviewEntity {

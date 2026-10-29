@@ -3,9 +3,9 @@ import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositor
 import { OtpRepositoryImpl } from "../infrastructure/repositories/Otp/OtpRedisRepositoryImpl.js";
 import { MailService } from "../service/otp/MailService.js";
 import { OtpSevice } from "../service/otp/OtpService.js";
-import { UserStatus } from "../infrastructure/entities/UserEntity.js";
 import bcrypt from "bcrypt";
 import { v4 as uuidV4 } from "uuid";
+import { UserStatus } from "../infrastructure/enums/UserEnums.js";
 
 interface UploadedImageInfo {
     filename: string;

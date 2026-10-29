@@ -1,8 +1,7 @@
 import { IApplicationRepository } from "../../domain/interface_repositories/IApplicationRepository.js";
-import { ApplicationEntity, ApplicationsPlatform, ApplicationStatus } from "../entities/ApplicationEntity.js";
+import { ApplicationEntity, ApplicationStatus } from "../entities/ApplicationEntity.js";
 import { AppDataSource } from "../../config/DataSource.js";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel.js";
-import { BasePostStateType, MobileOsType } from "..//entities/PostEntities/BasePostEntity.js";
 import createError from "http-errors";
 import { In } from "typeorm";
 import { AppRecruitInfo, AppSideInfo } from "../../domain/entities/interface/applicationPackage.js";
@@ -10,6 +9,7 @@ import { APPLICATION_STATUS_TO_STRING, convertCategoryToString, convertMobileOsT
 import { RecruitmentPostEntity } from "../entities/PostEntities/RecruitmentPostEntity.js";
 import { SideProjectPostEntity } from "../entities/PostEntities/SideProject/SideProjectPostEntity.js";
 import { ProjectRoleModel } from "../../domain/entities/SideProject/ProjectRoleModel.js";
+import { BasePostStateType } from "../enums/PostEnums.js";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);

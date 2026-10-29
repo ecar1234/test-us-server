@@ -3,8 +3,9 @@ import { AppDataSource } from "../../../config/DataSource.js";
 import { MessageModel } from "../../../domain/entities/MessagesModels/MessageModel.js";
 import { IMessageRepository } from "../../../domain/interface_repositories/MessageRepo/IMessageRepository.js";
 import { MessagesEntity } from "../../entities/MessagesEntities/MessageEntity.js";
-import { UserEntity, UserStatus } from "../../entities/UserEntity.js";
+import { UserEntity } from "../../entities/UserEntity.js";
 import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity.js";
+import { UserStatus } from "../../enums/UserEnums.js";
 
 
 export class MessageRepositoryImpl implements IMessageRepository {

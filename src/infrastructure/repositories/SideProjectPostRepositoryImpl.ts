@@ -3,9 +3,9 @@ import { ProjectRoleModel } from "../../domain/entities/SideProject/ProjectRoleM
 import { SideProjectPostModel } from "../../domain/entities/SideProject/SideProjectPostModel.js";
 import { ISideProjectPostRepository } from "../../domain/interface_repositories/ISideProjectPostRepository.js";
 import { convertCategoryToString, convertStringToCategory, MOBILE_OS_STRING, POST_STATUS_TO_STRING, STRING_MOBILE_OS, STRING_TO_POST_STATUS } from "../../utils/convertUtil.js";
-import { TResSideProjectApplications } from "../entities/package/SideProjectPackage.js";
-import { BasePostStateType } from "../entities/PostEntities/BasePostEntity.js";
-import { ProjectRoleEntity } from "../entities/PostEntities/SideProject/ProjectRoleEntity.js";
+// import { TResSideProjectApplications } from "../entities/package/SideProjectPackage.js";
+// import { BasePostStateType } from "../entities/PostEntities/BasePostEntity.js";
+// import { ProjectRoleEntity } from "../entities/PostEntities/SideProject/ProjectRoleEntity.js";
 import { SideProjectPostEntity } from "../entities/PostEntities/SideProject/SideProjectPostEntity.js";
 
 

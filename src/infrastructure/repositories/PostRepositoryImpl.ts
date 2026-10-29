@@ -1,15 +1,16 @@
 import { MoreThan } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
 import { redisClient } from "../../config/RedisConfig.js";
+import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel.js";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
-import { BasePostEntity, BasePostStateType } from "../entities/PostEntities/BasePostEntity.js";
 import { PromotionPostEntity } from "../entities/PostEntities/PromotionPostEntity.js";
 import { RecruitmentPostEntity } from "../entities/PostEntities/RecruitmentPostEntity.js";
 import { PromotionPostRepositoryImpl } from "./PromotionPostRepositoryImpl.js";
 import { RecruitmentPostRepositoryImpl } from "./RecruitmentPostRepositoryImpl.js";
 import { IPostRepository } from "../../domain/interface_repositories/IPostRepository.js";
-import { UserStatus } from "../entities/UserEntity.js";
+import { BasePostStateType } from "../enums/PostEnums.js";
+import { UserStatus } from "../enums/UserEnums.js";
 
 export class PostRepositoryImpl implements IPostRepository {
     private baseRepo = AppDataSource.getRepository(BasePostEntity);

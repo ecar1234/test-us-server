@@ -4,8 +4,9 @@ import { AppDataSource } from "../../../config/DataSource.js";
 import { RoomMemberEntity } from "../../entities/MessagesEntities/RoomMemberEntity.js";
 import { RoomMemberModel } from "../../../domain/entities/MessagesModels/RoomMenberModel.js";
 import { RoomEntity } from "../../entities/MessagesEntities/RoomEntity.js";
-import { UserEntity, UserStatus } from "../../entities/UserEntity.js";
+import { UserEntity } from "../../entities/UserEntity.js";
 import { UserModel } from "../../../domain/entities/UserModel.js";
+import { UserStatus } from "../../enums/UserEnums.js";
 
 export class RoomMemberRepositoryImpl implements IRoomMemberRepository {
     

@@ -1,12 +1,13 @@
+import { Like } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
+import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
 import { PromotionPostModel } from "../../domain/entities/PromotionPostModel.js";
 import { IPromotionPostRepository } from "../../domain/interface_repositories/IPromotionPostRepository.js";
-import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/PostEntities/BasePostEntity.js";
 import { PromotionPostEntity } from "../entities/PostEntities/PromotionPostEntity.js";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
-import { UserStatus } from "../entities/UserEntity.js";
-import { Like } from "typeorm";
 import { convertCategoryToString, convertStringToCategory, MOBILE_OS_STRING } from "../../utils/convertUtil.js";
+import { BasePostStateType } from "../enums/PostEnums.js";
+import { UserStatus } from "../enums/UserEnums.js";
 
 
 

@@ -1,5 +1,5 @@
 import { ApplicationsPlatform, ApplicationStatus } from "../infrastructure/entities/ApplicationEntity.js";
-import { BasePostStateType, MobileOsType, PostCategory } from "../infrastructure/entities/PostEntities/BasePostEntity.js";
+import { BasePostStateType, MobileOsType, PostCategory } from "../infrastructure/enums/PostEnums.js";
 
 export const convertCategoryToString = (category: PostCategory) => {
     switch (category) {
@@ -113,9 +113,10 @@ export const convertStringToMobileOs = (os: string): MobileOsType | null => {
     return STRING_MOBILE_OS[os];
 }
 
-export const PLATFORM_TO_STRING: Record<ApplicationsPlatform, string> = {
+export const PLATFORM_TO_STRING: Record<ApplicationsPlatform, string|null> = {
     [ApplicationsPlatform.MOBILE]: 'mobile',
-    [ApplicationsPlatform.WEB]: 'web'
+    [ApplicationsPlatform.WEB]: 'web',
+    [ApplicationsPlatform.EMPTY]: null
 }
 
 export const STRING_TO_PLATFORM: Record<string, ApplicationsPlatform> = {

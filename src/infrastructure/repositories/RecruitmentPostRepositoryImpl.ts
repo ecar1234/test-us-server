@@ -1,14 +1,15 @@
 import { In, Like, Not } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
-import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
-import { IRecruitmentPostRepository } from "../../domain/interface_repositories/IRecruitmentPostRepository.js";
-import { RecruitmentPostEntity } from "../entities/PostEntities/RecruitmentPostEntity.js";
 import { redisClient } from "../../config/RedisConfig.js";
+import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
+import { IRecruitmentPostRepository } from "../../domain/interface_repositories/IRecruitmentPostRepository.js";
+import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
+import { RecruitmentPostEntity } from "../entities/PostEntities/RecruitmentPostEntity.js";
 import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl.js";
-import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/PostEntities/BasePostEntity.js";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
-import { UserStatus } from "../entities/UserEntity.js";
 import { convertCategoryToString, convertStringToCategory, MOBILE_OS_STRING, POST_STATUS_TO_STRING, STRING_MOBILE_OS, STRING_TO_POST_STATUS } from "../../utils/convertUtil.js";
+import { UserStatus } from "../enums/UserEnums.js";
+import { BasePostStateType } from "../enums/PostEnums.js";
 
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
@@ -20,59 +21,6 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         this.applicationRepository = new ApplicationRepositoryImpl();
         this.reviewRepository = new PostReviewRepositoryImpl();
     }
-    // private transferCategoryToString(category: PostCategory): string {
-    //     switch (category) {
-    //         case PostCategory.GAME:
-    //             return 'game';
-    //         case PostCategory.TRAVEL:
-    //             return 'travel';
-    //         case PostCategory.DEVELOPER_TOOL:
-    //             return 'developerTool';
-    //         case PostCategory.HEALTH:
-    //             return 'health';
-    //         case PostCategory.EDUCATION:
-    //             return 'education';
-    //         case PostCategory.FINANCE:
-    //             return 'finance';
-    //         case PostCategory.WEATHER:
-    //             return 'weather';
-    //         case PostCategory.NEWS:
-    //             return 'news';
-    //         case PostCategory.BOOKS:
-    //             return 'books';
-    //         case PostCategory.LIFE:
-    //             return 'life';
-    //         case PostCategory.BUSINESS:
-    //             return 'business';
-    //         case PostCategory.PHOTOGRAPHY:
-    //             return 'photography';
-    //         case PostCategory.SOCIAL:
-    //             return 'social';
-    //         case PostCategory.SPORTS:
-    //             return 'sports';
-    //         case PostCategory.SHOPPING:
-    //             return 'shopping';
-    //         case PostCategory.FOOD:
-    //             return 'food';
-    //         case PostCategory.UTILITY:
-    //             return 'utility';
-    //         case PostCategory.MEDICAL:
-    //             return 'medical';
-    //         case PostCategory.MAGAZINE:
-    //             return 'magazine';
-    //         case PostCategory.MUSIC:
-    //             return 'music';
-    //         case PostCategory.ENTERTAINMENT:
-    //             return 'entertainment';
-    //         case PostCategory.ETC:
-    //             return 'etc';
-    //         default:
-    //             return 'etc';
-    //     }
-    // }
-    // private transferStringToCategory(category: string): PostCategory {
-
-    // }
 
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);

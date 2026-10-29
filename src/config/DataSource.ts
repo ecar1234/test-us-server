@@ -6,21 +6,21 @@ import * as dotenv from "dotenv";
 import { fileURLToPath } from "url";
 dotenv.config();
 
-import { MessagesEntity } from '../infrastructure/entities/MessagesEntities/MessageEntity.js';
-import { RoomEntity } from '../infrastructure/entities/MessagesEntities/RoomEntity.js';
-import { RoomMemberEntity } from "../infrastructure/entities/MessagesEntities/RoomMemberEntity.js";
-import { BasePostEntity } from "../infrastructure/entities/PostEntities/BasePostEntity.js";
-import { PromotionPostEntity } from "../infrastructure/entities/PostEntities/PromotionPostEntity.js";
-import { RecruitmentPostEntity } from "../infrastructure/entities/PostEntities/RecruitmentPostEntity.js";
-import { PostReviewEntity } from "../infrastructure/entities/PostReviewEntity.js";
-import { ApplicationEntity } from "../infrastructure/entities/ApplicationEntity.js";
-import { UserEntity } from "../infrastructure/entities/UserEntity.js";
-import { UserReviewEntity } from "../infrastructure/entities/UserReviewEntiry.js";
-import { FirebaseDeviceTokenEntity } from "../infrastructure/entities/FirebaseDeviceTokenEntity.js";
-import { PurchaseEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseEntity.js";
-import { PurchaseIosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseIosEntity.js";
-import { PurchaseAosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseAosEntity.js";
-import { PurchaseEventLogs } from "../infrastructure/entities/PurchaseEventLog.js";
+// import { MessagesEntity } from '../infrastructure/entities/MessagesEntities/MessageEntity.js';
+// import { RoomEntity } from '../infrastructure/entities/MessagesEntities/RoomEntity.js';
+// import { RoomMemberEntity } from "../infrastructure/entities/MessagesEntities/RoomMemberEntity.js";
+// import { BasePostEntity } from "../infrastructure/entities/PostEntities/BasePostEntity.js";
+// import { PromotionPostEntity } from "../infrastructure/entities/PostEntities/PromotionPostEntity.js";
+// import { RecruitmentPostEntity } from "../infrastructure/entities/PostEntities/RecruitmentPostEntity.js";
+// import { PostReviewEntity } from "../infrastructure/entities/PostReviewEntity.js";
+// import { ApplicationEntity } from "../infrastructure/entities/ApplicationEntity.js";
+// import { UserEntity } from "../infrastructure/entities/UserEntity.js";
+// import { UserReviewEntity } from "../infrastructure/entities/UserReviewEntiry.js";
+// import { FirebaseDeviceTokenEntity } from "../infrastructure/entities/FirebaseDeviceTokenEntity.js";
+// import { PurchaseEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseEntity.js";
+// import { PurchaseIosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseIosEntity.js";
+// import { PurchaseAosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseAosEntity.js";
+// import { PurchaseEventLogs } from "../infrastructure/entities/PurchaseEventLog.js";
 
 
 const isProd = process.env.NODE_ENV === "prod";

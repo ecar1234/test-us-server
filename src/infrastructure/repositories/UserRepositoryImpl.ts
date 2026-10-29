@@ -1,8 +1,9 @@
 import { AppDataSource } from "../../config/DataSource.js";
 import { UserModel } from "../../domain/entities/UserModel.js";
 import { IUserRepository } from "../../domain/interface_repositories/IUserRepository.js";
-import { UserEntity, UserMethod, UserRole, UserStatus, UserType } from "../entities/UserEntity.js";
+import { UserEntity } from "../entities/UserEntity.js";
 import { In } from "typeorm";
+import { UserMethod, UserRole, UserStatus, UserType } from "../enums/UserEnums.js";
 
 
 export class UserRepositoryImpl implements IUserRepository {
