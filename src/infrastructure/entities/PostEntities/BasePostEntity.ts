@@ -23,10 +23,12 @@ export enum BasePostStateType {
     END = 'end',
     DELETE = 'delete'
 }
-export enum MobileOsType{
+
+export enum MobileOsType {
     ANDROID = 'android',
     IOS = 'ios',
 }
+
 export enum PostCategory {
     GAME = 'game',
     TRAVEL = 'travel',
@@ -58,27 +60,23 @@ export abstract class BasePostEntity {
     @PrimaryGeneratedColumn('uuid')
     postId: string;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
-    @JoinColumn({ name: 'authorId' })
-    author: Relation<UserEntity>;
-
     @Column('varchar', { length: 30 })
     title: string;
 
     @Column("varchar", { length: 100 })
     subtitle: string;
 
-    @Column({ type: 'varchar', length: 10, nullable: false, default: 'mobile'})
-    platform: string;
-
-    @Column({type: 'enum', enum: MobileOsType, nullable: true})
-    mobileOs: MobileOsType;
-
-    @Column({type: 'enum', enum: PostCategory, default: 'etc'})
-    category: PostCategory;
-
     @Column('text')
     contents: string;
+
+    @Column({ type: 'varchar', length: 10, nullable: true, default: 'mobile' })
+    platform: string;
+
+    @Column({ type: 'enum', enum: MobileOsType, nullable: true })
+    mobileOs: MobileOsType;
+
+    @Column({ type: 'enum', enum: PostCategory, nullable: true, default: 'etc' })
+    category: PostCategory;
 
     @Column({ type: 'simple-json', nullable: true })
     images: { url: string; filename: string; originalname: string; mimetype: string; size: number; }[] | null;
@@ -100,6 +98,10 @@ export abstract class BasePostEntity {
 
     // @OneToMany(() => PostReviewEntity, review => review.post)
     // receivedReviews: PostReviewEntity[]
+
+    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'authorId' })
+    author: Relation<UserEntity>;
 
     @OneToMany(() => RoomEntity, room => room.post)
     rooms: Relation<RoomEntity>[]

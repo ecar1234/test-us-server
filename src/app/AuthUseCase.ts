@@ -30,24 +30,37 @@ export class AuthUseCase {
             return findUser;
         }
         const passwordHash = await bcrypt.hash(password, 10);
-        const userInfo = new UserModel(null, email, nickname, passwordHash, userType, UserStatus.ACTIVE, role, userName, birth, profileImg, method);
+        const userInfo = new UserModel({
+            userId: null,
+            email: email,
+            nickname: nickname,
+            password: passwordHash,
+            userType: userType,
+            status: UserStatus.ACTIVE,
+            role: role,
+            birth: birth,
+            userName: null,
+            profileImg: profileImg,
+            method: method,
+        });
         const newUser = await this.userRepo.registerUser(userInfo);
         return newUser;
     }
     async authUserRegister(email: string, nickname: string, profileUrl: string, userType: string, role: string, method: string): Promise<UserModel> {
-        const user = new UserModel(
-            null,
-            email,
-            nickname ?? `User${uuidV4()}`,
-            'authUserRegister',
-            userType,
-            UserStatus.ACTIVE,
-            role,
-            null,
-            null,
-            { url: profileUrl, filename: null, originalname: null, mimetype: null, size: null },
-            method
-        );
+
+        const nick = nickname ?? `User${uuidV4}`;
+        const user = new UserModel({
+            userId: null,
+            email: email,
+            nickname: nick,
+            password: 'authUserRegister',
+            userType: userType,
+            status: UserStatus.ACTIVE,
+            role: role,
+            userName: null,
+            profileImg: { url: profileUrl, filename: null, originalname: null, mimetype: null, size: null },
+            method: method,
+        });
         return await this.userRepo.registerUser(user);
     }
     async login(email: string, password: string): Promise<[UserModel | null, string]> {
@@ -72,7 +85,7 @@ export class AuthUseCase {
         const passwordHash = await bcrypt.hash(newPassword, 10);
         return this.userRepo.updatePassword(userId, passwordHash);
     }
-    async changePassword(email: string, newPassword: string): Promise<boolean> { 
+    async changePassword(email: string, newPassword: string): Promise<boolean> {
         try {
             const user = await this.userRepo.findUserByEmail(email);
             if (!user) {

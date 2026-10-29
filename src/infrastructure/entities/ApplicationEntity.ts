@@ -3,6 +3,7 @@ import { RecruitmentPostEntity } from "./PostEntities/RecruitmentPostEntity.js";
 import { UserEntity } from "./UserEntity.js";
 import { UserReviewEntity } from "./UserReviewEntiry.js";
 import { MobileOsType } from "./PostEntities/BasePostEntity.js";
+import { SideProjectPostEntity } from "./PostEntities/SideProject/SideProjectPostEntity.js";
 
 // 신청 상태를 정의하는 Enum
 export enum ApplicationStatus {
@@ -13,7 +14,8 @@ export enum ApplicationStatus {
 }
 export enum ApplicationsPlatform {
     WEB = 'web',
-    MOBILE = 'mobile'
+    MOBILE = 'mobile',
+    EMPTY = 'empty'
 }
 
 @Entity('applications')
@@ -41,9 +43,13 @@ export class ApplicationEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => RecruitmentPostEntity, post => post.applications, { onDelete: 'CASCADE' })
+    @ManyToOne(() => RecruitmentPostEntity, (recruitPost) => recruitPost.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'postId' })
-    post: Relation<RecruitmentPostEntity>
+    recruitPost: Relation<RecruitmentPostEntity>
+
+    @ManyToOne(() => SideProjectPostEntity, (side) => side.applications, {onDelete : 'CASCADE'})
+    @JoinColumn({name: 'postId'})
+    sidePost : Relation<SideProjectPostEntity>
 
     // 신청 유저의 승인 상테
     @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })

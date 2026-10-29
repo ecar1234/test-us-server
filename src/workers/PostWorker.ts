@@ -3,7 +3,7 @@ import { bullMqConnection } from "../config/RedisConfig.js";
 import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/RecruitmentPostRepositoryImpl.js";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
 import { ApplicationRepositoryImpl } from "../infrastructure/repositories/ApplicationRepositoryImpl.js";
-import { PostUseCase } from "../app/PostUseCase.js";
+import { PostUseCase } from "../app/posts/PostUseCase.js";
 import { PostRepositoryImpl } from "../infrastructure/repositories/PostRepositoryImpl.js";
 import { PromotionPostRepositoryImpl } from "../infrastructure/repositories/PromotionPostRepositoryImpl.js";
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";

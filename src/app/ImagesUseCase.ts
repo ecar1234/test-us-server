@@ -35,9 +35,18 @@ export class ImagesUseCase {
 
     async imagesRegister(images: UploadedImageInfo[], postId: string, postType: string): Promise<ImagesModel[]> {
         const models: ImagesModel[] = images.map((image) => {
-            return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId, postType);
+            return new ImagesModel({
+                id: null,
+                filename: image.filename,
+                originalname: image.originalname,
+                mimetype: image.mimetype,
+                size: image.size,
+                url: image.url,
+                postId: postId,
+                postType: postType,
+            });
         });
-        
+
         return await this.imagesRepo.imagesRegister(models, postId, postType);
     }
 
@@ -67,14 +76,23 @@ export class ImagesUseCase {
                 await Promise.all(deletePromises);
             }
         }
-        if(newImages && newImages.length > 0){
+        if (newImages && newImages.length > 0) {
             const modelsToSave: ImagesModel[] = newImages.map((image) => {
-                return new ImagesModel(null, image.filename, image.originalname, image.mimetype, image.size, image.url, postId, postType);
+                return new ImagesModel({
+                    id: null,
+                    filename: image.filename,
+                    originalname: image.originalname,
+                    mimetype: image.mimetype,
+                    size: image.size,
+                    url: image.url,
+                    postId: postId,
+                    postType: postType,
+                });
             });
             await this.imagesRepo.imagesUpdate(modelsToSave, postId, postType);
 
         }
-    
+
         switch (postType) {
             case 'recruitment':
                 return await this.recruitmentRepo.getPostById(postId);
@@ -85,7 +103,7 @@ export class ImagesUseCase {
         }
     }
 
-    async imagesDelete(deleteImages: ImageToDelete[]): Promise<boolean>{
+    async imagesDelete(deleteImages: ImageToDelete[]): Promise<boolean> {
         if (deleteImages && deleteImages.length > 0) {
             const modelsToDelete = deleteImages.map(img => img.id);
             const deleteResult = this.imagesRepo.imagesDelete(modelsToDelete);
@@ -109,10 +127,10 @@ export class ImagesUseCase {
                 await Promise.all(deletePromises);
 
                 return true;
-            }else {
+            } else {
                 return false;
             }
-        }else{
+        } else {
             return false;
         }
     }

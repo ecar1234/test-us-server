@@ -6,6 +6,7 @@ import { PromotionPostEntity } from "../entities/PostEntities/PromotionPostEntit
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
 import { UserStatus } from "../entities/UserEntity.js";
 import { Like } from "typeorm";
+import { convertCategoryToString, convertStringToCategory, MOBILE_OS_STRING } from "../../utils/convertUtil.js";
 
 
 
@@ -16,123 +17,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
     constructor() {
         this.reviewRepository = new PostReviewRepositoryImpl();
     }
-   
-    private transferCategoryToString(category: PostCategory): string {
-        switch (category) {
-            case PostCategory.GAME:
-                return 'game';
-            case PostCategory.TRAVEL:
-                return 'travel';
-            case PostCategory.DEVELOPER_TOOL:
-                return 'developerTool';
-            case PostCategory.HEALTH:
-                return 'health';
-            case PostCategory.EDUCATION:
-                return 'education';
-            case PostCategory.FINANCE:
-                return 'finance';
-            case PostCategory.WEATHER:
-                return 'weather';
-            case PostCategory.NEWS:
-                return 'news';
-            case PostCategory.BOOKS:
-                return 'books';
-            case PostCategory.LIFE:
-                return 'life';
-            case PostCategory.BUSINESS:
-                return 'business';
-            case PostCategory.PHOTOGRAPHY:
-                return 'photography';
-            case PostCategory.SOCIAL:
-                return 'social';
-            case PostCategory.SPORTS:
-                return 'sports';
-            case PostCategory.SHOPPING:
-                return 'shopping';
-            case PostCategory.FOOD:
-                return 'food';
-            case PostCategory.UTILITY:
-                return 'utility';
-            case PostCategory.MEDICAL:
-                return 'medical';
-            case PostCategory.MAGAZINE:
-                return 'magazine';
-            case PostCategory.MUSIC:
-                return 'music';
-            case PostCategory.ENTERTAINMENT:
-                return 'entertainment';
-            case PostCategory.ETC:
-                return 'etc';
-            default:
-                return 'etc';
-        }
-    }
-    private transferStringToCategory(category: string): PostCategory {
-        switch (category) {
-            case 'game':
-                return PostCategory.GAME;
-            case 'travel':
-                return PostCategory.TRAVEL;
-            case 'developerTool':
-                return PostCategory.DEVELOPER_TOOL;
-            case 'health':
-                return PostCategory.HEALTH;
-            case 'education':
-                return PostCategory.EDUCATION;
-            case 'finance':
-                return PostCategory.FINANCE;
-            case 'weather':
-                return PostCategory.WEATHER;
-            case 'news':
-                return PostCategory.NEWS;
-            case 'books':
-                return PostCategory.BOOKS;
-            case 'life':
-                return PostCategory.LIFE;
-            case 'business':
-                return PostCategory.BUSINESS;
-            case 'photography':
-                return PostCategory.PHOTOGRAPHY;
-            case 'social':
-                return PostCategory.SOCIAL;
-            case 'sports':
-                return PostCategory.SPORTS;
-            case 'shopping':
-                return PostCategory.SHOPPING;
-            case 'food':
-                return PostCategory.FOOD;
-            case 'utility':
-                return PostCategory.UTILITY;
-            case 'medical':
-                return PostCategory.MEDICAL;
-            case 'magazine':
-                return PostCategory.MAGAZINE;
-            case 'music':
-                return PostCategory.MUSIC;
-            case 'entertainment':
-                return PostCategory.ENTERTAINMENT;
-            case 'etc':
-                return PostCategory.ETC;
-            default:
-                return PostCategory.ETC;
-        }
-    }
-    private transferOsToString(os: MobileOsType): string {
-        switch (os) {
-            case MobileOsType.ANDROID:
-                return 'android';
-            case MobileOsType.IOS:
-                return 'ios';
-        }
-    }
-    private transferStringToOs(os: string): MobileOsType {
-        switch (os) {
-            case 'android':
-                return MobileOsType.ANDROID;
-            case 'ios':
-                return MobileOsType.IOS;
-        }
-    }
+
+
     private toEntity(post: PromotionPostModel): PromotionPostEntity {
         const status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED)
 
@@ -151,8 +37,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
             title: post.title,
             subtitle: post.subtitle,
             platform: post.platform,
-            mobileOs: this.transferStringToOs(post.mobileOs),
-            category: this.transferStringToCategory(post.category),
+            mobileOs: MOBILE_OS_STRING[post.mobileOs],
+            category: convertStringToCategory(post.category),
             contents: post.contents,
             images: post.images as BasePostEntity['images'],
             status: status,
@@ -170,30 +56,32 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
                 userId: post.author.userId,
                 nickname: post.author.nickname,
                 profileImg: post.author.image,
-                status: post.author.status === UserStatus.ACTIVE ? 'ACTIVE' : ( post.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE' )
+                status: post.author.status === UserStatus.ACTIVE ? 'ACTIVE' : (post.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE')
             }
             : null;
         const status = post.status === BasePostStateType.ACTIVE ?
             'active' : (post.status === BasePostStateType.EXPIRED ? 'expired' : 'delete');
-        const category = this.transferCategoryToString(post.category);
+        const category = convertCategoryToString(post.category);
         return new PromotionPostModel(
-            post.postId,
-            authorInfo,
-            post.title,
-            post.subtitle,
-            post.platform,
-            this.transferOsToString(post.mobileOs),
-            category,
-            post.contents,
-            status,
-            post.period,
-            post.views,
-            post.images || [],
-            post.domain,
-            'promotion',
-            // post.receivedReviews ? post.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
-            post.createdAt,
-            post.updatedAt
+            {
+                id: post.postId,
+                author: authorInfo,
+                title: post.title,
+                subtitle: post.subtitle,
+                platform: post.platform,
+                mobileOs: MOBILE_OS_STRING[post.mobileOs],
+                category: category,
+                contents: post.contents,
+                status: status,
+                period: post.period,
+                views: post.views,
+                images: post.images || [],
+                domain: post.domain,
+                // postType :'promotion',
+                // post.receivedReviews ? post.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt
+            }
         );
     }
 
@@ -226,8 +114,8 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         postEntity.title = post.title;
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
-        postEntity.mobileOs = this.transferStringToOs(post.mobileOs);
-        postEntity.category = this.transferStringToCategory(post.category);
+        postEntity.mobileOs = MOBILE_OS_STRING[post.mobileOs];
+        postEntity.category = convertStringToCategory(post.category);
         postEntity.contents = post.contents;
         postEntity.images = post.images as BasePostEntity['images'];
         postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'delete' ? BasePostStateType.DELETE : BasePostStateType.EXPIRED);
@@ -256,7 +144,7 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         }
         postEntity.views += 1;
         await this.repository.save(postEntity);
-    
+
         return this.toDomain(postEntity);;
     }
     async getUserPromotionPosts(userId: string): Promise<PromotionPostModel[]> {
@@ -300,12 +188,12 @@ export class PromotionPostRepositoryImpl implements IPromotionPostRepository {
         return domainPosts;
     }
 
-     async searchPosts(keyword: string): Promise<PromotionPostModel[]> {
+    async searchPosts(keyword: string): Promise<PromotionPostModel[]> {
         const postEntities = await this.repository.find({
             where: [
                 { title: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE },
-                { subtitle: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE  },
-                { contents: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE  }
+                { subtitle: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE },
+                { contents: Like(`%${keyword}%`), status: BasePostStateType.ACTIVE }
             ],
             relations: ['author']
         });

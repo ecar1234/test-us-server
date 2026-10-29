@@ -3,21 +3,32 @@ import { AppUseCase } from "../../app/AppUseCase.js";
 import { ApplicationModel } from "../../domain/entities/ApplicationModel.js";
 import { RecruitmentPostModel } from "../../domain/entities/RecruitmentPostModel.js";
 import { getApplicationsByIdQueue } from "../../config/RedisConfig.js";
+import { SideProjectPostModel } from "../../domain/entities/SideProject/SideProjectPostModel.js";
 
 export class ApplicationController {
     constructor(private appUseCase: AppUseCase) { }
 
-    async createApplication(req: Request, res: Response): Promise<void> {
+    async createAppRecruitPost(req: Request, res: Response): Promise<void> {
         try {
             const { applicantId, postId, platfrom, mobileOs } = req.body;
 
-            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.createApplication(applicantId, postId, platfrom, mobileOs);
+            const result: [ApplicationModel, RecruitmentPostModel] = await this.appUseCase.recruitAppCreate(applicantId, postId, platfrom, mobileOs);
             res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
         } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
 
         }
     }
+    async createAppSidePost(req: Request, res: Response): Promise<void> {
+        try {
+           const { applicatId, postId, roleId } = req.body;
+           const result:[ApplicationModel, SideProjectPostModel] = await this.appUseCase.sideAppCreate(applicatId, postId, roleId);
+           res.status(200).json({status: 200, application:result[0], post: result});
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+
     async updateApplication(req: Request, res: Response): Promise<void> {
         try {
             const {id ,applicantId, postId, platform, mobileOs, status } = req.body;
@@ -29,10 +40,10 @@ export class ApplicationController {
             res.status(500).json({ status: 500, error: error.message })  
         }
     }
-    async cancelApplication(req: Request, res: Response): Promise<void> {
+    async cancelRecruitApp(req: Request, res: Response): Promise<void> {
         try {
             const applicationId = req.body.applicationId;
-            const result = await this.appUseCase.cancelApplication(applicationId);
+            const result = await this.appUseCase.cancelRecuitApp(applicationId);
             if (result) {
                 res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
             } else {
@@ -42,6 +53,21 @@ export class ApplicationController {
             res.status(500).json({ status: 500, error: error.message });
         }
     }
+
+    async cancelSideApp(req: Request, res: Response): Promise<void> {
+        try {
+            const {appId, roleId} = req.body;
+            const result = await this.appUseCase.cancelSideApp(appId, roleId);
+            if (result) {
+                res.status(200).json({ status: 200, application: result[0], newPost: result[1]});
+            } else {
+                res.status(404).json({ status: 404, error: "Application not found" });
+            }
+        } catch (error) {
+            res.status(500).json({ status: 500, error: error.message });
+        }
+    }
+
     async acceptUser(req: Request, res: Response): Promise<void> {
         try {
             const { userId, postId } = req.body;

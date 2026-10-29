@@ -26,15 +26,47 @@ interface ImageToDelete {
 export class UserUseCase {
     constructor(private userRepo: UserRepositoryImpl, private postRepo: RecruitmentPostRepositoryImpl, private reviewRepo: UserReviewRepositoryImpl) { }
 
-   
-    async updateUserInfo(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date,method: string = 'EMAIL'): Promise<UserModel> {
+
+    async updateUserInfo(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date, method: string = 'EMAIL'): Promise<UserModel> {
         // console.log("use case : ", birth);
-        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, null, method);
+        const user = new UserModel({
+            userId: userId,
+            email: null,
+            nickname: nickname,
+            password: null,
+            userType: userType,
+            status: null,
+            role: role,
+            userName: userName,
+            birth: birth,
+            profileImg: null,
+            method: method,
+            createdAt: null,
+            updatedAt: null,
+            posts: null,
+            applications: null,
+        })
         return this.userRepo.updateUserInfo(user);
     }
     async updateUserInfoWithImg(userId: string, nickname: string, userType: string, role: string, userName: string, birth: Date, image: UploadedImageInfo, oldImage?: UploadedImageInfo, method: string = "EMAIL"): Promise<UserModel> {
-        const user = new UserModel(userId, null, nickname, null, userType, null, role, userName, birth, image, method);
-        
+        const user = new UserModel({
+            userId: userId,
+            email: null,
+            nickname: nickname,
+            password: null,
+            userType: userType,
+            status: null,
+            role: role,
+            userName: userName,
+            birth: birth,
+            profileImg: image,
+            method: method,
+            createdAt: null,
+            updatedAt: null,
+            posts: null,
+            applications: null,
+        });
+
         const isProd = process.env.NODE_ENV === "prod";
         const uploadPath = isProd ? process.env.MAIN_UPLOAD_USER_URL : process.env.UPLOAD_USER_URL;
 
@@ -58,7 +90,7 @@ export class UserUseCase {
         const users = await this.userRepo.findUsersByIds(userIds);
         // const reviews = await this.reviewRepo.getReviewByTesterIds(userIds, postId);
         // console.log('use case : ', users);
-       return users;
+        return users;
     }
     async getUserByEmail(email: string): Promise<UserModel | null> {
         return this.userRepo.findUserByEmail(email);

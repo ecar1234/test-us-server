@@ -8,7 +8,7 @@ import { ApplicationRepositoryImpl } from "./ApplicationRepositoryImpl.js";
 import { BasePostStateType, BasePostEntity, PostCategory, MobileOsType } from "../entities/PostEntities/BasePostEntity.js";
 import { PostReviewRepositoryImpl } from "./PostReviewRepositoryImpl.js";
 import { UserStatus } from "../entities/UserEntity.js";
-import { convertCategoryToString } from "../../utils/convertUtil.js";
+import { convertCategoryToString, convertStringToCategory, MOBILE_OS_STRING, POST_STATUS_TO_STRING, STRING_MOBILE_OS, STRING_TO_POST_STATUS } from "../../utils/convertUtil.js";
 
 
 export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository {
@@ -70,72 +70,10 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
     //             return 'etc';
     //     }
     // }
-    private transferStringToCategory(category: string): PostCategory {
-        switch (category) {
-            case 'game':
-                return PostCategory.GAME;
-            case 'travel':
-                return PostCategory.TRAVEL;
-            case 'developerTool':
-                return PostCategory.DEVELOPER_TOOL;
-            case 'health':
-                return PostCategory.HEALTH;
-            case 'education':
-                return PostCategory.EDUCATION;
-            case 'finance':
-                return PostCategory.FINANCE;
-            case 'weather':
-                return PostCategory.WEATHER;
-            case 'news':
-                return PostCategory.NEWS;
-            case 'books':
-                return PostCategory.BOOKS;
-            case 'life':
-                return PostCategory.LIFE;
-            case 'business':
-                return PostCategory.BUSINESS;
-            case 'photography':
-                return PostCategory.PHOTOGRAPHY;
-            case 'social':
-                return PostCategory.SOCIAL;
-            case 'sports':
-                return PostCategory.SPORTS;
-            case 'shopping':
-                return PostCategory.SHOPPING;
-            case 'food':
-                return PostCategory.FOOD;
-            case 'utility':
-                return PostCategory.UTILITY;
-            case 'medical':
-                return PostCategory.MEDICAL;
-            case 'magazine':
-                return PostCategory.MAGAZINE;
-            case 'music':
-                return PostCategory.MUSIC;
-            case 'entertainment':
-                return PostCategory.ENTERTAINMENT;
-            case 'etc':
-                return PostCategory.ETC;
-            default:
-                return PostCategory.ETC;
-        }
-    }
-    private transferOsToString(mobileOs: MobileOsType): string {
-        switch (mobileOs) {
-            case MobileOsType.ANDROID:
-                return 'android';
-            case MobileOsType.IOS:
-                return 'ios';
-        }
-    }
-    private transferStringToOs(mobileOs: string): MobileOsType {
-        switch (mobileOs) {
-            case 'android':
-                return MobileOsType.ANDROID;
-            case 'ios':
-                return MobileOsType.IOS;
-        }
-    }
+    // private transferStringToCategory(category: string): PostCategory {
+
+    // }
+
     public toDomainPost(postEntity: RecruitmentPostEntity): RecruitmentPostModel {
         // console.log("to postEntity : ",postEntity);
         const authorInfo = postEntity.author
@@ -146,33 +84,32 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
                 status: postEntity.author.status === UserStatus.ACTIVE ? 'ACTIVE' : (postEntity.author.status === UserStatus.INACTIVE ? 'INACTIVE' : 'DELETE')
             }
             : null;
-        const status = postEntity.status === BasePostStateType.ACTIVE ?
-            'active' : (postEntity.status === BasePostStateType.END ? 'end' : (postEntity.status === BasePostStateType.EXPIRED ? 'expired' : 'delete'));
         const category = convertCategoryToString(postEntity.category);
-        const mobbileOs = this.transferOsToString(postEntity.mobileOs);
+        const mobbileOs = MOBILE_OS_STRING[postEntity.mobileOs];
         return new RecruitmentPostModel(
-            postEntity.postId,
-            authorInfo,
-            postEntity.title,
-            postEntity.subtitle,
-            postEntity.platform,
-            mobbileOs,
-            category,
-            postEntity.contents,
-            status,
-            postEntity.period,
-            postEntity.views,
-            postEntity.images ?? [],
-            'recruitment',
-            // postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
-            postEntity.createdAt,
-            postEntity.updatedAt,
-            postEntity.applications ? postEntity.applications.map(app => app.appId) : []
+            {
+                id: postEntity.postId,
+                author: authorInfo,
+                title: postEntity.title,
+                subtitle: postEntity.subtitle,
+                platform: postEntity.platform,
+                mobileOs: mobbileOs,
+                category: category,
+                contents: postEntity.contents,
+                status: POST_STATUS_TO_STRING[postEntity.status],
+                period: postEntity.period,
+                views: postEntity.views,
+                images: postEntity.images ?? [],
+                // postType: 'recruitment',
+                // postEntity.receivedReviews ? postEntity.receivedReviews.map(review => this.reviewRepository.toDomainPostReview(review)) : [],
+                createdAt: postEntity.createdAt,
+                updatedAt: postEntity.updatedAt,
+                applications: postEntity.applications ? postEntity.applications.map(app => app.appId) : []
+            }
         );
     }
     private toEntityPost(post: RecruitmentPostModel): RecruitmentPostEntity {
         // console.log("post model : ", post);
-        const postStatus = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'end' ? BasePostStateType.END : BasePostStateType.EXPIRED);
 
         let authorRelation: { userId: string } | undefined = undefined;
         if (post.author) {
@@ -192,11 +129,11 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
             title: post.title,
             subtitle: post.subtitle,
             platform: post.platform,
-            mobileOs: this.transferStringToOs(post.mobileOs),
-            category: this.transferStringToCategory(post.category),
+            mobileOs: STRING_MOBILE_OS[post.mobileOs],
+            category: convertStringToCategory(post.category),
             contents: post.contents,
             images: post.images as BasePostEntity['images'],
-            status: postStatus,
+            status: STRING_TO_POST_STATUS[post.status],
             period: post.period,
             views: post.views,
             createdAt: post.createdAt ? post.createdAt : new Date(),
@@ -247,8 +184,8 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
         postEntity.title = post.title;
         postEntity.subtitle = post.subtitle;
         postEntity.platform = post.platform;
-        postEntity.mobileOs = this.transferStringToOs(post.mobileOs);
-        postEntity.category = this.transferStringToCategory(post.category);
+        postEntity.mobileOs = STRING_MOBILE_OS[post.mobileOs];
+        postEntity.category = convertStringToCategory(post.category);
         postEntity.contents = post.contents;
         postEntity.images = post.images as BasePostEntity['images'];
         postEntity.status = post.status === 'active' ? BasePostStateType.ACTIVE : (post.status === 'end' ? BasePostStateType.END : BasePostStateType.EXPIRED);
@@ -285,7 +222,7 @@ export class RecruitmentPostRepositoryImpl implements IRecruitmentPostRepository
 
     async getPostsPaginations(page: number, size: number = 20): Promise<RecruitmentPostModel[]> {
         const posts = await this.postRepository.find({
-            where: { status: BasePostStateType.ACTIVE , author: { status: UserStatus.ACTIVE } },
+            where: { status: BasePostStateType.ACTIVE, author: { status: UserStatus.ACTIVE } },
             relations: ['author'],
             order: { createdAt: 'DESC' },
             skip: (page - 1) * 10,

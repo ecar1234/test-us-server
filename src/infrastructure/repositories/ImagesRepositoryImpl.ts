@@ -9,16 +9,18 @@ export class ImagesRepositoryImpl implements IImagesRepository {
 
     private toDomainModel(entity: ImagesEntity): ImagesModel {
         return new ImagesModel(
-            entity.id,
-            entity.filename,
-            entity.originalname,
-            entity.mimetype,
-            entity.size,
-            entity.url,
-            entity.postId,
-            entity.postType,
-            entity.createdAt,
-            entity.updatedAt
+            {
+                id: entity.id,
+                filename:entity.filename,
+                originalname: entity.originalname,
+                mimetype:entity.mimetype,
+                size:entity.size,
+                url:entity.url,
+                postId :entity.postId,
+                // entity.postType,
+                createdAt: entity.createdAt,
+                updatedAt:entity.updatedAt
+            }
         );
     }
     private toEntityModel(model: ImagesModel) {
@@ -49,7 +51,7 @@ export class ImagesRepositoryImpl implements IImagesRepository {
 
             // 새 이미지들을 데이터베이스에 저장
             const savedEntities = await transactionalEntityManager.save(ImagesEntity, newImageEntities);
-            
+
             return savedEntities.map(entity => this.toDomainModel(entity));
         });
     }
@@ -81,7 +83,7 @@ export class ImagesRepositoryImpl implements IImagesRepository {
     async imagesDelete(deleteImages: number[]): Promise<boolean> {
         try {
             const res = await this.imageRepo.delete(deleteImages);
-            if(res.affected > 0){
+            if (res.affected > 0) {
                 return true;
             } else {
                 return false;

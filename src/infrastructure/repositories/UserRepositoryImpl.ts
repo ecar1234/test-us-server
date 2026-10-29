@@ -6,28 +6,30 @@ import { In } from "typeorm";
 
 
 export class UserRepositoryImpl implements IUserRepository {
-  
+
     private userRepository = AppDataSource.getRepository(UserEntity);
 
     private toDomainUser(userEntity: UserEntity): UserModel {
         // console.log(userEntity);
         return new UserModel(
-            userEntity.userId,
-            userEntity.email,
-            userEntity.nickname,
-            userEntity.password_hash,
-            userEntity.type === UserType.INDIVIDUALS ? 'INDIVIDUALS' : (userEntity.type === UserType.COMPANIES ? 'COMPANIES' : 'NORMAL'),
-            userEntity.status === UserStatus.ACTIVE ? 'ACTIVE' : 'INACTIVE',
-            this.getUserRoleString(userEntity.role),
-            userEntity.userName,
-            userEntity.birth,
-            userEntity.image,
-            userEntity.method,
-            userEntity.createdAt,
-            userEntity.updatedAt,
-            userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
-            userEntity.applications ? userEntity.applications.map(
-                applicationEntity => applicationEntity.appId) : [],
+            {
+                userId: userEntity.userId,
+                email: userEntity.email,
+                nickname: userEntity.nickname,
+                password: userEntity.password_hash,
+                userType: userEntity.type === UserType.INDIVIDUALS ? 'INDIVIDUALS' : (userEntity.type === UserType.COMPANIES ? 'COMPANIES' : 'NORMAL'),
+                status: userEntity.status === UserStatus.ACTIVE ? 'ACTIVE' : 'INACTIVE',
+                role: this.getUserRoleString(userEntity.role),
+                userName: userEntity.userName,
+                birth: userEntity.birth,
+                profileImg: userEntity.image,
+                method: userEntity.method,
+                createdAt: userEntity.createdAt,
+                updatedAt: userEntity.updatedAt,
+                posts: userEntity.posts ? userEntity.posts.map(post => post.postId) : [],
+                applications: userEntity.applications ? userEntity.applications.map(
+                    applicationEntity => applicationEntity.appId) : [],
+            }
         );
     }
     private toEntityUser(user: UserModel): UserEntity {
@@ -129,7 +131,7 @@ export class UserRepositoryImpl implements IUserRepository {
         return true;
     }
     async updateUserInfo(user: UserModel): Promise<UserModel> {
-        
+
         const findUser = await this.userRepository.findOne({ where: { userId: user.userId } });
         if (!findUser) {
             throw new Error("User not found");
@@ -137,7 +139,7 @@ export class UserRepositoryImpl implements IUserRepository {
         const userEntity = this.toEntityUser(user);
 
         findUser.nickname = user.nickname;
-        findUser.type = userEntity.type,
+        findUser.type = userEntity.type;
         findUser.role = userEntity.role;
         findUser.userName = userEntity.userName;
         findUser.birth = userEntity.birth;
@@ -148,7 +150,7 @@ export class UserRepositoryImpl implements IUserRepository {
         return this.toDomainUser(savedUser);
     }
     findUserById(userId: string): Promise<UserModel | null> {
-        return this.userRepository.findOne({ where: {userId: userId, status: UserStatus.ACTIVE} })
+        return this.userRepository.findOne({ where: { userId: userId, status: UserStatus.ACTIVE } })
             .then(userEntity => userEntity ? this.toDomainUser(userEntity) : null);
     }
     async findUsersByIds(ids: string[]): Promise<UserModel[]> {

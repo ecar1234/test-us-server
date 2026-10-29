@@ -1,10 +1,10 @@
 import { In } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
-import { FirebaseRepository } from "../../domain/interface_repositories/IFirebaseRepository.js";
+import { IFirebaseRepository } from "../../domain/interface_repositories/IFirebaseRepository.js";
 import { FirebaseDeviceTokenEntity } from "../entities/FirebaseDeviceTokenEntity.js";
 
 
-export class FirebaseRepositoryImpl implements FirebaseRepository {
+export class FirebaseRepositoryImpl implements IFirebaseRepository {
     private tokenRepo = AppDataSource.getRepository(FirebaseDeviceTokenEntity);
 
     async createMessingToken(userId: string, fcmToken: string, deviceType: string): Promise<void> {

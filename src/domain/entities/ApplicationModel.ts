@@ -1,15 +1,15 @@
-import { PostInfo } from "./interface/applicationPackage.js";
+import { AppRecruitInfo, AppSideInfo } from "./interface/applicationPackage.js";
 
 export class ApplicationModel {
     constructor(
         props: {
             id?: number,
             platform: string,
-            mobileOs: string,
+            mobileOs?: string,
             status: string,
-            appliedAt: Date,
-            updatedAt: Date,
-            postInfo: PostInfo,
+            appliedAt?: Date,
+            updatedAt?: Date,
+            postInfo: AppRecruitInfo | AppSideInfo,
             applicantId: string
         }
     ) {
@@ -25,10 +25,10 @@ export class ApplicationModel {
 
     readonly id: number | null;
     platform: string;
-    mobileOs: string;
+    mobileOs: string | null = null;
     status: string;
     readonly appliedAt: Date;
     updatedAt: Date | null = null;
-    postInfo: PostInfo;
+    postInfo: AppRecruitInfo | AppSideInfo;
     applicantId: string;
 }
