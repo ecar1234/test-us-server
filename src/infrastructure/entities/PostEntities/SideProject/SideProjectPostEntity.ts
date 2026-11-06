@@ -15,7 +15,7 @@ export class SideProjectPostEntity extends BasePostEntity {
     @OneToMany('ProjectRoleEntity', (role: ProjectRoleEntity) => role.post, { cascade: true })
     projectRoles: Relation<ProjectRoleEntity[]>
 
-    @Column()
+    @Column({type: 'datetime', nullable: true})
     expiredAt: Date
 
     @OneToMany('ApplicationEntity', (app: ApplicationEntity) => app.sidePost.applications)

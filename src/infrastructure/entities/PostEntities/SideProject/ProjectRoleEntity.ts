@@ -7,7 +7,7 @@ export class ProjectRoleEntity {
     @PrimaryGeneratedColumn('increment')
     id: number;
 
-    @Column()
+    @Column({type: 'varchar', length: 10})
     roleName: string;
 
     @Column({type: 'int', default: 0})
