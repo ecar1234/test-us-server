@@ -6,6 +6,8 @@ import { RecruitmentPostRepositoryImpl } from "../infrastructure/repositories/Re
 import { FirebaseRepositoryImpl } from "../infrastructure/repositories/FirebaseRepositoryImpl.js";
 import { UserReviewRepositoryImpl } from "../infrastructure/repositories/UserReviewRepositoryImpl.js";
 import { UserRepositoryImpl } from "../infrastructure/repositories/UserRepositoryImpl.js";
+import { SideProjectPostRepositoryImpl } from "../infrastructure/repositories/SideProjectPostRepositoryImpl.js";
+import { ProjectRoleRepositoryImpl } from "../infrastructure/repositories/ProjectRoleRepositoryImpl.js";
 
 const isProd = process.env.NODE_ENV === "prod";
 
@@ -18,7 +20,9 @@ const applicationWorker = new Worker(
         const firebaseRepository = new FirebaseRepositoryImpl();
         const userRepo = new UserRepositoryImpl();
         const userReviewRepo = new UserReviewRepositoryImpl();
-        const useCase = new AppUseCase(appRepository, postRepository, firebaseRepository, userRepo, userReviewRepo);
+        const sideRepo = new SideProjectPostRepositoryImpl();
+        const projectRole = new ProjectRoleRepositoryImpl();
+        const useCase = new AppUseCase(appRepository, postRepository, sideRepo, projectRole , firebaseRepository, userRepo, userReviewRepo);
         const applications = await useCase.findApplicationsByUserId(userId);
         if (!applications) {
             return { 'state': 'failed', 'applications': [] };

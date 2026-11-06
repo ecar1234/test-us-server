@@ -1,8 +1,8 @@
 import { AppDataSource } from "../../config/DataSource.js";
+import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
 import { PostReviewModel } from "../../domain/entities/PostReviewModel.js";
 import { IPostReviewRepository } from "../../domain/interface_repositories/IPostReviewRepository.js";
 import { PostReviewEntity, PostReviewType } from "../entities/PostReviewEntity.js";
-import { BasePostEntity } from "../entities/PostEntities/BasePostEntity.js";
 import { UserEntity } from "../entities/UserEntity.js";
 import { EntityManager, In } from "typeorm";
 

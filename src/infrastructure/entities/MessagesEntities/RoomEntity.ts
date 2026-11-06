@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
-import { BasePostEntity } from "../PostEntities/BasePostEntity.js";
-import { RoomMemberEntity } from "./RoomMemberEntity.js";
-import { MessagesEntity } from "./MessageEntity.js";
+import type { BasePostEntity } from "../PostEntities/BasePostEntity.js";
+import type { RoomMemberEntity } from "./RoomMemberEntity.js";
+import type { MessagesEntity } from "./MessageEntity.js";
 
 export enum RoomType {
     DM = 'DM',
@@ -17,7 +17,7 @@ export class RoomEntity {
     type: RoomType;
 
     // 어떤 게시글에서 파생된 채팅방인지
-    @ManyToOne(() => BasePostEntity, { onDelete: 'CASCADE' })
+    @ManyToOne('BasePostEntity', (post: BasePostEntity) => post, { onDelete: 'CASCADE' })
     post: Relation<BasePostEntity>;
 
     // 1:1 채팅의 경우 상대방(신청자) ID를 기록하여 구분
@@ -33,10 +33,10 @@ export class RoomEntity {
     @Column({ type: 'timestamp', nullable: true })
     lastMessageAt: Date; // 목록 정렬용 시간 캐싱
 
-    @OneToMany(() => RoomMemberEntity, (member) => member.room)
+    @OneToMany('RoomMemberEntity', (member: RoomMemberEntity) => member.room)
     members: Relation<RoomMemberEntity>[];
 
-    @OneToMany(() => MessagesEntity, (message) => message.room)
+    @OneToMany('MessagesEntity', (message: MessagesEntity) => message.room)
     messages: Relation<MessagesEntity>[];
 
     @CreateDateColumn()

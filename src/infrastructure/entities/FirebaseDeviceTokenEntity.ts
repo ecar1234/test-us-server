@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { UserEntity } from "./UserEntity.js";
+import type { UserEntity } from "./UserEntity.js";
 
 @Entity('device_tokens')
 export class FirebaseDeviceTokenEntity {
@@ -19,7 +19,7 @@ export class FirebaseDeviceTokenEntity {
     createdAt!: Date;
     
     @Index()
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @ManyToOne('UserEntity', (user: UserEntity) => user.userId, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'userId' })
     user!: UserEntity; // 사용자 엔티티와의 관계 설정 (선택 사항이지만 권장됨)
 }

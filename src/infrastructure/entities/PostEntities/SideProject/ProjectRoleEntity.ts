@@ -1,5 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Relation } from "typeorm";
-import { SideProjectPostEntity } from "./SideProjectPostEntity.js";
+import type { SideProjectPostEntity } from "./SideProjectPostEntity.js";
 
 
 @Entity('project_role_entity')
@@ -19,7 +19,7 @@ export class ProjectRoleEntity {
     @Column({type: 'boolean', default: false})
     isClosed: boolean;
 
-    @ManyToOne(() => SideProjectPostEntity, (post) => post.projectRoles, {onDelete: 'CASCADE'})
+    @ManyToOne('SideProjectPostEntity', (post: SideProjectPostEntity) => post.projectRoles, {onDelete: 'CASCADE'})
     @JoinColumn({name: 'postId'})
     post: Relation<SideProjectPostEntity>;
 } 

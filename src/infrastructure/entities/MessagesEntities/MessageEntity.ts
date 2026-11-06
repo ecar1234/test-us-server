@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
-import { UserEntity } from "../UserEntity.js";
-import { RoomEntity } from "./RoomEntity.js";
+import type { UserEntity } from "../UserEntity.js";
+import type { RoomEntity } from "./RoomEntity.js";
 
 @Entity('messages')
 export class MessagesEntity {
@@ -12,11 +12,11 @@ export class MessagesEntity {
 
    // 어느 방의 메시지인지 (인덱스 추가로 조회 성능 향상)
    @Index()
-   @ManyToOne(() => RoomEntity, (chatRoom) => chatRoom.messages, { onDelete: 'CASCADE' })
+   @ManyToOne('RoomEntity', (chatRoom: RoomEntity) => chatRoom.messages, { onDelete: 'CASCADE' })
    room: Relation<RoomEntity>;
 
    // 보낸 사람
-   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+   @ManyToOne('UserEntity', { onDelete: 'CASCADE' })
    sender: Relation<UserEntity>;
 
    @CreateDateColumn()

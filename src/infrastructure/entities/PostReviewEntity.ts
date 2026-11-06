@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Unique } from "typeorm";
-import { UserEntity } from "./UserEntity.js";
-import { BasePostEntity } from "./PostEntities/BasePostEntity.js";
+import type { BasePostEntity } from "./PostEntities/BasePostEntity.js";
+import type { UserEntity } from "./UserEntity.js";
 
 export enum PostReviewType {
     PROMOTION_RATING = 'PROMOTION',
@@ -25,11 +25,11 @@ export class PostReviewEntity {
     @CreateDateColumn()
     createdAt: Date;
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @ManyToOne('UserEntity', (user: UserEntity) => user.userId, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'reviewerUserId' })
     reviewer: Relation<UserEntity>;
 
-    @ManyToOne(() => BasePostEntity, { onDelete: 'CASCADE' })
+    @ManyToOne('BasePostEntity', (post: BasePostEntity) => post.postId, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'postId' })
     post: Relation<BasePostEntity>;
 }

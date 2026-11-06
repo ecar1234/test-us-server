@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Relation, Unique, UpdateDateColumn } from "typeorm";
-import { RecruitmentPostEntity } from "./PostEntities/RecruitmentPostEntity.js";
-import { UserEntity } from "./UserEntity.js";
-import { SideProjectPostEntity } from "./PostEntities/SideProject/SideProjectPostEntity.js";
+import type { RecruitmentPostEntity } from "./PostEntities/RecruitmentPostEntity.js";
+import type { UserEntity } from "./UserEntity.js";
+import type { SideProjectPostEntity } from "./PostEntities/SideProject/SideProjectPostEntity.js";
 import { MobileOsType } from "../enums/PostEnums.js";
 
 // 신청 상태를 정의하는 Enum
@@ -18,7 +18,7 @@ export enum ApplicationsPlatform {
 }
 
 @Entity('applications')
-@Unique(['post', 'applicant'])
+@Unique(['recruitPost', 'applicant'])
 export class ApplicationEntity {
     @PrimaryGeneratedColumn('increment')
     appId: number
@@ -42,16 +42,16 @@ export class ApplicationEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => RecruitmentPostEntity, (recruitPost) => recruitPost.applications, { onDelete: 'CASCADE' })
+    @ManyToOne('RecruitmentPostEntity', (recruitPost:RecruitmentPostEntity) => recruitPost.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'postId' })
     recruitPost: Relation<RecruitmentPostEntity>
 
-    @ManyToOne(() => SideProjectPostEntity, (side) => side.applications, {onDelete : 'CASCADE'})
+    @ManyToOne( 'SideProjectPostEntity', (side:SideProjectPostEntity) => side.applications, {onDelete : 'CASCADE'})
     @JoinColumn({name: 'postId'})
     sidePost : Relation<SideProjectPostEntity>
 
     // 신청 유저의 승인 상테
-    @ManyToOne(() => UserEntity, user => user.applications, { onDelete: 'CASCADE' })
+    @ManyToOne('UserEntity', (user:UserEntity) => user.applications, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'appUserId' })
     applicant: Relation<UserEntity>
 

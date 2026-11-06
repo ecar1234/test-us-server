@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Relation, Table, TableInheritance, UpdateDateColumn } from "typeorm";
-import { UserEntity } from "../UserEntity.js";
+import type { UserEntity } from "../UserEntity.js";
 
 export enum PurchaseState {
     PURCHASED = 'purchased',
@@ -39,7 +39,7 @@ export abstract class PurchaseEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne(() => UserEntity, (user) => user.purchases,{ onDelete: 'SET NULL', nullable: true })
+    @ManyToOne('UserEntity', (user: UserEntity) => user.purchases,{ onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'userId' })
     user: Relation<UserEntity>;
 }

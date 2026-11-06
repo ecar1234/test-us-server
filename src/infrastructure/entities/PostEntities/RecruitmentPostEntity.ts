@@ -1,6 +1,6 @@
 import { Column, ChildEntity, OneToMany } from "typeorm";
 import { BasePostEntity } from "./BasePostEntity.js";
-import { ApplicationEntity } from "../ApplicationEntity.js";
+import type { ApplicationEntity } from "../ApplicationEntity.js";
 
 
 @ChildEntity('RECRUIT')
@@ -18,6 +18,6 @@ export class RecruitmentPostEntity extends BasePostEntity {
     @Column({ type: 'datetime', nullable: true, comment: '테스트 종료 일시' })
     testEndDate: Date;
 
-    @OneToMany(() => ApplicationEntity, application => application.sidePost)
+    @OneToMany('ApplicationEntity', (app: ApplicationEntity) => app.recruitPost.applications)
     applications: ApplicationEntity[];
 }

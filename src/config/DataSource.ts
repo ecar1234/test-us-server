@@ -6,28 +6,63 @@ import * as dotenv from "dotenv";
 import { fileURLToPath } from "url";
 dotenv.config();
 
-// import { MessagesEntity } from '../infrastructure/entities/MessagesEntities/MessageEntity.js';
-// import { RoomEntity } from '../infrastructure/entities/MessagesEntities/RoomEntity.js';
-// import { RoomMemberEntity } from "../infrastructure/entities/MessagesEntities/RoomMemberEntity.js";
-// import { BasePostEntity } from "../infrastructure/entities/PostEntities/BasePostEntity.js";
-// import { PromotionPostEntity } from "../infrastructure/entities/PostEntities/PromotionPostEntity.js";
-// import { RecruitmentPostEntity } from "../infrastructure/entities/PostEntities/RecruitmentPostEntity.js";
-// import { PostReviewEntity } from "../infrastructure/entities/PostReviewEntity.js";
-// import { ApplicationEntity } from "../infrastructure/entities/ApplicationEntity.js";
-// import { UserEntity } from "../infrastructure/entities/UserEntity.js";
-// import { UserReviewEntity } from "../infrastructure/entities/UserReviewEntiry.js";
-// import { FirebaseDeviceTokenEntity } from "../infrastructure/entities/FirebaseDeviceTokenEntity.js";
-// import { PurchaseEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseEntity.js";
-// import { PurchaseIosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseIosEntity.js";
-// import { PurchaseAosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseAosEntity.js";
-// import { PurchaseEventLogs } from "../infrastructure/entities/PurchaseEventLog.js";
+// 1. 부모 엔티티 최상단 import (초기화 순서 보장)
+import { BasePostEntity } from "../infrastructure/entities/PostEntities/BasePostEntity.js";
+import { PurchaseEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseEntity.js";
 
+// 2. 자식 및 연관 엔티티 import
+// import { CoffeeChatPostEntity } from "../infrastructure/entities/PostEntities/CoffeeChatPostEntity.js";
+import { PromotionPostEntity } from "../infrastructure/entities/PostEntities/PromotionPostEntity.js";
+import { RecruitmentPostEntity } from "../infrastructure/entities/PostEntities/RecruitmentPostEntity.js";
+import { SideProjectPostEntity } from "../infrastructure/entities/PostEntities/SideProject/SideProjectPostEntity.js";
+import { ProjectRoleEntity } from "../infrastructure/entities/PostEntities/SideProject/ProjectRoleEntity.js";
+
+import { PurchaseIosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseIosEntity.js";
+import { PurchaseAosEntity } from "../infrastructure/entities/PurchaseEntities/PurchaseAosEntity.js";
+
+import { RoomEntity } from '../infrastructure/entities/MessagesEntities/RoomEntity.js';
+import { RoomMemberEntity } from "../infrastructure/entities/MessagesEntities/RoomMemberEntity.js";
+import { MessagesEntity } from '../infrastructure/entities/MessagesEntities/MessageEntity.js';
+
+import { UserEntity } from "../infrastructure/entities/UserEntity.js";
+import { ApplicationEntity } from "../infrastructure/entities/ApplicationEntity.js";
+import { FirebaseDeviceTokenEntity } from "../infrastructure/entities/FirebaseDeviceTokenEntity.js";
+import { ImagesEntity } from "../infrastructure/entities/ImagesEntity.js";
+import { PostReviewEntity } from "../infrastructure/entities/PostReviewEntity.js";
+import { UserReviewEntity } from "../infrastructure/entities/UserReviewEntity.js";
+// import { PurchaseEventLog } from "../infrastructure/entities/PurchaseEventLog.js";
 
 const isProd = process.env.NODE_ENV === "prod";
-// 현재 파일의 전체 경로 (URL 객체를 파일 시스템 경로 문자열로 변환)
 const __filename = fileURLToPath(import.meta.url);
-// 현재 파일이 위치한 디렉토리 경로
 const __dirname = path.dirname(__filename);
+
+// 부모 엔티티가 배열 내에서 자식 엔티티보다 앞에 위치해야 함
+const entityList = [
+  // 1. 부모 클래스 우선 배치
+  BasePostEntity,
+  PurchaseEntity,
+
+  // 2. 상속받는 자식 클래스 배치
+  // CoffeeChatPostEntity,
+  PromotionPostEntity,
+  RecruitmentPostEntity,
+  SideProjectPostEntity,
+  ProjectRoleEntity,
+  PurchaseIosEntity,
+  PurchaseAosEntity,
+
+  // 3. 기타 참조/독립 클래스 배치
+  UserEntity,
+  RoomEntity,
+  RoomMemberEntity,
+  MessagesEntity,
+  ApplicationEntity,
+  FirebaseDeviceTokenEntity,
+  ImagesEntity,
+  PostReviewEntity,
+  UserReviewEntity,
+  // PurchaseEventLog,
+];
 
 const createMainDataSource = () => {
   console.log(`[DataSource] 🚀 Initializing PRODUCTION DataSource (DB: ${process.env.MAIN_DATA_BASE_NAME})`);
@@ -41,12 +76,7 @@ const createMainDataSource = () => {
     synchronize: false,
     logging: true,
     driver: mysql2,
-    entities: [
-      path.join(__dirname, "..", "infrastructure/entities/**/*{.ts,.js}"),
-      path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/**/*{.ts,.js}"),
-      path.join(__dirname, "..", "infrastructure/entities/PostEntities/**/*{.ts,.js}"),
-      path.join(__dirname, "..", "infrastructure/entities/PurchaseEntities/**/*{.ts,.js}"),
-    ],
+    entities: entityList,
     migrations: [
       path.join(__dirname, "..", "migration/*.js"),
     ],
@@ -65,18 +95,12 @@ const createDevDataSource = () => {
     synchronize: false,
     logging: true,
     driver: mysql2,
-    entities: [
-      path.join(__dirname, "..", "infrastructure/entities/**/*{.ts,.js}"),
-      path.join(__dirname, "..", "infrastructure/entities/MessagesEntities/**/*{.ts,.js}"),
-      path.join(__dirname, "..", "infrastructure/entities/PostEntities/**/*{.ts,.js}"),
-      path.join(__dirname, "..", "infrastructure/entities/PurchaseEntities/**/*{.ts,.js}"),
-    ],
+    entities: entityList,
     migrations: [
       path.join(__dirname, "..", "migration/*.ts"),
     ],
   });
 }
-
 
 export const AppDataSource: DataSource = isProd
   ? createMainDataSource()

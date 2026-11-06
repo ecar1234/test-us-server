@@ -11,8 +11,8 @@ import {
     AfterLoad,
     Relation,
 } from "typeorm";
-import { UserEntity } from "../UserEntity.js";
-import { RoomEntity } from "../MessagesEntities/RoomEntity.js";
+import type { UserEntity } from "../UserEntity.js";
+import type { RoomEntity } from "../MessagesEntities/RoomEntity.js";
 import { BasePostStateType, MobileOsType, PostCategory } from "../../enums/PostEnums.js";
 
 
@@ -61,11 +61,11 @@ export abstract class BasePostEntity {
     // @OneToMany(() => PostReviewEntity, review => review.post)
     // receivedReviews: PostReviewEntity[]
 
-    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+    @ManyToOne('UserEntity', (user:UserEntity) => user.userId, { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
     author: Relation<UserEntity>;
 
-    @OneToMany(() => RoomEntity, room => room.post)
+    @OneToMany('RoomEntity', (room: RoomEntity  ) => room.post)
     rooms: Relation<RoomEntity>[]
 
     @AfterLoad()

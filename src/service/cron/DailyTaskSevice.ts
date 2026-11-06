@@ -3,10 +3,11 @@ import { FirebaseDeviceTokenEntity } from "../../infrastructure/entities/Firebas
 import { expiredPostNotificationHandler } from "../firebase/notificationHandler.js";
 import { UserEntity } from "../../infrastructure/entities/UserEntity.js";
 import { RecruitmentPostEntity } from "../../infrastructure/entities/PostEntities/RecruitmentPostEntity.js";
-import { BasePostStateType } from "../../infrastructure/entities/PostEntities/BasePostEntity.js";
+
 import { PromotionPostEntity } from "../../infrastructure/entities/PostEntities/PromotionPostEntity.js";
 import fs from 'fs/promises';
 import path from 'path';
+import { BasePostStateType } from "../../infrastructure/enums/PostEnums.js";
 
 
 export class DailyTaskService {

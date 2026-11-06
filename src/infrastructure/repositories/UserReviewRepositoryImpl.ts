@@ -2,7 +2,7 @@ import { EntityManager, In, IsNull } from "typeorm";
 import { AppDataSource } from "../../config/DataSource.js";
 import { IUserReviewRepository } from "../../domain/interface_repositories/IUserReviewRepository.js";
 import { UserReviewModel } from "../../domain/entities/UserReviewModel.js";
-import { UserReviewEntity } from "../entities/UserReviewEntiry.js";
+import { UserReviewEntity } from "../entities/UserReviewEntity.js";
 
 
 export class UserReviewRepositoryImpl implements IUserReviewRepository {

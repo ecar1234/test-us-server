@@ -1,8 +1,8 @@
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
+import type { BasePostEntity } from "./PostEntities/BasePostEntity.js";
 import { ApplicationEntity } from "./ApplicationEntity.js";
 import { MessagesEntity } from "./MessagesEntities/MessageEntity.js";
-import { UserReviewEntity } from "./UserReviewEntiry.js";
-import { BasePostEntity } from "./PostEntities/BasePostEntity.js";
+import { UserReviewEntity } from "./UserReviewEntity.js";
 import { FirebaseDeviceTokenEntity } from "./FirebaseDeviceTokenEntity.js";
 import { RoomMemberEntity } from "./MessagesEntities/RoomMemberEntity.js";
 import { PurchaseEntity } from "./PurchaseEntities/PurchaseEntity.js";
@@ -51,7 +51,7 @@ export class UserEntity {
     @UpdateDateColumn()
     updatedAt: Date
 
-    @OneToMany(() => BasePostEntity, (post) => post.author)
+    @OneToMany('BasePostEntity', (post: BasePostEntity) => post.author)
     posts: BasePostEntity[];
 
     @OneToMany(() => ApplicationEntity, (app) => app.applicant)
