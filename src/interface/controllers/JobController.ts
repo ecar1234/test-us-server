@@ -102,6 +102,8 @@ export class JobController {
                     return res.status(200).json({ status: 200, state: 'failed', recruitPosts: [], promotionPosts: [] });
                 }
             } else if (await job.isFailed()) {
+                console.error(`Job [${jobId}] Failed Reason:`, job.failedReason);
+                console.error(`Job [${jobId}] Stacktrace:`, job.stacktrace);
                 return res.status(500).json({
                     status: 500,
                     state: 'failed',
@@ -114,7 +116,7 @@ export class JobController {
                     message: '작업이 아직 처리 중입니다.',
                 });
             }
-        } catch (error){
+        } catch (error) {
             res.status(500).json({ status: 500, error: error.message });
         }
     }

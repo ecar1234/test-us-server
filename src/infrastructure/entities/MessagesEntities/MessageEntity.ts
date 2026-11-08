@@ -12,7 +12,7 @@ export class MessagesEntity {
 
    // 어느 방의 메시지인지 (인덱스 추가로 조회 성능 향상)
    @Index()
-   @ManyToOne('RoomEntity', (chatRoom: RoomEntity) => chatRoom.messages, { onDelete: 'CASCADE' })
+   @ManyToOne('RoomEntity', { onDelete: 'CASCADE' })
    room: Relation<RoomEntity>;
 
    // 보낸 사람

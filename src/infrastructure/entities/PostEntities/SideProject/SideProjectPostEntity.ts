@@ -1,6 +1,6 @@
 import { ChildEntity, Column, OneToMany, Relation } from "typeorm";
 import { BasePostEntity } from "../BasePostEntity.js";
-import type { ProjectRoleEntity } from "./ProjectRoleEntity.js";
+import { ProjectRoleEntity } from "./ProjectRoleEntity.js";
 import type { ApplicationEntity } from "../../ApplicationEntity.js";
 
 
@@ -12,12 +12,12 @@ export class SideProjectPostEntity extends BasePostEntity {
     @Column({type: 'simple-array', nullable: true})
     referenceLink: string[];
 
-    @OneToMany('ProjectRoleEntity', (role: ProjectRoleEntity) => role.post, { cascade: true })
+    @OneToMany(() => ProjectRoleEntity, (role: ProjectRoleEntity) => role.post, { cascade: true })
     projectRoles: Relation<ProjectRoleEntity[]>
 
     @Column({type: 'datetime', nullable: true})
     expiredAt: Date
 
-    @OneToMany('ApplicationEntity', (app: ApplicationEntity) => app.sidePost.applications)
+    @OneToMany('ApplicationEntity', (app: ApplicationEntity) => app.sidePost)
     applications: ApplicationEntity[];
 }

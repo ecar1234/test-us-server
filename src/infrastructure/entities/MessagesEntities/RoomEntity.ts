@@ -17,7 +17,7 @@ export class RoomEntity {
     type: RoomType;
 
     // 어떤 게시글에서 파생된 채팅방인지
-    @ManyToOne('BasePostEntity', (post: BasePostEntity) => post, { onDelete: 'CASCADE' })
+    @ManyToOne('BasePostEntity', { onDelete: 'CASCADE' })
     post: Relation<BasePostEntity>;
 
     // 1:1 채팅의 경우 상대방(신청자) ID를 기록하여 구분

@@ -13,7 +13,8 @@ import { BasePostStateType } from "../enums/PostEnums.js";
 
 export class ApplicationRepositoryImpl implements IApplicationRepository {
     private applicationRepository = AppDataSource.getRepository(ApplicationEntity);
-    private toRecruitPostModel(post:RecruitmentPostEntity): AppRecruitInfo{
+    
+    private toRecruitPostModel(post: RecruitmentPostEntity): AppRecruitInfo {
         const postInfo: AppRecruitInfo = {
             postId: post.postId,
             title: post.title,
@@ -23,8 +24,8 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         }
         return postInfo;
     }
-    private toSidePostModel(post:SideProjectPostEntity):AppSideInfo{
-        const postInfo : AppSideInfo = {
+    private toSidePostModel(post: SideProjectPostEntity): AppSideInfo {
+        const postInfo: AppSideInfo = {
             postId: post.postId,
             title: post.title,
             platform: post.platform,
@@ -42,16 +43,16 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     }
     public toApplicationModel(entity: ApplicationEntity): ApplicationModel {
         // applicant 객체가 존재하고 userId가 있는지 확인하는 방어 코드 추가
-        let postInfo : AppRecruitInfo | AppSideInfo;
-        if(entity.recruitPost){
-            this.toRecruitPostModel(entity.recruitPost);
-        }else {
-            this.toSidePostModel(entity.sidePost);
+        let postInfo: AppRecruitInfo | AppSideInfo;
+        if (entity.recruitPost) {
+            postInfo = this.toRecruitPostModel(entity.recruitPost);
+        } else {
+            postInfo = this.toSidePostModel(entity.sidePost);
         }
         return new ApplicationModel(
             {
                 id: entity.appId,
-                platform: PLATFORM_TO_STRING[entity.platform ],
+                platform: PLATFORM_TO_STRING[entity.platform],
                 mobileOs: convertMobileOsToString(entity.mobileOs),
                 status: APPLICATION_STATUS_TO_STRING[entity.status],
                 appliedAt: entity.appliedAt,
@@ -67,7 +68,7 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
             platform: STRING_TO_PLATFORM[model.platform],
             mobileOs: convertStringToMobileOs(model.mobileOs),
             status: STRING_TO_APPLICATION_STATUS[model.status],
-        //    ...('thumbnailUrl' in model.postInfo && {recruitPost: { postId: model.postInfo.postId }}),
+            //    ...('thumbnailUrl' in model.postInfo && {recruitPost: { postId: model.postInfo.postId }}),
             // applicant: { userId: model.applicantId },
         });
     }
@@ -75,11 +76,21 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
 
     public async create(application: ApplicationModel): Promise<ApplicationModel> {
         const entity = await this.applicationRepository.findOne({
-            where: {
-                recruitPost: { postId: application.postInfo.postId },
-                applicant: { userId: application.applicantId }
-            },
-            relations: ['post', 'applicant']
+            where: [
+                {
+                    sidePost: { postId: application.postInfo.postId },
+                    applicant: { userId: application.applicantId }
+                },
+                {
+                    recruitPost: { postId: application.postInfo.postId },
+                    applicant: { userId: application.applicantId }
+                }
+            ],
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
         if (entity) {
             throw createError(409, "Application already exists");
@@ -90,7 +101,11 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
         // 저장 후 관계가 포함된 완전한 엔티티를 다시 조회합니다.
         const newApp = await this.applicationRepository.findOne({
             where: { appId: savedEntity.appId },
-            relations: ['post', 'applicant']
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
         return this.toApplicationModel(newApp);
     }
@@ -108,7 +123,11 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
 
         const result = await this.applicationRepository.findOne({
             where: { appId: application.id },
-            relations: ['post', 'applicant']
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
         return this.toApplicationModel(result!);
     }
@@ -116,7 +135,11 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     public async cancel(id: number): Promise<ApplicationModel> {
         const findApp = await this.applicationRepository.findOne({
             where: { appId: id },
-            relations: ['post', 'applicant']
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
         if (!findApp) {
             throw new Error("Application not found");
@@ -127,11 +150,21 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     }
     public async acceptUser(userId: string, postId: string): Promise<ApplicationModel> {
         const application = await this.applicationRepository.findOne({
-            where: {
-                applicant: { userId },
-                recruitPost: { postId },
-            },
-            relations: ['applicant', 'post']
+            where: [
+                {
+                    sidePost: { postId: postId },
+                    applicant: { userId: userId }
+                },
+                {
+                    recruitPost: { postId: postId },
+                    applicant: { userId: userId }
+                }
+            ],
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
 
         if (!application) {
@@ -147,11 +180,21 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     }
     public async rejectUser(userId: string, postId: string): Promise<ApplicationModel> {
         const application = await this.applicationRepository.findOne({
-            where: {
-                applicant: { userId },
-                recruitPost: { postId },
-            },
-            relations: ['applicant', 'post']
+            where: [
+                {
+                    sidePost: { postId: postId },
+                    applicant: { userId: userId }
+                },
+                {
+                    recruitPost: { postId: postId },
+                    applicant: { userId: userId }
+                }
+            ],
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
 
         if (!application) {
@@ -166,7 +209,11 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     public async findApplicationsByUserId(userId: string): Promise<ApplicationModel[]> {
         const applicationEntities = await this.applicationRepository.find({
             where: { applicant: { userId: userId } },
-            relations: ['applicant', 'post']
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
         if (!applicationEntities) {
             throw new Error("Application not found");
@@ -179,7 +226,11 @@ export class ApplicationRepositoryImpl implements IApplicationRepository {
     public async getPostApplicantsInfo(applicationIds: number[]): Promise<ApplicationModel[]> {
         const applicants = await this.applicationRepository.find({
             where: { appId: In(applicationIds) },
-            relations: ['applicant', 'post']
+            relations: {
+                applicant: true,
+                sidePost: true,
+                recruitPost: true
+            }
         });
         return applicants.map(entity => this.toApplicationModel(entity));
     }

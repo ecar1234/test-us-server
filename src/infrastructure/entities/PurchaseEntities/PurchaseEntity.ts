@@ -39,7 +39,7 @@ export abstract class PurchaseEntity {
     @UpdateDateColumn()
     updatedAt: Date;
 
-    @ManyToOne('UserEntity', (user: UserEntity) => user.purchases,{ onDelete: 'SET NULL', nullable: true })
+    @ManyToOne('UserEntity', { onDelete: 'SET NULL', nullable: true })
     @JoinColumn({ name: 'userId' })
     user: Relation<UserEntity>;
 }

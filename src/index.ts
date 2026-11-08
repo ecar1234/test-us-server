@@ -26,7 +26,6 @@ import { DbBackupScheduledJob, ExpiredPostNotificationScheduledJob, ImageCleanup
 import { CreatePurchaseRouter } from './interface/routes/PurchaseRoute.js';
 import { initSocket } from './service/socket.io/index.js';
 import { randomUUID } from 'crypto';
-import { AppStoreServerAPIClient, Environment } from '@apple/app-store-server-library';
 import { AppleClientInit } from './service/apple/AppleInit.js';
 import PromotionRoute from "./interface/routes/posts/PromotionRoute.js";
 import SideProjectRoute from "./interface/routes/posts/SideProjectRoute.js";

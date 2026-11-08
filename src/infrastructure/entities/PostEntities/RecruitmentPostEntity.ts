@@ -18,6 +18,6 @@ export class RecruitmentPostEntity extends BasePostEntity {
     @Column({ type: 'datetime', nullable: true, comment: '테스트 종료 일시' })
     testEndDate: Date;
 
-    @OneToMany('ApplicationEntity', (app: ApplicationEntity) => app.recruitPost.applications)
+    @OneToMany('ApplicationEntity', (app: ApplicationEntity) => app.recruitPost)
     applications: ApplicationEntity[];
 }

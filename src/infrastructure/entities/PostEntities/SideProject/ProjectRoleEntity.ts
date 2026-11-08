@@ -19,7 +19,7 @@ export class ProjectRoleEntity {
     @Column({type: 'boolean', default: false})
     isClosed: boolean;
 
-    @ManyToOne('SideProjectPostEntity', (post: SideProjectPostEntity) => post.projectRoles, {onDelete: 'CASCADE'})
+    @ManyToOne('SideProjectPostEntity', {onDelete: 'CASCADE'})
     @JoinColumn({name: 'postId'})
     post: Relation<SideProjectPostEntity>;
 } 

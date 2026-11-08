@@ -25,11 +25,11 @@ export class PostReviewEntity {
     @CreateDateColumn()
     createdAt: Date;
 
-    @ManyToOne('UserEntity', (user: UserEntity) => user.userId, { onDelete: 'CASCADE' })
+    @ManyToOne('UserEntity', { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'reviewerUserId' })
     reviewer: Relation<UserEntity>;
 
-    @ManyToOne('BasePostEntity', (post: BasePostEntity) => post.postId, { onDelete: 'CASCADE' })
+    @ManyToOne('BasePostEntity', { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'postId' })
     post: Relation<BasePostEntity>;
 }

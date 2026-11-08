@@ -61,7 +61,7 @@ export abstract class BasePostEntity {
     // @OneToMany(() => PostReviewEntity, review => review.post)
     // receivedReviews: PostReviewEntity[]
 
-    @ManyToOne('UserEntity', (user:UserEntity) => user.userId, { onDelete: 'CASCADE' })
+    @ManyToOne('UserEntity', { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'authorId' })
     author: Relation<UserEntity>;
 
